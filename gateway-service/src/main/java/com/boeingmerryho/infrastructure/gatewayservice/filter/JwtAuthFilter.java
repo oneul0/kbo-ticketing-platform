@@ -14,6 +14,7 @@ import java.util.Base64;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,6 +28,7 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "spring.cloud.gateway.jwt.filter.enabled", havingValue = "true", matchIfMissing = true)
 public class JwtAuthFilter implements GlobalFilter, Ordered {
 
   private static final List<String> EXCLUDED_PATHS = Arrays.asList(
