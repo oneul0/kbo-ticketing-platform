@@ -1,0 +1,4 @@
+INSERT INTO `baseball`.p_membership (id, season, name, discount, is_deleted, deleted_by, deleted_at, created_by, created_at, updated_by, updated_at) VALUES (1, 2025, 'SENIOR', 0, 0, null, null, 1, '2025-04-07 21:33:00', null, null);
+INSERT INTO `baseball`.p_membership (id, season, name, discount, is_deleted, deleted_by, deleted_at, created_by, created_at, updated_by, updated_at) VALUES (2, 2025, 'GOLD', 7, 0, null, null, 1, '2025-04-07 21:33:27', null, null);
+INSERT INTO `baseball`.p_membership (id, season, name, discount, is_deleted, deleted_by, deleted_at, created_by, created_at, updated_by, updated_at) VALUES (3, 2025, 'VIP', 10, 0, null, null, 1, '2025-04-07 21:33:54', null, null);
+INSERT INTO `baseball`.p_membership (id, season, name, discount, is_deleted, deleted_by, deleted_at, created_by, created_at, updated_by, updated_at) VALUES (4, 2025, 'SVIP', 15, 0, null, null, 1, '2025-04-07 21:34:16', null, null);
