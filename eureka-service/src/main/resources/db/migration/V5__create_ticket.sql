@@ -7,7 +7,7 @@ create table p_ticket
     ticket_no  nvarchar(50)                   not null,
     status     nvarchar(20) default 'PENDING' not null,
     price      int                            not null,
-    is_deleted boolean      default 'false'   not null,
+    is_deleted boolean      default false     not null,
     deleted_by bigint                         null,
     deleted_at datetime                       null,
     created_by bigint                         null,
