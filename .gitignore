@@ -44,3 +44,4 @@ eureka-service/src/main/resources/application-test.yml
 
 # LOG 파일
 /logs
+/.gitattributes
