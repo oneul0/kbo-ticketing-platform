@@ -2,7 +2,7 @@ package com.boeingmerryho.business.storeservice.presentation;
 
 import org.springframework.http.HttpStatus;
 
-import com.boeingmerryho.business.storeservice.common.SuccessCode;
+import io.github.boeingmerryho.commonlibrary.response.SuccessCode;
 
 public enum StoreSuccessCode implements SuccessCode {
 	CREATED_STORE("매장이 성공적으로 등록되었습니다.", HttpStatus.CREATED),
