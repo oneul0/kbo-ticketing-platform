@@ -23,13 +23,29 @@ public class Store extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(
+        nullable = false
+    )
     private Long stadiumId;
 
+    @Column(
+        nullable = false,
+        length = 50
+    )
     private String name;
 
+    @Column(
+        nullable = false
+    )
     private LocalDateTime openAt;
 
-    private LocalDateTime closeAt;
+    @Column(
+        nullable = false
+    )
+    private LocalDateTime closedAt;
 
+    @Column(
+        nullable = false
+    )
     private Boolean isClosed;
 }
