@@ -3,6 +3,7 @@ package com.boeingmerryho.business.paymentservice.domain.entity;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
 
+import io.github.boeingmerryho.commonlibrary.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

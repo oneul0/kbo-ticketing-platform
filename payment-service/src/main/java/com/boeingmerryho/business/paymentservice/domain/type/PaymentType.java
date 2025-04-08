@@ -4,13 +4,13 @@ import lombok.Getter;
 
 @Getter
 public enum PaymentType {
-    TICKET("티켓"),
-    MEMBERSHIP("멤버십"),
-    ;
+	TICKET("티켓"),
+	MEMBERSHIP("멤버십"),
+	;
 
-    private final String description;
+	private final String description;
 
-    PaymentType(String description) {
-        this.description = description;
-    }
+	PaymentType(String description) {
+		this.description = description;
+	}
 }
