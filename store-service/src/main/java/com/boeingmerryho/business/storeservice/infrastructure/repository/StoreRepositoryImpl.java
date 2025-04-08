@@ -1,11 +1,24 @@
 package com.boeingmerryho.business.storeservice.infrastructure.repository;
 
-import com.boeingmerryho.business.storeservice.domain.repository.StoreRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import com.boeingmerryho.business.storeservice.domain.entity.Store;
+import com.boeingmerryho.business.storeservice.domain.repository.StoreRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
 public class StoreRepositoryImpl implements StoreRepository {
-    private StoreJpaRepository storeJpaRepository;
+	private final StoreJpaRepository storeJpaRepository;
+
+	@Override
+	public Store save(Store store) {
+		return storeJpaRepository.save(store);
+	}
+
+	@Override
+	public boolean existsByStadiumIdAndNameAndIsDeletedFalse(Long stadiumId, String name) {
+		return storeJpaRepository.existsByStadiumIdAndNameAndIsDeletedFalse(stadiumId, name);
+	}
 }

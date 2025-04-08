@@ -7,6 +7,7 @@ import io.github.boeingmerryho.commonlibrary.exception.BaseErrorCode;
 public enum StoreErrorCode implements BaseErrorCode {
 
 	ALREADY_REGISTERED(HttpStatus.CONFLICT, "STORE_001", "이미 등록된 매장입니다."),
+	INVALID_STADIUM(HttpStatus.BAD_REQUEST, "STORE_002", "존재하지 않는 구장입니다."),
 	;
 
 	private final HttpStatus status;
