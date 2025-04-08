@@ -5,7 +5,9 @@ import org.springframework.data.domain.Pageable;
 
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailSearchRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailAdminResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailResponseDto;
 
 @Mapper(componentModel = "spring")
@@ -18,5 +20,9 @@ public interface PaymentPresentationMapper {
 		Pageable customPageable,
 		Long id,
 		Long paymentId,
-		Boolean isDeleted);
+		Boolean isDeleted
+	);
+
+	PaymentDetailAdminResponseDto toPaymentDetailAdminResponseDto(
+		PaymentDetailAdminResponseServiceDto responseServiceDto);
 }
