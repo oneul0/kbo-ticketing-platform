@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.boeingmerryho.business.paymentservice.application.PaymentAdminService;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailResponseDto;
-import com.boeingmerryho.business.paymentservice.presentation.temp.PaymentSuccessCode;
-import com.boeingmerryho.business.paymentservice.presentation.temp.SuccessResponse;
 
+import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
