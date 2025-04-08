@@ -12,5 +12,5 @@ public interface PaymentApplicationMapper {
 	@Mapping(target = "userId", source = "paymentDetail.payment.userId")
 	@Mapping(target = "paymentId", source = "paymentDetail.payment.id")
 	@Mapping(target = "price", source = "paymentDetail.payment.totalPrice")
-	PaymentDetailResponseServiceDto toPaymentDetailResponseDto(PaymentDetail paymentDetail);
+	PaymentDetailResponseServiceDto toPaymentDetailResponseServiceDto(PaymentDetail paymentDetail);
 }

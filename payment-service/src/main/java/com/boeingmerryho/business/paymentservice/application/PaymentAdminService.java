@@ -20,6 +20,6 @@ public class PaymentAdminService {
 		PaymentDetail paymentDetail = paymentRepository.findPaymentDetailById(requestServiceDto.id())
 			.orElseThrow(() -> new EntityNotFoundException("Payment not found"));
 
-		return mapper.toPaymentDetailResponseDto(paymentDetail);
+		return mapper.toPaymentDetailResponseServiceDto(paymentDetail);
 	}
 }

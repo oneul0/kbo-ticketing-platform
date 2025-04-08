@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.paymentservice.application.PaymentService;
@@ -30,6 +31,25 @@ public class PaymentController {
 			mapper.toPaymentDetailRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
 			mapper.toPaymentDetailResponseDto(responseServiceDto));
+
+	}
+
+	@GetMapping("/details")
+	public ResponseEntity<SuccessResponse<Page<PaymentDetailResponseDto>>> searchPaymentDetail(
+		@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+		@RequestParam(value = "size", required = false, defaultValue = "10") int size,
+		@RequestParam(value = "sortDirection", required = false, defaultValue = "DESC") String sortDirection,
+		@RequestParam(value = "by", required = false) String by,
+		@RequestParam(value = "id", required = false) Long id,
+		@RequestParam(value = "paymentId", required = false) Long paymentId
+	) {
+
+		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
+
+		Page<PaymentDetailResponseServiceDto> responseServiceDto = paymentService.searchPaymentDetail(
+			mapper.toPaymentDetailSearchRequestServiceDto(pageable, id, paymentId, Boolean.FALSE));
+		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
+			responseServiceDto.map(mapper::toPaymentDetailResponseDto));
 
 	}
 
