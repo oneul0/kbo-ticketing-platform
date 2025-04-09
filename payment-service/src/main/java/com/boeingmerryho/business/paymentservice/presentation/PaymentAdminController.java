@@ -5,13 +5,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.paymentservice.application.PaymentAdminService;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailAdminResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailAdminResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentTicketCancelResponseDto;
 import com.boeingmerryho.business.paymentservice.utils.PageableUtils;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
@@ -23,6 +26,16 @@ import lombok.RequiredArgsConstructor;
 public class PaymentAdminController {
 	private final PaymentAdminService paymentAdminService;
 	private final PaymentPresentationMapper mapper;
+
+	@PutMapping("/{id}/cancel/tickets")
+	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(@PathVariable Long id) {
+
+		PaymentTicketCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelTicketPayment(
+			mapper.toPaymentTicketCancelRequestServiceDto(id));
+		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
+			mapper.toPaymentTicketCancelResponseDto(responseServiceDto));
+
+	}
 
 	@GetMapping("/details/{id}")
 	public ResponseEntity<SuccessResponse<PaymentDetailAdminResponseDto>> getPaymentDetail(@PathVariable Long id) {
@@ -41,6 +54,7 @@ public class PaymentAdminController {
 		@RequestParam(value = "sortDirection", required = false, defaultValue = "DESC") String sortDirection,
 		@RequestParam(value = "by", required = false) String by,
 		@RequestParam(value = "id", required = false) Long id,
+		@RequestParam(value = "userId", required = false) Long userId,
 		@RequestParam(value = "paymentId", required = false) Long paymentId,
 		@RequestParam(value = "isDeleted", required = false) Boolean isDeleted
 	) {
@@ -48,7 +62,7 @@ public class PaymentAdminController {
 		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
 
 		Page<PaymentDetailAdminResponseServiceDto> responseServiceDto = paymentAdminService.searchPaymentDetail(
-			mapper.toPaymentDetailSearchRequestServiceDto(pageable, id, paymentId, isDeleted));
+			mapper.toPaymentDetailSearchRequestServiceDto(pageable, id, userId, paymentId, isDeleted));
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
 			responseServiceDto.map(mapper::toPaymentDetailAdminResponseDto));
 

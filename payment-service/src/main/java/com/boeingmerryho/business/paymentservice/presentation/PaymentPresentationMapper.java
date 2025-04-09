@@ -18,7 +18,8 @@ public interface PaymentPresentationMapper {
 
 	PaymentTicketCancelRequestServiceDto toPaymentTicketCancelRequestServiceDto(Long id);
 
-	PaymentTicketCancelResponseDto toPaymentTicketCancelResponseDto(PaymentTicketCancelResponseServiceDto responseServiceDto);
+	PaymentTicketCancelResponseDto toPaymentTicketCancelResponseDto(
+		PaymentTicketCancelResponseServiceDto responseServiceDto);
 
 	PaymentDetailRequestServiceDto toPaymentDetailRequestServiceDto(Long id);
 
@@ -27,6 +28,7 @@ public interface PaymentPresentationMapper {
 	PaymentDetailSearchRequestServiceDto toPaymentDetailSearchRequestServiceDto(
 		Pageable customPageable,
 		Long id,
+		Long userId,
 		Long paymentId,
 		Boolean isDeleted
 	);

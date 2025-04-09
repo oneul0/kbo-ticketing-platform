@@ -94,6 +94,14 @@ public class PaymentQueryRepository {
 		return paymentDetail.payment.id.eq(paymentId);
 	}
 
+	private BooleanExpression eqUserId(Long userId) {
+		if (userId == null) {
+			return null;
+		}
+		return paymentDetail.payment.userId.eq(userId);
+
+	}
+
 	private BooleanExpression eqId(Long id) {
 		if (id == null) {
 			return null;

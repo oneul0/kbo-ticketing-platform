@@ -59,8 +59,10 @@ public class PaymentController {
 
 		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
 
+		Long userId = 1L;
+
 		Page<PaymentDetailResponseServiceDto> responseServiceDto = paymentService.searchPaymentDetail(
-			mapper.toPaymentDetailSearchRequestServiceDto(pageable, id, paymentId, Boolean.FALSE));
+			mapper.toPaymentDetailSearchRequestServiceDto(pageable, id, userId, paymentId, Boolean.FALSE));	// TODO userId
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
 			responseServiceDto.map(mapper::toPaymentDetailResponseDto));
 
