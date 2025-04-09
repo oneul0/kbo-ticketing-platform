@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatActiveServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatCreateServiceRequestDto;
+import com.boeingmerryho.business.seatservice.application.dto.request.SeatDeleteServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatInActiveServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatUpdateServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatActiveServiceResponseDto;
@@ -33,4 +34,6 @@ public interface SeatPresentationMapper {
 	SeatUpdateServiceRequestDto toSeatUpdateServiceRequestDto(Long id, SeatUpdateRequestDto seatUpdateRequestDto);
 
 	SeatUpdateResponseDto toSeatUpdateResponseDto(SeatUpdateServiceResponseDto seatUpdateServiceResponseDto);
+
+	SeatDeleteServiceRequestDto toSeatDeleteServiceRequestDto(Long id);
 }

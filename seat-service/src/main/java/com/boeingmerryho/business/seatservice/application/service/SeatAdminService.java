@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.boeingmerryho.business.seatservice.application.dto.mapper.SeatApplicationMapper;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatActiveServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatCreateServiceRequestDto;
+import com.boeingmerryho.business.seatservice.application.dto.request.SeatDeleteServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatInActiveServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatServiceUpdateDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatUpdateServiceRequestDto;
@@ -14,7 +15,8 @@ import com.boeingmerryho.business.seatservice.application.dto.response.SeatCreat
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatInActiveServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatUpdateServiceResponseDto;
 import com.boeingmerryho.business.seatservice.domain.Seat;
-import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatServiceHelper;
+import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatAdminServiceHelper;
+import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatCommonHelper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class SeatAdminService {
-	private final SeatServiceHelper seatServiceHelper;
+	private final SeatCommonHelper seatCommonHelper;
 	private final SeatApplicationMapper seatApplicationMapper;
+	private final SeatAdminServiceHelper seatAdminServiceHelper;
 
 	@Transactional
 	public SeatCreateServiceResponseDto createSeat(SeatCreateServiceRequestDto serviceCreate) {
@@ -40,7 +43,7 @@ public class SeatAdminService {
 			.isActive(serviceCreate.isActive())
 			.build();
 
-		seatServiceHelper.save(newSeat);
+		seatCommonHelper.save(newSeat);
 		log.info("seatNo: {}, 새로운 좌석 생성 완료", newSeatNo);
 
 		return seatApplicationMapper.toSeatCreateServiceResponseDto(newSeat);
@@ -48,7 +51,7 @@ public class SeatAdminService {
 
 	@Transactional
 	public SeatActiveServiceResponseDto activeSeat(SeatActiveServiceRequestDto serviceDto) {
-		Seat seat = seatServiceHelper.getSeatById(serviceDto.id());
+		Seat seat = seatCommonHelper.getSeatById(serviceDto.id());
 
 		seat.active();
 		log.info("seatNo: {}, 좌석 이용 가능 상태로 변경 완료", seat.getSeatNo());
@@ -58,7 +61,7 @@ public class SeatAdminService {
 
 	@Transactional
 	public SeatInActiveServiceResponseDto inActiveSeat(SeatInActiveServiceRequestDto serviceDto) {
-		Seat seat = seatServiceHelper.getSeatById(serviceDto.id());
+		Seat seat = seatCommonHelper.getSeatById(serviceDto.id());
 
 		seat.inActive();
 		log.info("seatNo: {}, 좌석 이용 불가능 상태로 변경 완료", seat.getSeatNo());
@@ -68,7 +71,7 @@ public class SeatAdminService {
 
 	@Transactional
 	public SeatUpdateServiceResponseDto updateSeat(SeatUpdateServiceRequestDto serviceDto) {
-		Seat seat = seatServiceHelper.getSeatById(serviceDto.id());
+		Seat seat = seatCommonHelper.getSeatById(serviceDto.id());
 
 		SeatServiceUpdateDto seatServiceUpdateDto = seatApplicationMapper.toSeatServiceUpdateDto(serviceDto);
 
@@ -76,6 +79,14 @@ public class SeatAdminService {
 		log.info("seatId: {}, 좌석 정보 변경 완료", seat.getId());
 
 		return seatApplicationMapper.toSeatUpdateServiceResponseDto(seat);
+	}
+
+	@Transactional
+	public void deleteSeat(SeatDeleteServiceRequestDto serviceDto) {
+		Seat seat = seatCommonHelper.getSeatById(serviceDto.id());
+		seatAdminServiceHelper.delete(seat);
+
+		log.info("seatId: {}, 좌석 삭제 완료", seat.getId());
 	}
 
 	private String makeSeatNo(Integer seatBlock, Integer seatColumn, Integer seatRow) {
