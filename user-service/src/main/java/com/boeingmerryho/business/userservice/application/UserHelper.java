@@ -127,7 +127,7 @@ public class UserHelper {
 	}
 
 	public Map<String, String> updateUserJwtTokenRedis(Long id) {
-		redisUtil.updateUserJwtToken(id);
+		return redisUtil.updateUserJwtToken(id);
 	}
 
 	public void clearRedisUserData(Long userId) {
