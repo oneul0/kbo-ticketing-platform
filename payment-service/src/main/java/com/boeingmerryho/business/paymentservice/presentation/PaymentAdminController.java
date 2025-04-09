@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.paymentservice.application.PaymentAdminService;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailAdminResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailAdminResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentMembershipCancelResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentTicketCancelResponseDto;
 import com.boeingmerryho.business.paymentservice.utils.PageableUtils;
 
@@ -29,12 +31,19 @@ public class PaymentAdminController {
 
 	@PutMapping("/{id}/cancel/tickets")
 	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(@PathVariable Long id) {
-
 		PaymentTicketCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelTicketPayment(
 			mapper.toPaymentTicketCancelRequestServiceDto(id));
-		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
+		return SuccessResponse.of(PaymentSuccessCode.REQUESTED_REFUND_TICKET,
 			mapper.toPaymentTicketCancelResponseDto(responseServiceDto));
+	}
 
+	@PutMapping("/{id}/cancel/memberships")
+	public ResponseEntity<SuccessResponse<PaymentMembershipCancelResponseDto>> cancelMembershipPayment(
+		@PathVariable Long id) {
+		PaymentMembershipCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelMembershipPayment(
+			mapper.toPaymentMembershipCancelRequestServiceDto(id));
+		return SuccessResponse.of(PaymentSuccessCode.REQUESTED_REFUND_MEMBERSHIP,
+			mapper.toPaymentMembershipCancelResponseDto(responseServiceDto));
 	}
 
 	@GetMapping("/details/{id}")

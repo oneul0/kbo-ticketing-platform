@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.paymentservice.application.PaymentService;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentMembershipCancelResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentTicketCancelResponseDto;
 import com.boeingmerryho.business.paymentservice.utils.PageableUtils;
 
@@ -29,12 +31,19 @@ public class PaymentController {
 
 	@PutMapping("/{id}/cancel/tickets")
 	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(@PathVariable Long id) {
-
 		PaymentTicketCancelResponseServiceDto responseServiceDto = paymentService.cancelTicketPayment(
 			mapper.toPaymentTicketCancelRequestServiceDto(id));
-		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
+		return SuccessResponse.of(PaymentSuccessCode.REQUESTED_REFUND_TICKET,
 			mapper.toPaymentTicketCancelResponseDto(responseServiceDto));
+	}
 
+	@PutMapping("/{id}/cancel/memberships")
+	public ResponseEntity<SuccessResponse<PaymentMembershipCancelResponseDto>> cancelMembershipPayment(
+		@PathVariable Long id) {
+		PaymentMembershipCancelResponseServiceDto responseServiceDto = paymentService.cancelMembershipPayment(
+			mapper.toPaymentMembershipCancelRequestServiceDto(id));
+		return SuccessResponse.of(PaymentSuccessCode.REQUESTED_REFUND_MEMBERSHIP,
+			mapper.toPaymentMembershipCancelResponseDto(responseServiceDto));
 	}
 
 	@GetMapping("/details/{id}")
@@ -62,7 +71,8 @@ public class PaymentController {
 		Long userId = 1L;
 
 		Page<PaymentDetailResponseServiceDto> responseServiceDto = paymentService.searchPaymentDetail(
-			mapper.toPaymentDetailSearchRequestServiceDto(pageable, id, userId, paymentId, Boolean.FALSE));	// TODO userId
+			mapper.toPaymentDetailSearchRequestServiceDto(pageable, id, userId, paymentId,
+				Boolean.FALSE));    // TODO userId
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
 			responseServiceDto.map(mapper::toPaymentDetailResponseDto));
 
