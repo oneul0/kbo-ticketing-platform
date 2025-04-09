@@ -6,6 +6,8 @@ import java.util.List;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import com.boeingmerryho.business.seatservice.application.dto.request.SeatServiceUpdateDto;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -71,4 +73,21 @@ public class Seat {
 
 	@OneToMany(mappedBy = "seat", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<SeatReservation> seatReservations = new ArrayList<>();
+
+	public void active() {
+		isActive = true;
+	}
+
+	public void inActive() {
+		isActive = false;
+	}
+
+	public void update(SeatServiceUpdateDto update) {
+		if (update.name() != null) {
+			this.name = update.name();
+		}
+		if (update.price() != null) {
+			this.price = update.price();
+		}
+	}
 }
