@@ -6,9 +6,11 @@ import org.springframework.context.annotation.Primary;
 import com.boeingmerryho.business.storeservice.application.dto.request.StoreCreateRequestServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreCreateResponseServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreDetailAdminResponseServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.response.StoreDetailResponseServiceDto;
 import com.boeingmerryho.business.storeservice.presentation.dto.request.StoreCreateRequestDto;
 import com.boeingmerryho.business.storeservice.presentation.dto.response.StoreCreateResponseDto;
 import com.boeingmerryho.business.storeservice.presentation.dto.response.StoreDetailAdminResponseDto;
+import com.boeingmerryho.business.storeservice.presentation.dto.response.StoreDetailResponseDto;
 
 @Primary
 @Mapper(componentModel = "spring")
@@ -17,5 +19,7 @@ public interface StorePresentationMapper {
 
 	StoreCreateResponseDto toStoreCreateResponseDto(StoreCreateResponseServiceDto responseServiceDto);
 
-	StoreDetailAdminResponseDto toStoreDetailResponseDto(StoreDetailAdminResponseServiceDto responseServiceDto);
+	StoreDetailAdminResponseDto toStoreDetailAdminResponseDto(StoreDetailAdminResponseServiceDto responseServiceDto);
+
+	StoreDetailResponseDto toStoreDetailResponseDto(StoreDetailResponseServiceDto responseServiceDto);
 }
