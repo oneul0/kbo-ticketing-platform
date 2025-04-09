@@ -27,7 +27,6 @@ import com.boeingmerryho.business.userservice.application.dto.request.UserAdminU
 import com.boeingmerryho.business.userservice.application.dto.request.UserAdminWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.UserLogoutRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.UserAdminFindResponseDto;
-import com.boeingmerryho.business.userservice.application.dto.response.UserLoginResponseServiceDto;
 import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
 import com.boeingmerryho.business.userservice.application.utils.jwt.JwtTokenProvider;
 import com.boeingmerryho.business.userservice.domain.User;
@@ -53,6 +52,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserAdminService {
 
+	private static final String USER_INFO_PREFIX = "user:info:";
+	private static final String USER_TOKEN_PREFIX = "user:token:";
+	private static final String BLACKLIST_PREFIX = "blacklist:";
+
 	private final UserRepository userRepository;
 	private final CustomUserRepository customUserRepository;
 	private final UserApplicationMapper userApplicationMapper;
@@ -64,172 +67,157 @@ public class UserAdminService {
 
 	@Value("${admin.key}")
 	private String adminKey;
-	@Value("${slack.code.ttl}")
-	private Long SLACK_CODE_TTL;
 
 	@Transactional
-	public void registerUserAdmin(UserAdminRegisterRequestServiceDto requestServiceDto) {
-		userHelper.validateRequiredField(requestServiceDto.username(), ErrorCode.USERNAME_NULL);
-		userHelper.validateRequiredField(requestServiceDto.password(), ErrorCode.PASSWORD_NULL);
-		userHelper.validateRequiredField(requestServiceDto.slackId(), ErrorCode.SLACKID_NULL);
-		userHelper.validateRequiredField(requestServiceDto.key(), ErrorCode.ADMIN_REGISTER_KEY_IS_NULL);
+	public Long registerUserAdmin(UserAdminRegisterRequestServiceDto dto) {
+		validateAdminKey(dto.adminKey());
+		userHelper.validateRegisterRequest(dto, userRepository);
 
-		userHelper.emailVerify(requestServiceDto.username());
-		userHelper.passwordVerify(requestServiceDto.password());
-		userHelper.checkUsernameExists(requestServiceDto.username(), userRepository);
+		User user = User.withAdminRole(
+			dto.username(),
+			userHelper.encodePassword(dto.password(), passwordEncoder),
+			dto.email(),
+			dto.nickname(),
+			dto.birth()
+		);
 
-		if (!requestServiceDto.key().equals(adminKey)) {
+		return userRepository.save(user).getId();
+	}
+
+	private void validateAdminKey(String key) {
+		if (key == null || !key.equals(adminKey)) {
 			throw new UserException(ErrorCode.ADMIN_REGISTER_KEY_NOT_MATCH);
 		}
-
-		String encodedPassword = userHelper.encodePassword(requestServiceDto.password(),
-			passwordEncoder);
-		User user = User.builder()
-			.username(requestServiceDto.username())
-			.password(encodedPassword)
-			.email(requestServiceDto.slackId())
-			.role(UserRoleType.ADMIN)
-			.build();
-
-		//todo: 생성된 유저 반환하기
-		userRepository.save(user);
 	}
 
 	@Transactional(readOnly = true)
-	@Cacheable(cacheNames = "user", key = "#requestServiceDto.id()")
-	public UserAdminFindResponseDto findUserAdmin(UserAdminFindRequestServiceDto requestServiceDto) {
-		User user = userHelper.findUserById(requestServiceDto.id(), userRepository);
+	@Cacheable
+	public UserAdminCheckEmailResponseDto checkEmail(UserAdminCheckEmailRequestServiceDto dto) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Transactional(readOnly = true)
+	@Cacheable(cacheNames = "user", key = "#dto.id()")
+	public UserAdminFindResponseDto findUserAdmin(UserAdminFindRequestServiceDto dto) {
+		User user = userHelper.findUserById(dto.id(), userRepository);
 		return userApplicationMapper.toUserAdminFindResponseDto(user);
 	}
 
 	@Transactional(readOnly = true)
 	@Cacheable(cacheNames = "users")
-	public Page<UserAdminSearchResponseDto> searchUsers(
-		UserAdminSearchRequestServiceDto requestServiceDto, Pageable pageable) {
-		Page<User> users = customUserRepository.findDynamicQuery(
-			createUserSearchCriteria(requestServiceDto),
-			pageable);
+	public Page<UserAdminSearchResponseDto> searchAdminUsers(UserAdminSearchRequestServiceDto dto, Pageable pageable) {
+		UserSearchCriteria criteria = UserSearchCriteria.fromAdmin(dto);
+		Page<User> users = customUserRepository.findDynamicQuery(criteria, pageable);
+		return users.map(userApplicationMapper::toUserAdminSearchResponseDto);
+	}
+
+	@Transactional(readOnly = true)
+	@Cacheable(cacheNames = "users")
+	public Page<UserAdminSearchResponseDto> searchUsers(UserAdminSearchRequestServiceDto dto, Pageable pageable) {
+		UserSearchCriteria criteria = UserSearchCriteria.fromAdmin(dto); // 일반 검색 DTO 사용
+		Page<User> users = customUserRepository.findDynamicQuery(criteria, pageable);
 		return users.map(userApplicationMapper::toUserAdminSearchResponseDto);
 	}
 
 	@Transactional
-	public UserAdminUpdateResponseDto updateUser(UserAdminUpdateRequestServiceDto requestServiceDto) {
-
-		return null;
-	}
-
-	@Transactional
-	public UserAdminUpdateResponseDto updateMe(UserAdminUpdateRequestServiceDto requestServiceDto) {
-
-		return null;
-	}
-
-	@Transactional
-	public UserAdminUpdateRoleResponseDto updateRoleUser(
-		UserAdminUpdateRoleRequestServiceDto requestServiceDto) {
-		User user = userHelper.findUserById(requestServiceDto.id(), userRepository);
+	public UserAdminUpdateRoleResponseDto updateUserRole(UserAdminUpdateRoleRequestServiceDto dto) {
+		User user = userHelper.findUserById(dto.id(), userRepository);
 		userHelper.checkMasterRole(user);
 
-		UserRoleType role = user.getRole();
-		user.updateRoleType(requestServiceDto.newRole());
+		UserRoleType oldRole = user.getRole();
+		user.updateRoleType(dto.newRole());
+		userHelper.updateRedisUserInfo(user, redisUtil);
 
-		User updatedUser = userHelper.findUserById(requestServiceDto.id(), userRepository);
-		userHelper.updateRedisUserInfo(updatedUser, redisUtil);
-		return userApplicationMapper.toUserAdminUpdateRoleResponseDto(
-			requestServiceDto.id(), role, requestServiceDto.newRole());
+		// return UserAdminUpdateRoleResponseDto.of(dto.id(), oldRole, dto.newRole());
+		return null;
 	}
 
 	@Transactional
-	public void deleteRoleUser(UserAdminDeleteRoleRequestServiceDto requestServiceDto) {
-		User user = userHelper.findUserById(requestServiceDto.id(), userRepository);
+	public void deleteUserRole(UserAdminDeleteRoleRequestServiceDto dto) {
+		User user = userHelper.findUserById(dto.id(), userRepository);
 		userHelper.checkMasterRole(user);
 
 		user.deleteRoleType();
-
-		User updatedUser = userHelper.findUserById(requestServiceDto.id(), userRepository);
-		userHelper.updateRedisUserInfo(updatedUser, redisUtil);
+		userHelper.updateRedisUserInfo(user, redisUtil);
 	}
 
 	@Transactional
-	public void deleteUser(UserAdminDeleteRequestServiceDto requestServiceDto) {
-		User user = userHelper.findUserById(requestServiceDto.id(), userRepository);
+	public void deleteUser(UserAdminDeleteRequestServiceDto dto) {
+		User user = userHelper.findUserById(dto.id(), userRepository);
 		user.softDelete(user.getId());
 
-		String userInfoKey = "user:info:" + user.getId();
-		String tokenKey = "user:token:" + user.getId();
-		redisTemplate.delete(userInfoKey);
+		clearRedisUserData(user.getId());
+	}
+
+	private void clearRedisUserData(Long userId) {
+		redisTemplate.delete(USER_INFO_PREFIX + userId);
+		redisTemplate.delete(USER_TOKEN_PREFIX + userId);
+	}
+
+	public void logoutUser(UserLogoutRequestServiceDto dto) {
+		Long userId = dto.id();
+		String tokenKey = USER_TOKEN_PREFIX + userId;
+
+		Map<Object, Object> token = getUserTokenFromRedis(tokenKey);
+		String accessToken = extractAccessToken(token);
+		blacklistToken(accessToken);
+
 		redisTemplate.delete(tokenKey);
 	}
 
-	public UserSearchCriteria createUserSearchCriteria(UserAdminSearchRequestServiceDto requestDto) {
-		return UserSearchCriteria.builder()
-			.id(requestDto.id())
-			.username(requestDto.username())
-			.email(requestDto.email())
-			.nickname(requestDto.nickname())
-			.role(requestDto.role())
-			.isDeleted(requestDto.isDeleted())
-			.build();
-	}
-
-	public void logoutUser(UserLogoutRequestServiceDto requestServiceDto) {
-		Long userId = requestServiceDto.id();
-		String tokenKey = "user:token:" + userId;
+	private Map<Object, Object> getUserTokenFromRedis(String tokenKey) {
 		if (!redisTemplate.hasKey(tokenKey)) {
 			throw new UserException(ErrorCode.NOT_FOUND);
 		}
 		Map<Object, Object> token = redisTemplate.opsForHash().entries(tokenKey);
-		String accessToken = (String)token.get("accessToken");
-
 		if (token == null || token.isEmpty()) {
 			throw new UserException(ErrorCode.JWT_REQUIRED);
 		}
-
-		Claims claims = jwtTokenProvider.parseJwtToken(accessToken);
-		long ttlMillis = jwtTokenProvider.calculateTtlMillis(claims.getExpiration());
-
-		String blacklistKey = "blacklist:" + accessToken;
-		redisTemplate.opsForValue().set(blacklistKey, "blacklisted");
-
-		if (ttlMillis > 0) {
-			redisTemplate.expire(blacklistKey, ttlMillis, TimeUnit.MILLISECONDS);
-		} else {
-			redisTemplate.expire(blacklistKey, 1, TimeUnit.SECONDS);
-		}
-
-		if (userId != null) {
-			String userInfoKey = "user:token:" + userId;
-			redisTemplate.delete(userInfoKey);
-		}
+		return token;
 	}
 
-	public UserLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto requestServiceDto) {
-		if (!userRepository.existsByEmail(requestServiceDto.email())) {
-			throw new UserException(ErrorCode.NOT_FOUND);
-		}
+	private String extractAccessToken(Map<Object, Object> token) {
+		return (String)token.get("accessToken");
+	}
 
-		User user = userHelper.findUserByEmail(requestServiceDto.email(), userRepository);
-		userHelper.updateRedisUserInfo(user, redisUtil);
-		Map<String, String> tokenMap = redisUtil.updateUserJwtToken(user.getId());
+	private void blacklistToken(String accessToken) {
+		Claims claims = jwtTokenProvider.parseJwtToken(accessToken);
+		long ttlMillis = jwtTokenProvider.calculateTtlMillis(claims.getExpiration());
+		String blacklistKey = BLACKLIST_PREFIX + accessToken;
 
-		UserLoginResponseServiceDto serviceDto = new UserLoginResponseServiceDto(
-			tokenMap.get("accessToken"),
-			tokenMap.get("refreshToken")
-		);
-		return userApplicationMapper.toUserLoginResponseDto(serviceDto);
+		redisTemplate.opsForValue().set(blacklistKey, "blacklisted");
+		redisTemplate.expire(blacklistKey, Math.max(ttlMillis, 1), TimeUnit.MILLISECONDS);
+	}
+
+	public UserLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto dto) {
+		// User user = userHelper.findUserByEmail(dto.email(), userRepository);
+		// userHelper.updateRedisUserInfo(user, redisUtil);
+		//
+		// Map<String, String> tokenMap = redisUtil.updateUserJwtToken(user.getId());
+		// UserLoginResponseServiceDto serviceDto = UserLoginResponseServiceDto.fromTokens(
+		// 	tokenMap.get("accessToken"),
+		// 	tokenMap.get("refreshToken")
+		// );
+		// return userApplicationMapper.toUserLoginResponseDto(serviceDto);
+		return null;
 	}
 
 	@Transactional
-	public void withdrawUser(UserAdminWithdrawRequestServiceDto requestServiceDto) {
+	public void withdrawUser(UserAdminWithdrawRequestServiceDto dto) {
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
-	@Transactional(readOnly = true)
-	@Cacheable
-	public UserAdminCheckEmailResponseDto checkEmail(UserAdminCheckEmailRequestServiceDto requestServiceDto) {
-		return null;
+	public UserAdminRefreshTokenResponseDto refreshToken(UserAdminRefreshTokenRequestServiceDto dto) {
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
-	public UserAdminRefreshTokenResponseDto refreshToken(UserAdminRefreshTokenRequestServiceDto requestServiceDto) {
-		return null;
+	@Transactional
+	public UserAdminUpdateResponseDto updateUser(UserAdminUpdateRequestServiceDto dto) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Transactional
+	public UserAdminUpdateResponseDto updateMe(UserAdminUpdateRequestServiceDto dto) {
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 }

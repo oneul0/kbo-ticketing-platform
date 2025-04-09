@@ -1,5 +1,8 @@
 package com.boeingmerryho.business.userservice.application.dto.request;
 
-public record UserAdminRegisterRequestServiceDto(String username, String password, String slackId, String key) {
+import java.time.LocalDate;
+
+public record UserAdminRegisterRequestServiceDto(String email, String password, String username, String nickname,
+												 LocalDate birth, String adminKey) {
 
 }

@@ -58,12 +58,12 @@ public class UserAdminController {
 		"username, password, email, key를 입력 받아 회원가입"
 	)
 	@PostMapping("/register")
-	public ResponseEntity<Void> registerAdminUser(
+	public ResponseEntity<Long> registerAdminUser(
 		@RequestBody UserAdminRegisterRequestDto requestDto) {
 		UserAdminRegisterRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminSignUpServiceDto(
 			requestDto);
-		userAdminService.registerUserAdmin(requestServiceDto);
-		return ResponseEntity.ok().build();
+		Long registeredUserId = userAdminService.registerUserAdmin(requestServiceDto);
+		return ResponseEntity.ok().body(registeredUserId);
 	}
 
 	@Description(
@@ -108,9 +108,10 @@ public class UserAdminController {
 		@RequestBody UserAdminUpdateRoleRequestDto requestDto) {
 		UserAdminUpdateRoleRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminUpdateRoleRequestServiceDto(
 			requestDto, id);
-		UserAdminUpdateRoleResponseDto responseDto = userAdminService.updateRoleUser(
-			requestServiceDto);
-		return ResponseEntity.ok(responseDto);
+		// UserAdminUpdateRoleResponseDto responseDto = userAdminService.updateRoleUser(
+		// 	requestServiceDto);
+		// return ResponseEntity.ok(responseDto);
+		return null;
 	}
 
 	@Description(
@@ -142,7 +143,7 @@ public class UserAdminController {
 	public ResponseEntity<?> deleteRoleUserMaster(@PathVariable Long id) {
 		UserAdminDeleteRoleRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminDeleteRoleRequestServiceDto(
 			id);
-		userAdminService.deleteRoleUser(requestServiceDto);
+		userAdminService.deleteUserRole(requestServiceDto);
 		return ResponseEntity.ok().build();
 	}
 
