@@ -1,7 +1,9 @@
 package com.boeingmerryho.business.userservice.application.dto.mapper;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import com.boeingmerryho.business.userservice.application.dto.response.UserAdminFindResponseDto;
 import com.boeingmerryho.business.userservice.application.dto.response.UserLoginResponseServiceDto;
@@ -20,6 +22,7 @@ public interface UserApplicationMapper {
 
 	UserLoginResponseDto toUserLoginResponseDto(UserLoginResponseServiceDto responseServiceDto);
 
+	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	UserFindResponseDto toUserFindResponseDto(User user);
 
 	@Mapping(target = "id", source = "id")
@@ -38,13 +41,5 @@ public interface UserApplicationMapper {
 	UserCheckEmailResponseDto toUserCheckEmailResponseDto(Boolean idEmailDuplicated);
 
 	UserAdminCheckEmailResponseDto toUserAdminCheckEmailResponseDto(Boolean isEmailDuplicated);
-
-	// @Mapping(target = "id", source = "id")
-	// @Mapping(target = "username", source = "username")
-	// @Mapping(target = "password", source = "password")
-	// @Mapping(target = "email", source = "email")
-	// @Mapping(target = "role", source = "role")
-	// @Mapping(target = "status", source = "status")
-	// UserSearchResponseDto toUserSearchResponseDto(User user);
 
 }

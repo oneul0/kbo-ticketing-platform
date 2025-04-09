@@ -158,7 +158,6 @@ public class UserAdminController {
 		@RequestParam(value = "by", required = false) String by,
 		@ModelAttribute UserAdminSearchRequestDto requestDto) {
 
-		//todo: by 추가해서 검색 조건 설정
 		Pageable customPageable = pageableConfig.customPageable(page, size, sortDirection, by);
 
 		UserAdminSearchRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminSearchRequestServiceDto(
