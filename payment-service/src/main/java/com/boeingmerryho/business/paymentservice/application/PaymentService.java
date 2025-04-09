@@ -18,8 +18,9 @@ import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
+import com.boeingmerryho.business.paymentservice.exception.ErrorCode;
+import com.boeingmerryho.business.paymentservice.exception.PaymentException;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -32,7 +33,7 @@ public class PaymentService {
 	public PaymentTicketCancelResponseServiceDto cancelTicketPayment(
 		PaymentTicketCancelRequestServiceDto requestServiceDto) {
 		Payment payment = paymentRepository.findById(requestServiceDto.id())
-			.orElseThrow(() -> new EntityNotFoundException("Payment not found"));
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
 		assertCancellablePayment(payment);
 		payment.requestCancel();
 		return mapper.toPaymentTicketCancelResponseServiceDto(payment.getId());
@@ -41,10 +42,10 @@ public class PaymentService {
 	private static void assertCancellablePayment(Payment payment) {
 
 		if (!payment.validateStatus(PaymentStatus.CONFIRMED)) {
-			throw new RuntimeException("Payment not confirmed");
+			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
 		}
 		if (!payment.validateType(PaymentType.TICKET)) {
-			throw new RuntimeException("Payment type not supported");
+			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
 		}
 	}
 
@@ -52,7 +53,7 @@ public class PaymentService {
 	public PaymentMembershipCancelResponseServiceDto cancelMembershipPayment(
 		PaymentMembershipCancelRequestServiceDto requestServiceDto) {
 		Payment payment = paymentRepository.findById(requestServiceDto.id())
-			.orElseThrow(() -> new EntityNotFoundException("Payment not found"));
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
 		assertCancellablePayment(payment);
 		payment.requestCancel();
 		return mapper.toPaymentMembershipCancelResponseServiceDto(payment.getId());
@@ -62,7 +63,7 @@ public class PaymentService {
 	public PaymentDetailResponseServiceDto getPaymentDetail(
 		PaymentDetailRequestServiceDto requestServiceDto) {
 		PaymentDetail paymentDetail = paymentRepository.findPaymentDetailByIdAndIsDeleted(requestServiceDto.id())
-			.orElseThrow(() -> new EntityNotFoundException("Payment detail not found"));
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
 		return mapper.toPaymentDetailResponseServiceDto(paymentDetail);
 	}
 
