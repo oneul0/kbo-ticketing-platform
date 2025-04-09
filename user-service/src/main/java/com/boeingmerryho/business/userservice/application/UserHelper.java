@@ -20,7 +20,6 @@ public class UserHelper {
 	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
 	private static final Pattern PASSWORD_PATTERN = Pattern.compile(
 		"^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,15}$");
-	private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-z0-9]{4,10}$");
 
 	public User findUserById(Long id, UserRepository userRepository) {
 		return userRepository.findById(id)
@@ -34,12 +33,12 @@ public class UserHelper {
 
 	public void validateRegisterRequest(UserAdminRegisterRequestServiceDto dto, UserRepository userRepository) {
 		validateCommonFields(dto.email(), dto.password(), dto.username(), dto.nickname(), dto.birth());
-		checkUsernameExists(dto.email(), userRepository);
+		checkEmailExists(dto.email(), userRepository);
 	}
 
 	public void validateRegisterRequest(UserRegisterRequestServiceDto dto, UserRepository userRepository) {
 		validateCommonFields(dto.email(), dto.password(), dto.username(), dto.nickname(), dto.birth());
-		checkUsernameExists(dto.email(), userRepository);
+		checkEmailExists(dto.email(), userRepository);
 	}
 
 	private void validateCommonFields(String email, String password, String username, String nickname,
@@ -52,7 +51,6 @@ public class UserHelper {
 
 		verifyEmailFormat(email);
 		verifyPasswordFormat(password);
-		verifyUsernameFormat(username);
 	}
 
 	private void validateRequiredField(String field, ErrorCode errorCode) {
@@ -83,13 +81,7 @@ public class UserHelper {
 		}
 	}
 
-	private void verifyUsernameFormat(String username) {
-		if (!USERNAME_PATTERN.matcher(username).matches()) {
-			throw new UserException(ErrorCode.USERNAME_REGEX_NOT_MATCH);
-		}
-	}
-
-	public void checkUsernameExists(String email, UserRepository userRepository) {
+	public void checkEmailExists(String email, UserRepository userRepository) {
 		if (userRepository.existsByEmail(email)) {
 			throw new UserException(ErrorCode.ALREADY_EXISTS);
 		}

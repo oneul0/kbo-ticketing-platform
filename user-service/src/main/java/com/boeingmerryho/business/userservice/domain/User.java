@@ -31,7 +31,7 @@ import lombok.experimental.SuperBuilder;
 public class User extends BaseEntity implements Serializable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "email", nullable = false)
