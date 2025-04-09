@@ -24,6 +24,11 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 	}
 
 	@Override
+	public Optional<Payment> findById(Long id) {
+		return paymentJpaRepository.findById(id);
+	}
+
+	@Override
 	public Optional<PaymentDetail> findPaymentDetailByIdAndIsDeleted(Long id) {
 		return paymentQueryRepository.findPaymentDetailByIdAndIsDeletedFalse(id);
 	}

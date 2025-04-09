@@ -3,13 +3,19 @@ package com.boeingmerryho.business.paymentservice.application;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailSearchRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentTicketCancelRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.domain.context.PaymentDetailSearchContext;
+import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
+import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
+import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -18,16 +24,36 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentService {
 	private final PaymentRepository paymentRepository;
-	private final PaymentApplicationMapper mapper;
+	private final PaymentApplicationMapperImpl mapper;
 
+	@Transactional
+	public PaymentTicketCancelResponseServiceDto cancelTicketPayment(
+		PaymentTicketCancelRequestServiceDto requestServiceDto) {
+		Payment payment = paymentRepository.findById(requestServiceDto.id())
+			.orElseThrow(() -> new EntityNotFoundException("Payment not found"));
+		assertCancellableTicketPayment(payment);
+		payment.requestCancel();
+		return mapper.toPaymentTicketCancelResponseServiceDto(payment.getId());
+	}
+
+	private static void assertCancellableTicketPayment(Payment payment) {
+		if (!payment.validateStatus(PaymentStatus.CONFIRMED)) {
+			throw new RuntimeException("Payment not confirmed");
+		}
+		if (!payment.validateType(PaymentType.TICKET)) {
+			throw new RuntimeException("Payment type not supported");
+		}
+	}
+
+	@Transactional(readOnly = true)
 	public PaymentDetailResponseServiceDto getPaymentDetail(
 		PaymentDetailRequestServiceDto requestServiceDto) {
 		PaymentDetail paymentDetail = paymentRepository.findPaymentDetailByIdAndIsDeleted(requestServiceDto.id())
-			.orElseThrow(() -> new EntityNotFoundException("Payment not found"));
-
+			.orElseThrow(() -> new EntityNotFoundException("Payment detail not found"));
 		return mapper.toPaymentDetailResponseServiceDto(paymentDetail);
 	}
 
+	@Transactional(readOnly = true)
 	public Page<PaymentDetailResponseServiceDto> searchPaymentDetail(
 		PaymentDetailSearchRequestServiceDto requestServiceDto) {
 		Page<PaymentDetail> paymentDetails = paymentRepository.searchPaymentDetail(
@@ -54,4 +80,5 @@ public class PaymentService {
 			.isDeleted(isDeleted)
 			.build();
 	}
+
 }

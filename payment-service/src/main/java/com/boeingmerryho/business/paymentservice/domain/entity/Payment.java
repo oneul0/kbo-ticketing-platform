@@ -47,4 +47,21 @@ public class Payment extends BaseEntity {
 	@Column(nullable = false)
 	private PaymentType type;
 
+	public void requestCancel() {
+		this.status = PaymentStatus.REFUND_REQUESTED;
+	}
+
+	public boolean validateStatus(PaymentStatus status) {
+		if (this.status == status) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean validateType(PaymentType type) {
+		if (this.type == type) {
+			return true;
+		}
+		return false;
+	}
 }

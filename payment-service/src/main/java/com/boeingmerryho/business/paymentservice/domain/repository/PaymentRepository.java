@@ -11,6 +11,8 @@ import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
 public interface PaymentRepository {
 	Payment save(Payment payment);
 
+	Optional<Payment> findById(Long id);
+
 	Optional<PaymentDetail> findPaymentDetailByIdAndIsDeleted(Long id);
 
 	Page<PaymentDetail> searchPaymentDetail(PaymentDetailSearchContext searchContext);
