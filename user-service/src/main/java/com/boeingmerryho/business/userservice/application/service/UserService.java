@@ -121,7 +121,7 @@ public class UserService {
 	}
 
 	@Transactional
-	public UserAdminUpdateResponseDto updateUser(UserUpdateRequestServiceDto dto) {
+	public UserAdminUpdateResponseDto updateMe(UserUpdateRequestServiceDto dto) {
 
 		User user = userHelper.findUserById(dto.id(), userRepository);
 

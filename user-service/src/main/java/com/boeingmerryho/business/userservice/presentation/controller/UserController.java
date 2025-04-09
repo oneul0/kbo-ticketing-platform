@@ -76,7 +76,7 @@ public class UserController {
 		@RequestBody UserUpdateRequestDto requestDto) {
 		UserUpdateRequestServiceDto requestServiceDto = userPresentationMapper.toUserUpdateRequestServiceDto(
 			requestDto, id);
-		UserAdminUpdateResponseDto responseDto = userService.updateUser(requestServiceDto);
+		UserAdminUpdateResponseDto responseDto = userService.updateMe(requestServiceDto);
 		return ResponseEntity.ok(responseDto);
 	}
 
