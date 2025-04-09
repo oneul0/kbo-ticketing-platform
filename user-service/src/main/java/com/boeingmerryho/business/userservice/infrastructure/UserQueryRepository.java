@@ -1,5 +1,7 @@
 package com.boeingmerryho.business.userservice.infrastructure;
 
+import static com.boeingmerryho.business.userservice.domain.QUser.*;
+
 import java.util.List;
 import java.util.Optional;
 

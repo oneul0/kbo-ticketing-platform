@@ -31,7 +31,7 @@ import lombok.experimental.SuperBuilder;
 public class User extends BaseEntity implements Serializable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "email", nullable = false)
@@ -53,6 +53,33 @@ public class User extends BaseEntity implements Serializable {
 	@Column(nullable = false)
 	@Builder.Default
 	private UserRoleType role = UserRoleType.NORMAL;
+
+	public static User withAdminRole(String username, String password, String email, String nickname, LocalDate birth) {
+		return User.builder()
+			.username(username)
+			.password(password)
+			.email(email)
+			.nickname(nickname)
+			.birth(birth)
+			.role(UserRoleType.ADMIN)
+			.build();
+	}
+
+	public static User withDefaultRole(String username, String password, String email, String nickname,
+		LocalDate birth) {
+		return User.builder()
+			.username(username)
+			.password(password)
+			.email(email)
+			.nickname(nickname)
+			.birth(birth)
+			.role(UserRoleType.NORMAL)
+			.build();
+	}
+
+	public boolean isAdmin() {
+		return this.role == UserRoleType.ADMIN;
+	}
 
 	public void updateRoleType(UserRoleType role) {
 		this.role = role;

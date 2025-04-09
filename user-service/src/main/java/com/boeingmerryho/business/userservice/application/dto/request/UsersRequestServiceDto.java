@@ -1,6 +1,6 @@
 package com.boeingmerryho.business.userservice.application.dto.request;
 
-import com.oringmaryho.business.userservice.domain.UserRoleType;
+import com.boeingmerryho.business.userservice.domain.UserRoleType;
 
 public record UsersRequestServiceDto(UserRoleType role, Boolean isDeleted) {
 }

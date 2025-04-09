@@ -50,9 +50,8 @@ public class UserController {
 	public ResponseEntity<?> registerUser(@RequestBody UserRegisterRequestDto requestDto) {
 		UserRegisterRequestServiceDto requestServiceDto = userPresentationMapper.toUserRegisterRequestServiceDto(
 			requestDto);
-		userService.registerUser(requestServiceDto);
-		//todo: 반환값 반환하기
-		return ResponseEntity.ok().build();
+		Long registeredUserId = userService.registerUser(requestServiceDto);
+		return ResponseEntity.ok().body(registeredUserId);
 	}
 
 	@GetMapping("/me")
@@ -77,7 +76,7 @@ public class UserController {
 		@RequestBody UserUpdateRequestDto requestDto) {
 		UserUpdateRequestServiceDto requestServiceDto = userPresentationMapper.toUserUpdateRequestServiceDto(
 			requestDto, id);
-		UserAdminUpdateResponseDto responseDto = userService.updateUser(requestServiceDto);
+		UserAdminUpdateResponseDto responseDto = userService.updateMe(requestServiceDto);
 		return ResponseEntity.ok(responseDto);
 	}
 
@@ -88,7 +87,7 @@ public class UserController {
 	public ResponseEntity<?> withdrawUser(@RequestAttribute("userId") Long id) {
 		UserWithdrawRequestServiceDto requestServiceDto = userPresentationMapper.toUserWithdrawRequestServiceDto(
 			id);
-		userService.deleteUser(requestServiceDto);
+		userService.withdrawUser(requestServiceDto);
 		return ResponseEntity.ok().build();
 	}
 
