@@ -10,6 +10,7 @@ import com.boeingmerryho.business.userservice.application.dto.request.UserAdminR
 import com.boeingmerryho.business.userservice.application.dto.request.UserRegisterRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
 import com.boeingmerryho.business.userservice.domain.User;
+import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
 import com.boeingmerryho.business.userservice.exception.UserException;
@@ -93,6 +94,12 @@ public class UserHelper {
 
 	public void checkMasterRole(User user) {
 		if (user.isAdmin()) {
+			throw new UserException(ErrorCode.CANNOT_GRANT_MASTER_ROLE);
+		}
+	}
+
+	public void isAdminRole(UserRoleType type) {
+		if (type.equals(UserRoleType.ADMIN)) {
 			throw new UserException(ErrorCode.CANNOT_GRANT_MASTER_ROLE);
 		}
 	}

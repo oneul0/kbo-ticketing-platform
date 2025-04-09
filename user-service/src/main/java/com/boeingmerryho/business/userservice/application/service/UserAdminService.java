@@ -121,15 +121,15 @@ public class UserAdminService {
 
 	@Transactional
 	public UserAdminUpdateRoleResponseDto updateUserRole(UserAdminUpdateRoleRequestServiceDto dto) {
+		userHelper.isAdminRole(dto.newRole());
+		
 		User user = userHelper.findUserById(dto.id(), userRepository);
-		userHelper.checkMasterRole(user);
 
 		UserRoleType oldRole = user.getRole();
 		user.updateRoleType(dto.newRole());
 		userHelper.updateRedisUserInfo(user, redisUtil);
 
-		// return UserAdminUpdateRoleResponseDto.of(dto.id(), oldRole, dto.newRole());
-		return null;
+		return userApplicationMapper.toUserAdminUpdateRoleResponseDto(dto.id(), oldRole, dto.newRole());
 	}
 
 	@Transactional
@@ -213,7 +213,25 @@ public class UserAdminService {
 
 	@Transactional
 	public UserAdminUpdateResponseDto updateUser(UserAdminUpdateRequestServiceDto dto) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		User user = userRepository.findById(dto.id())
+			.orElseThrow(() -> new IllegalArgumentException("User not found with id: " + dto.id()));
+
+		if (!userHelper.isEmpty(dto.password())) {
+			user.updatePassword(passwordEncoder.encode(dto.password()));
+		}
+		if (!userHelper.isEmpty(dto.username())) {
+			user.updateUsername(dto.username());
+		}
+		if (!userHelper.isEmpty(dto.nickname())) {
+			user.updateNickname(dto.nickname());
+		}
+		if (dto.birth() != null) {
+			user.updateBirth(dto.birth());
+		}
+
+		userRepository.save(user);
+
+		return new UserAdminUpdateResponseDto(user.getId());
 	}
 
 	@Transactional
