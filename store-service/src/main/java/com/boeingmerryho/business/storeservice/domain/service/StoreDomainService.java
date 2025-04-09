@@ -4,8 +4,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.boeingmerryho.business.storeservice.application.dto.mapper.StoreApplicationMapper;
+import com.boeingmerryho.business.storeservice.application.dto.query.StoreSearchCondition;
 import com.boeingmerryho.business.storeservice.application.dto.request.StoreCreateRequestServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.request.StoreSearchAdminRequestServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.request.StoreSearchRequestServiceDto;
 import com.boeingmerryho.business.storeservice.domain.entity.Store;
 import com.boeingmerryho.business.storeservice.domain.repository.StoreQueryRepository;
 import com.boeingmerryho.business.storeservice.domain.repository.StoreRepository;
@@ -37,7 +39,15 @@ public class StoreDomainService {
 			.orElseThrow(() -> new GlobalException(StoreErrorCode.NOT_FOUND));
 	}
 
+	public Page<Store> search(StoreSearchRequestServiceDto requestServiceDto) {
+		var condition = new StoreSearchCondition(requestServiceDto.stadiumId(), requestServiceDto.name(),
+			requestServiceDto.isClosed(), false);
+		return storeQueryRepository.search(condition, requestServiceDto.customPageable());
+	}
+
 	public Page<Store> search(StoreSearchAdminRequestServiceDto requestServiceDto) {
-		return storeQueryRepository.search(requestServiceDto);
+		var condition = new StoreSearchCondition(requestServiceDto.stadiumId(), requestServiceDto.name(),
+			requestServiceDto.isClosed(), requestServiceDto.isDeleted());
+		return storeQueryRepository.search(condition, requestServiceDto.customPageable());
 	}
 }

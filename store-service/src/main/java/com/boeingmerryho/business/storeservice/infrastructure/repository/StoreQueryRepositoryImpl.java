@@ -5,9 +5,10 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import com.boeingmerryho.business.storeservice.application.dto.request.StoreSearchAdminRequestServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.query.StoreSearchCondition;
 import com.boeingmerryho.business.storeservice.domain.entity.QStore;
 import com.boeingmerryho.business.storeservice.domain.entity.Store;
 import com.boeingmerryho.business.storeservice.domain.repository.StoreQueryRepository;
@@ -25,18 +26,18 @@ public class StoreQueryRepositoryImpl implements StoreQueryRepository {
 	private final EntityManager entityManager;
 
 	@Override
-	public Page<Store> search(StoreSearchAdminRequestServiceDto requestDto) {
+	public Page<Store> search(StoreSearchCondition condition, Pageable pageable) {
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		QStore store = QStore.store;
 
-		BooleanBuilder where = buildCondition(store, requestDto);
+		BooleanBuilder where = buildCondition(store, condition);
 
 		List<Store> content = queryFactory
 			.selectFrom(store)
 			.where(where)
-			.orderBy(QueryDslUtils.getOrderSpecifiers(requestDto.customPageable().getSort(), Store.class))
-			.offset(requestDto.customPageable().getOffset())
-			.limit(requestDto.customPageable().getPageSize())
+			.orderBy(QueryDslUtils.getOrderSpecifiers(pageable.getSort(), Store.class))
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
 			.fetch();
 
 		Long total = queryFactory
@@ -47,17 +48,17 @@ public class StoreQueryRepositoryImpl implements StoreQueryRepository {
 
 		return new PageImpl<>(
 			content,
-			PageRequest.of(requestDto.customPageable().getPageNumber(), requestDto.customPageable().getPageSize()),
+			PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
 			total != null ? total : 0L);
 	}
 
-	private BooleanBuilder buildCondition(QStore store, StoreSearchAdminRequestServiceDto dto) {
+	private BooleanBuilder buildCondition(QStore store, StoreSearchCondition condition) {
 		BooleanBuilder builder = new BooleanBuilder();
 
-		builder.and(equalStadiumId(store, dto.stadiumId()));
-		builder.and(likeName(store, dto.name()));
-		builder.and(equalIsClosed(store, dto.isClosed()));
-		builder.and(equalIsDeleted(store, dto.isDeleted()));
+		builder.and(equalStadiumId(store, condition.stadiumId()));
+		builder.and(likeName(store, condition.name()));
+		builder.and(equalIsClosed(store, condition.isClosed()));
+		builder.and(equalIsDeleted(store, condition.isDeleted()));
 
 		return builder;
 	}
