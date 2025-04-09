@@ -1,26 +1,42 @@
 package com.boeingmerryho.business.userservice.application;
 
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.boeingmerryho.business.userservice.application.dto.request.UserAdminRegisterRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.UserRegisterRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
+import com.boeingmerryho.business.userservice.application.utils.jwt.JwtTokenProvider;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
 import com.boeingmerryho.business.userservice.exception.UserException;
 
+import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class UserHelper {
 
 	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
 	private static final Pattern PASSWORD_PATTERN = Pattern.compile(
 		"^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,15}$");
+
+	private static final String USER_INFO_PREFIX = "user:info:";
+	private static final String USER_TOKEN_PREFIX = "user:token:";
+	private static final String BLACKLIST_PREFIX = "blacklist:";
+
+	private final RedisTemplate<String, Object> redisTemplate;
+	private final JwtTokenProvider jwtTokenProvider;
+	private final RedisUtil redisUtil;
 
 	public User findUserById(Long id, UserRepository userRepository) {
 		return userRepository.findById(id)
@@ -104,7 +120,50 @@ public class UserHelper {
 		}
 	}
 
-	public void updateRedisUserInfo(User user, RedisUtil redisUtil) {
+	//-----redis
+
+	public void updateRedisUserInfo(User user) {
 		redisUtil.updateUserInfo(user);
 	}
+
+	public void clearRedisUserData(Long userId) {
+		redisTemplate.delete(USER_INFO_PREFIX + userId);
+		redisTemplate.delete(USER_TOKEN_PREFIX + userId);
+	}
+
+	public void deleteKeyFromRedis(String tokenKey) {
+		redisTemplate.delete(tokenKey);
+	}
+
+	public void hasKeyInRedis(String key) {
+		if (!redisTemplate.hasKey(key)) {
+			throw new UserException(ErrorCode.NOT_FOUND);
+		}
+	}
+
+	public Map<Object, Object> getMapEntriesFromRedis(String key) {
+		return redisTemplate.opsForHash().entries(key);
+	}
+
+	public void setOpsForValueRedis(String key, String value) {
+		redisTemplate.opsForValue().set(key, value);
+	}
+
+	public void blacklistToken(String accessToken) {
+		Claims claims = jwtTokenProvider.parseJwtToken(accessToken);
+		long ttlMillis = jwtTokenProvider.calculateTtlMillis(claims.getExpiration());
+		String blacklistKey = getBlacklistPrefix() + accessToken;
+
+		setOpsForValueRedis(blacklistKey, "blacklisted");
+		redisTemplate.expire(blacklistKey, Math.max(ttlMillis, 1), TimeUnit.MILLISECONDS);
+	}
+
+	public String getUserTokenPrefix() {
+		return USER_TOKEN_PREFIX;
+	}
+
+	private String getBlacklistPrefix() {
+		return BLACKLIST_PREFIX;
+	}
+
 }

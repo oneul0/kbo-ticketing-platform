@@ -99,8 +99,8 @@ public class UserAdminController {
 		return ResponseEntity.ok(responseDto);
 	}
 
-	@Description("회원 탈퇴(본인)")
-	@DeleteMapping("/{id}")
+	@Description("사용자 삭제")
+	@DeleteMapping("/me")
 	public ResponseEntity<?> withdrawUserMaster(@PathVariable Long id) {
 		UserAdminWithdrawRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminWithdrawRequestServiceDto(
 			id);
@@ -108,8 +108,8 @@ public class UserAdminController {
 		return ResponseEntity.ok().build();
 	}
 
-	@Description("사용자 삭제")
-	@DeleteMapping("/me")
+	@Description("회원 탈퇴(본인)")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteUserMaster(@RequestAttribute("userId") Long id) {
 		UserAdminDeleteRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminDeleteRequestServiceDto(
 			id);

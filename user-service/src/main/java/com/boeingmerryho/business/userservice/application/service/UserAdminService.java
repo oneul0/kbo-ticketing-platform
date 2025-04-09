@@ -1,13 +1,11 @@
 package com.boeingmerryho.business.userservice.application.service;
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +25,6 @@ import com.boeingmerryho.business.userservice.application.dto.request.UserAdminU
 import com.boeingmerryho.business.userservice.application.dto.request.UserAdminWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.UserLogoutRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.UserAdminFindResponseDto;
-import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
-import com.boeingmerryho.business.userservice.application.utils.jwt.JwtTokenProvider;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.domain.UserSearchCriteria;
@@ -43,7 +39,6 @@ import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdmi
 import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminUpdateRoleResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.UserLoginResponseDto;
 
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,17 +47,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserAdminService {
 
-	private static final String USER_INFO_PREFIX = "user:info:";
-	private static final String USER_TOKEN_PREFIX = "user:token:";
-	private static final String BLACKLIST_PREFIX = "blacklist:";
-
 	private final UserRepository userRepository;
 	private final CustomUserRepository customUserRepository;
 	private final UserApplicationMapper userApplicationMapper;
 	private final PasswordEncoder passwordEncoder;
-	private final RedisTemplate<String, Object> redisTemplate;
-	private final JwtTokenProvider jwtTokenProvider;
-	private final RedisUtil redisUtil;
+
 	private final UserHelper userHelper;
 
 	@Value("${admin.key}")
@@ -122,12 +111,12 @@ public class UserAdminService {
 	@Transactional
 	public UserAdminUpdateRoleResponseDto updateUserRole(UserAdminUpdateRoleRequestServiceDto dto) {
 		userHelper.isAdminRole(dto.newRole());
-		
+
 		User user = userHelper.findUserById(dto.id(), userRepository);
 
 		UserRoleType oldRole = user.getRole();
 		user.updateRoleType(dto.newRole());
-		userHelper.updateRedisUserInfo(user, redisUtil);
+		userHelper.updateRedisUserInfo(user);
 
 		return userApplicationMapper.toUserAdminUpdateRoleResponseDto(dto.id(), oldRole, dto.newRole());
 	}
@@ -135,10 +124,9 @@ public class UserAdminService {
 	@Transactional
 	public void deleteUserRole(UserAdminDeleteRoleRequestServiceDto dto) {
 		User user = userHelper.findUserById(dto.id(), userRepository);
-		userHelper.checkMasterRole(user);
 
 		user.deleteRoleType();
-		userHelper.updateRedisUserInfo(user, redisUtil);
+		userHelper.updateRedisUserInfo(user);
 	}
 
 	@Transactional
@@ -146,30 +134,24 @@ public class UserAdminService {
 		User user = userHelper.findUserById(dto.id(), userRepository);
 		user.softDelete(user.getId());
 
-		clearRedisUserData(user.getId());
-	}
-
-	private void clearRedisUserData(Long userId) {
-		redisTemplate.delete(USER_INFO_PREFIX + userId);
-		redisTemplate.delete(USER_TOKEN_PREFIX + userId);
+		userHelper.clearRedisUserData(user.getId());
 	}
 
 	public void logoutUser(UserLogoutRequestServiceDto dto) {
 		Long userId = dto.id();
-		String tokenKey = USER_TOKEN_PREFIX + userId;
+		String tokenKey = userHelper.getUserTokenPrefix() + userId;
 
 		Map<Object, Object> token = getUserTokenFromRedis(tokenKey);
 		String accessToken = extractAccessToken(token);
-		blacklistToken(accessToken);
+		userHelper.blacklistToken(accessToken);
 
-		redisTemplate.delete(tokenKey);
+		userHelper.deleteKeyFromRedis(tokenKey);
 	}
 
 	private Map<Object, Object> getUserTokenFromRedis(String tokenKey) {
-		if (!redisTemplate.hasKey(tokenKey)) {
-			throw new UserException(ErrorCode.NOT_FOUND);
-		}
-		Map<Object, Object> token = redisTemplate.opsForHash().entries(tokenKey);
+		userHelper.hasKeyInRedis(tokenKey);
+
+		Map<Object, Object> token = userHelper.getMapEntriesFromRedis(tokenKey);
 		if (token == null || token.isEmpty()) {
 			throw new UserException(ErrorCode.JWT_REQUIRED);
 		}
@@ -178,15 +160,6 @@ public class UserAdminService {
 
 	private String extractAccessToken(Map<Object, Object> token) {
 		return (String)token.get("accessToken");
-	}
-
-	private void blacklistToken(String accessToken) {
-		Claims claims = jwtTokenProvider.parseJwtToken(accessToken);
-		long ttlMillis = jwtTokenProvider.calculateTtlMillis(claims.getExpiration());
-		String blacklistKey = BLACKLIST_PREFIX + accessToken;
-
-		redisTemplate.opsForValue().set(blacklistKey, "blacklisted");
-		redisTemplate.expire(blacklistKey, Math.max(ttlMillis, 1), TimeUnit.MILLISECONDS);
 	}
 
 	public UserLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto dto) {
@@ -204,7 +177,10 @@ public class UserAdminService {
 
 	@Transactional
 	public void withdrawUser(UserAdminWithdrawRequestServiceDto dto) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		User user = userHelper.findUserById(dto.id(), userRepository);
+		user.softDelete(user.getId());
+
+		userHelper.clearRedisUserData(user.getId());
 	}
 
 	public UserAdminRefreshTokenResponseDto refreshToken(UserAdminRefreshTokenRequestServiceDto dto) {
@@ -213,8 +189,7 @@ public class UserAdminService {
 
 	@Transactional
 	public UserAdminUpdateResponseDto updateUser(UserAdminUpdateRequestServiceDto dto) {
-		User user = userRepository.findById(dto.id())
-			.orElseThrow(() -> new IllegalArgumentException("User not found with id: " + dto.id()));
+		User user = userHelper.findUserById(dto.id(), userRepository);
 
 		if (!userHelper.isEmpty(dto.password())) {
 			user.updatePassword(passwordEncoder.encode(dto.password()));
@@ -253,7 +228,7 @@ public class UserAdminService {
 			user.updateBirth(dto.birth());
 		}
 
-		userHelper.updateRedisUserInfo(user, redisUtil);
+		userHelper.updateRedisUserInfo(user);
 
 		return userApplicationMapper.toUserAdminUpdateResponseDto(user.getId());
 	}

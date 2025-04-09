@@ -146,7 +146,10 @@ public class UserService {
 
 	@Transactional
 	public void withdrawUser(UserWithdrawRequestServiceDto dto) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		User user = userHelper.findUserById(dto.id(), userRepository);
+		user.softDelete(user.getId());
+
+		clearRedisUserData(user.getId());
 	}
 
 	@Transactional(readOnly = true)
