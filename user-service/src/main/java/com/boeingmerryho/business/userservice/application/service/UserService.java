@@ -41,6 +41,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserService {
 
+	private static final String USER_TOKEN_PREFIX = "user:token:";
+	private static final String BLACKLIST_PREFIX = "blacklist:";
+
 	private final UserRepository userRepository;
 	private final UserApplicationMapper userApplicationMapper;
 	private final PasswordEncoder passwordEncoder;
@@ -50,94 +53,90 @@ public class UserService {
 	private final UserHelper userHelper;
 
 	@Transactional
-	public void registerUser(UserRegisterRequestServiceDto requestServiceDto) {
+	public Long registerUser(UserRegisterRequestServiceDto dto) {
+		userHelper.validateRegisterRequest(dto, userRepository);
 
-		String encodedPassword = userHelper.encodePassword(requestServiceDto.password(),
-			passwordEncoder);
-		User user = User.builder()
-			.username(requestServiceDto.username())
-			.password(encodedPassword)
-			.email(requestServiceDto.slackId())
-			.build();
+		User user = User.withDefaultRole(
+			dto.username(),
+			userHelper.encodePassword(dto.password(), passwordEncoder),
+			dto.email(),
+			dto.nickname(),
+			dto.birth()
+		);
 
-		userRepository.save(user);
+		return userRepository.save(user).getId();
 	}
 
-	public UserLoginResponseDto loginUser(UserLoginRequestServiceDto requestServiceDto) {
-		if (!userRepository.existsByEmail(requestServiceDto.username())) {
-			throw new UserException(ErrorCode.NOT_FOUND);
-		}
+	public UserLoginResponseDto loginUser(UserLoginRequestServiceDto dto) {
+		User user = userHelper.findUserByEmail(dto.username(), userRepository);
+		userHelper.updateRedisUserInfo(user, redisUtil);
 
-		User user = userHelper.findUserByEmail(requestServiceDto.username(), userRepository);
-		redisUtil.updateUserInfo(user);
 		Map<String, String> tokenMap = redisUtil.updateUserJwtToken(user.getId());
-
-		UserLoginResponseServiceDto serviceDto = new UserLoginResponseServiceDto(
+		UserLoginResponseServiceDto serviceDto = UserLoginResponseServiceDto.fromTokens(
 			tokenMap.get("accessToken"),
 			tokenMap.get("refreshToken")
 		);
 		return userApplicationMapper.toUserLoginResponseDto(serviceDto);
 	}
 
-	public void logoutUser(UserLogoutRequestServiceDto requestServiceDto) {
-		Long userId = requestServiceDto.id();
-		String tokenKey = "user:token:" + userId;
+	public void logoutUser(UserLogoutRequestServiceDto dto) {
+		String tokenKey = USER_TOKEN_PREFIX + dto.id();
+		Map<Object, Object> token = getUserTokenFromRedis(tokenKey);
+		String accessToken = extractAccessToken(token);
+
+		blacklistToken(accessToken);
+		redisTemplate.delete(tokenKey);
+	}
+
+	private Map<Object, Object> getUserTokenFromRedis(String tokenKey) {
 		if (!redisTemplate.hasKey(tokenKey)) {
 			throw new UserException(ErrorCode.NOT_FOUND);
 		}
 		Map<Object, Object> token = redisTemplate.opsForHash().entries(tokenKey);
-		String accessToken = (String)token.get("accessToken");
-
 		if (token == null || token.isEmpty()) {
 			throw new UserException(ErrorCode.JWT_REQUIRED);
 		}
-
-		Claims claims = jwtTokenProvider.parseJwtToken(accessToken);
-		long ttlMillis = jwtTokenProvider.calculateTtlMillis(claims.getExpiration());
-
-		String blacklistKey = "blacklist:" + accessToken;
-		redisTemplate.opsForValue().set(blacklistKey, "blacklisted");
-
-		if (ttlMillis > 0) {
-			redisTemplate.expire(blacklistKey, ttlMillis, TimeUnit.MILLISECONDS);
-			log.debug("블랙리스트에 추가된 토큰 : {} TTL: {} ms", token, ttlMillis);
-		} else {
-			redisTemplate.expire(blacklistKey, 1, TimeUnit.SECONDS);
-			log.debug("토큰 {} 은 이미 만료되어 최소 TTL로 설정", token);
-		}
-
-		if (userId != null) {
-			String userInfoKey = "user:token:" + userId;
-			redisTemplate.delete(userInfoKey);
-		}
+		return token;
 	}
 
-	public UserFindResponseDto findUser(UserFindRequestServiceDto requestServiceDto) {
-		if (!requestServiceDto.id().equals(requestServiceDto.id())) {
-			throw new UserException(ErrorCode.USER_NOT_MATCH);
-		}
+	private String extractAccessToken(Map<Object, Object> token) {
+		return (String)token.get("accessToken");
+	}
 
-		User user = userHelper.findUserById(requestServiceDto.id(), userRepository);
+	private void blacklistToken(String accessToken) {
+		Claims claims = jwtTokenProvider.parseJwtToken(accessToken);
+		long ttlMillis = jwtTokenProvider.calculateTtlMillis(claims.getExpiration());
+		String blacklistKey = BLACKLIST_PREFIX + accessToken;
+
+		redisTemplate.opsForValue().set(blacklistKey, "blacklisted");
+		redisTemplate.expire(blacklistKey, Math.max(ttlMillis, 1), TimeUnit.MILLISECONDS);
+		log.debug("Token {} blacklisted with TTL: {} ms", accessToken, ttlMillis);
+	}
+
+	@Transactional(readOnly = true)
+	@Cacheable(cacheNames = "user", key = "'user:' + #dto.id()")
+	public UserFindResponseDto findUser(UserFindRequestServiceDto dto) {
+		User user = userHelper.findUserById(dto.id(), userRepository);
 		return userApplicationMapper.toUserFindResponseDto(user);
 	}
 
 	@Transactional
-	public UserAdminUpdateResponseDto updateUser(UserUpdateRequestServiceDto requestServiceDto) {
-
-		return null;
+	public UserAdminUpdateResponseDto updateUser(UserUpdateRequestServiceDto dto) {
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
 	@Transactional
-	public void deleteUser(UserWithdrawRequestServiceDto requestServiceDto) {
+	public void withdrawUser(UserWithdrawRequestServiceDto dto) {
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
 	@Transactional(readOnly = true)
-	@Cacheable
-	public UserCheckEmailResponseDto checkEmail(UserCheckEmailRequestServiceDto requestServiceDto) {
-		return null;
+	@Cacheable(cacheNames = "emailCheck", key = "'user:' + #dto.email()")
+	public UserCheckEmailResponseDto checkEmail(UserCheckEmailRequestServiceDto dto) {
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
-	public UserRefreshTokenResponseDto refreshToken(UserRefreshTokenRequestServiceDto requestServiceDto) {
-		return null;
+	public UserRefreshTokenResponseDto refreshToken(UserRefreshTokenRequestServiceDto dto) {
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 }

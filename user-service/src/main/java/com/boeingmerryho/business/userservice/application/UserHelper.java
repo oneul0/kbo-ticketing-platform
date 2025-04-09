@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.boeingmerryho.business.userservice.application.dto.request.UserAdminRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.UserRegisterRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
@@ -32,16 +33,26 @@ public class UserHelper {
 	}
 
 	public void validateRegisterRequest(UserAdminRegisterRequestServiceDto dto, UserRepository userRepository) {
-		validateRequiredField(dto.email(), ErrorCode.SLACKID_NULL);
-		validateRequiredField(dto.password(), ErrorCode.PASSWORD_NULL);
-		validateRequiredField(dto.username(), ErrorCode.USERNAME_NULL);
-		validateRequiredField(dto.nickname(), ErrorCode.USERNAME_NULL); // 닉네임도 필수로 가정
-		validateRequiredField(dto.birth(), ErrorCode.USERNAME_NULL); // 생일도 필수로 가정
-
-		verifyEmailFormat(dto.email());
-		verifyPasswordFormat(dto.password());
-		verifyUsernameFormat(dto.username());
+		validateCommonFields(dto.email(), dto.password(), dto.username(), dto.nickname(), dto.birth());
 		checkUsernameExists(dto.email(), userRepository);
+	}
+
+	public void validateRegisterRequest(UserRegisterRequestServiceDto dto, UserRepository userRepository) {
+		validateCommonFields(dto.email(), dto.password(), dto.username(), dto.nickname(), dto.birth());
+		checkUsernameExists(dto.email(), userRepository);
+	}
+
+	private void validateCommonFields(String email, String password, String username, String nickname,
+		LocalDate birth) {
+		validateRequiredField(email, ErrorCode.EMAIL_NULL);
+		validateRequiredField(password, ErrorCode.PASSWORD_NULL);
+		validateRequiredField(username, ErrorCode.USERNAME_NULL);
+		validateRequiredField(nickname, ErrorCode.USERNAME_NULL);
+		validateRequiredField(birth, ErrorCode.USERNAME_NULL);
+
+		verifyEmailFormat(email);
+		verifyPasswordFormat(password);
+		verifyUsernameFormat(username);
 	}
 
 	private void validateRequiredField(String field, ErrorCode errorCode) {

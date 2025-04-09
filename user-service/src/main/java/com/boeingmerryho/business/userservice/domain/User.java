@@ -65,6 +65,18 @@ public class User extends BaseEntity implements Serializable {
 			.build();
 	}
 
+	public static User withDefaultRole(String username, String password, String email, String nickname,
+		LocalDate birth) {
+		return User.builder()
+			.username(username)
+			.password(password)
+			.email(email)
+			.nickname(nickname)
+			.birth(birth)
+			.role(UserRoleType.NORMAL)
+			.build();
+	}
+
 	public boolean isAdmin() {
 		return this.role == UserRoleType.ADMIN;
 	}
