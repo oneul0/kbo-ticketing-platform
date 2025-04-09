@@ -12,4 +12,5 @@ public interface StoreRepository {
 	Optional<Store> findById(Long id);
 
 	Optional<Store> findByIdAndIsDeletedFalse(Long id);
+
 }
