@@ -39,6 +39,6 @@ public class StoreAdminService {
 	public Page<StoreSearchAdminResponseServiceDto> searchStore(
 		StoreSearchAdminRequestServiceDto requestServiceDto) {
 		Page<Store> stores = storeDomainService.search(requestServiceDto);
-		return stores.map(mapper::toStoreSearchResponseServiceDto);
+		return stores.map(mapper::toStoreSearchAdminResponseServiceDto);
 	}
 }
