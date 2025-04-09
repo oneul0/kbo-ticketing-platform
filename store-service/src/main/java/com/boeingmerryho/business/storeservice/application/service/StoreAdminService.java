@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.boeingmerryho.business.storeservice.application.dto.mapper.StoreApplicationMapper;
 import com.boeingmerryho.business.storeservice.application.dto.request.StoreCreateRequestServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreCreateResponseServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.response.StoreDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.storeservice.domain.entity.Store;
 import com.boeingmerryho.business.storeservice.domain.service.StoreDomainService;
 import com.boeingmerryho.business.storeservice.domain.service.StoreValidator;
@@ -27,4 +28,8 @@ public class StoreAdminService {
 		return mapper.toStoreCreateResponseServiceDto(saved);
 	}
 
+	public StoreDetailAdminResponseServiceDto getStoreDetail(Long id) {
+		Store storeDetail = storeDomainService.findById(id);
+		return mapper.toStoreDetailResponseServiceDto(storeDetail);
+	}
 }
