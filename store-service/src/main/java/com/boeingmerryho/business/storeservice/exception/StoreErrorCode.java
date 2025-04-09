@@ -8,7 +8,7 @@ public enum StoreErrorCode implements BaseErrorCode {
 
 	ALREADY_REGISTERED(HttpStatus.CONFLICT, "STORE_001", "이미 등록된 매장입니다."),
 	INVALID_STADIUM(HttpStatus.BAD_REQUEST, "STORE_002", "존재하지 않는 구장입니다."),
-	;
+	NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_003", "존재하지 않는 매장입니다.");
 
 	private final HttpStatus status;
 	private final String errorCode;
