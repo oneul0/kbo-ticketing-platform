@@ -7,9 +7,11 @@ import com.boeingmerryho.business.userservice.application.dto.response.UserAdmin
 import com.boeingmerryho.business.userservice.application.dto.response.UserLoginResponseServiceDto;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
+import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminCheckEmailResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminSearchResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminUpdateResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminUpdateRoleResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.UserCheckEmailResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.UserFindResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.UserLoginResponseDto;
 
@@ -32,6 +34,10 @@ public interface UserApplicationMapper {
 	UserAdminFindResponseDto toUserAdminFindResponseDto(User user);
 
 	UserAdminSearchResponseDto toUserAdminSearchResponseDto(User user);
+
+	UserCheckEmailResponseDto toUserCheckEmailResponseDto(Boolean idEmailDuplicated);
+
+	UserAdminCheckEmailResponseDto toUserAdminCheckEmailResponseDto(Boolean isEmailDuplicated);
 
 	// @Mapping(target = "id", source = "id")
 	// @Mapping(target = "username", source = "username")

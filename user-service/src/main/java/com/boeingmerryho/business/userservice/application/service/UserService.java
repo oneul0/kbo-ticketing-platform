@@ -133,7 +133,8 @@ public class UserService {
 	@Transactional(readOnly = true)
 	@Cacheable(cacheNames = "emailCheck", key = "'user:' + #dto.email()")
 	public UserCheckEmailResponseDto checkEmail(UserCheckEmailRequestServiceDto dto) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		Boolean idEmailDuplicated = userRepository.existsByEmail(dto.email());
+		return userApplicationMapper.toUserCheckEmailResponseDto(idEmailDuplicated);
 	}
 
 	public UserRefreshTokenResponseDto refreshToken(UserRefreshTokenRequestServiceDto dto) {

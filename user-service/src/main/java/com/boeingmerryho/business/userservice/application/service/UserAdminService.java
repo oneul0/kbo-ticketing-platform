@@ -93,7 +93,8 @@ public class UserAdminService {
 	@Transactional(readOnly = true)
 	@Cacheable
 	public UserAdminCheckEmailResponseDto checkEmail(UserAdminCheckEmailRequestServiceDto dto) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		Boolean isEmailDuplicated = userRepository.existsByEmail(dto.email());
+		return userApplicationMapper.toUserAdminCheckEmailResponseDto(isEmailDuplicated);
 	}
 
 	@Transactional(readOnly = true)
