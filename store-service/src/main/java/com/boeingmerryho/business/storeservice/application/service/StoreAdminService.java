@@ -30,6 +30,6 @@ public class StoreAdminService {
 
 	public StoreDetailAdminResponseServiceDto getStoreDetail(Long id) {
 		Store storeDetail = storeDomainService.findById(id);
-		return mapper.toStoreDetailResponseServiceDto(storeDetail);
+		return mapper.toStoreDetailAdminResponseServiceDto(storeDetail);
 	}
 }

@@ -45,7 +45,7 @@ public class StoreAdminController {
 		@PathVariable Long id
 	) {
 		StoreDetailAdminResponseServiceDto responseServiceDto = storeAdminService.getStoreDetail(id);
-		StoreDetailAdminResponseDto responseDto = mapper.toStoreDetailResponseDto(responseServiceDto);
+		StoreDetailAdminResponseDto responseDto = mapper.toStoreDetailAdminResponseDto(responseServiceDto);
 		return SuccessResponse.of(StoreSuccessCode.FETCHED_STORE, responseDto);
 	}
 }
