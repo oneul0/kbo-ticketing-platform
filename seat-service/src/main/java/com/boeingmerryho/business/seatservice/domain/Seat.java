@@ -71,4 +71,12 @@ public class Seat {
 
 	@OneToMany(mappedBy = "seat", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<SeatReservation> seatReservations = new ArrayList<>();
+
+	public void active() {
+		isActive = true;
+	}
+
+	public void inActive() {
+		isActive = false;
+	}
 }
