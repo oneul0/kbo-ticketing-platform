@@ -1,10 +1,13 @@
 package com.boeingmerryho.business.storeservice.domain.service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.boeingmerryho.business.storeservice.application.dto.mapper.StoreApplicationMapper;
 import com.boeingmerryho.business.storeservice.application.dto.request.StoreCreateRequestServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.request.StoreSearchAdminRequestServiceDto;
 import com.boeingmerryho.business.storeservice.domain.entity.Store;
+import com.boeingmerryho.business.storeservice.domain.repository.StoreQueryRepository;
 import com.boeingmerryho.business.storeservice.domain.repository.StoreRepository;
 import com.boeingmerryho.business.storeservice.exception.StoreErrorCode;
 
@@ -16,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class StoreDomainService {
 
 	private final StoreRepository storeRepository;
+	private final StoreQueryRepository storeQueryRepository;
 	private final StoreApplicationMapper mapper;
 
 	public Store save(StoreCreateRequestServiceDto requestDto) {
@@ -31,5 +35,9 @@ public class StoreDomainService {
 	public Store getAnyStoreById(Long id) {
 		return storeRepository.findById(id)
 			.orElseThrow(() -> new GlobalException(StoreErrorCode.NOT_FOUND));
+	}
+
+	public Page<Store> search(StoreSearchAdminRequestServiceDto requestServiceDto) {
+		return storeQueryRepository.search(requestServiceDto);
 	}
 }
