@@ -25,6 +25,7 @@ import com.boeingmerryho.business.userservice.application.dto.request.UserAdminU
 import com.boeingmerryho.business.userservice.application.dto.request.UserAdminWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.UserLogoutRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.UserAdminFindResponseDto;
+import com.boeingmerryho.business.userservice.application.dto.response.UserLoginResponseServiceDto;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.domain.UserSearchCriteria;
@@ -163,16 +164,15 @@ public class UserAdminService {
 	}
 
 	public UserLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto dto) {
-		// User user = userHelper.findUserByEmail(dto.email(), userRepository);
-		// userHelper.updateRedisUserInfo(user, redisUtil);
-		//
-		// Map<String, String> tokenMap = redisUtil.updateUserJwtToken(user.getId());
-		// UserLoginResponseServiceDto serviceDto = UserLoginResponseServiceDto.fromTokens(
-		// 	tokenMap.get("accessToken"),
-		// 	tokenMap.get("refreshToken")
-		// );
-		// return userApplicationMapper.toUserLoginResponseDto(serviceDto);
-		return null;
+		User user = userHelper.findUserByEmail(dto.email(), userRepository);
+		userHelper.updateRedisUserInfo(user);
+
+		Map<String, String> tokenMap = userHelper.updateUserJwtTokenRedis(user.getId());
+		UserLoginResponseServiceDto serviceDto = UserLoginResponseServiceDto.fromTokens(
+			tokenMap.get("accessToken"),
+			tokenMap.get("refreshToken")
+		);
+		return userApplicationMapper.toUserLoginResponseDto(serviceDto);
 	}
 
 	@Transactional

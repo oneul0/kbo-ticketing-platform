@@ -126,6 +126,10 @@ public class UserHelper {
 		redisUtil.updateUserInfo(user);
 	}
 
+	public Map<String, String> updateUserJwtTokenRedis(Long id) {
+		redisUtil.updateUserJwtToken(id);
+	}
+
 	public void clearRedisUserData(Long userId) {
 		redisTemplate.delete(USER_INFO_PREFIX + userId);
 		redisTemplate.delete(USER_TOKEN_PREFIX + userId);

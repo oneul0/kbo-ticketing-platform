@@ -1,7 +1,6 @@
 package com.boeingmerryho.business.userservice.application.service;
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,8 +19,6 @@ import com.boeingmerryho.business.userservice.application.dto.request.UserRegist
 import com.boeingmerryho.business.userservice.application.dto.request.UserUpdateRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.UserWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.UserLoginResponseServiceDto;
-import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
-import com.boeingmerryho.business.userservice.application.utils.jwt.JwtTokenProvider;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
@@ -32,7 +29,6 @@ import com.boeingmerryho.business.userservice.presentation.dto.response.UserFind
 import com.boeingmerryho.business.userservice.presentation.dto.response.UserLoginResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.UserRefreshTokenResponseDto;
 
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,8 +43,6 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final UserApplicationMapper userApplicationMapper;
 	private final PasswordEncoder passwordEncoder;
-	private final JwtTokenProvider jwtTokenProvider;
-	private final RedisUtil redisUtil;
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final UserHelper userHelper;
 
@@ -69,9 +63,9 @@ public class UserService {
 
 	public UserLoginResponseDto loginUser(UserLoginRequestServiceDto dto) {
 		User user = userHelper.findUserByEmail(dto.username(), userRepository);
-		userHelper.updateRedisUserInfo(user, redisUtil);
+		userHelper.updateRedisUserInfo(user);
 
-		Map<String, String> tokenMap = redisUtil.updateUserJwtToken(user.getId());
+		Map<String, String> tokenMap = userHelper.updateUserJwtTokenRedis(user.getId());
 		UserLoginResponseServiceDto serviceDto = UserLoginResponseServiceDto.fromTokens(
 			tokenMap.get("accessToken"),
 			tokenMap.get("refreshToken")
@@ -84,7 +78,7 @@ public class UserService {
 		Map<Object, Object> token = getUserTokenFromRedis(tokenKey);
 		String accessToken = extractAccessToken(token);
 
-		blacklistToken(accessToken);
+		userHelper.blacklistToken(accessToken);
 		redisTemplate.delete(tokenKey);
 	}
 
@@ -101,16 +95,6 @@ public class UserService {
 
 	private String extractAccessToken(Map<Object, Object> token) {
 		return (String)token.get("accessToken");
-	}
-
-	private void blacklistToken(String accessToken) {
-		Claims claims = jwtTokenProvider.parseJwtToken(accessToken);
-		long ttlMillis = jwtTokenProvider.calculateTtlMillis(claims.getExpiration());
-		String blacklistKey = BLACKLIST_PREFIX + accessToken;
-
-		redisTemplate.opsForValue().set(blacklistKey, "blacklisted");
-		redisTemplate.expire(blacklistKey, Math.max(ttlMillis, 1), TimeUnit.MILLISECONDS);
-		log.debug("Token {} blacklisted with TTL: {} ms", accessToken, ttlMillis);
 	}
 
 	@Transactional(readOnly = true)
@@ -139,7 +123,7 @@ public class UserService {
 			user.updateBirth(dto.birth());
 		}
 
-		userHelper.updateRedisUserInfo(user, redisUtil);
+		userHelper.updateRedisUserInfo(user);
 
 		return userApplicationMapper.toUserAdminUpdateResponseDto(user.getId());
 	}
@@ -149,7 +133,7 @@ public class UserService {
 		User user = userHelper.findUserById(dto.id(), userRepository);
 		user.softDelete(user.getId());
 
-		clearRedisUserData(user.getId());
+		userHelper.clearRedisUserData(user.getId());
 	}
 
 	@Transactional(readOnly = true)
