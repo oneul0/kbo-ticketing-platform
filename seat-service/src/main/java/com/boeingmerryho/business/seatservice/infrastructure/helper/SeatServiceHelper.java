@@ -20,4 +20,8 @@ public class SeatServiceHelper {
 		return seatRepository.findById(id)
 			.orElseThrow(() -> new GlobalException(SeatErrorCode.NOT_FOUND_SEAT));
 	}
+
+	public void save(Seat seat) {
+		seatRepository.save(seat);
+	}
 }
