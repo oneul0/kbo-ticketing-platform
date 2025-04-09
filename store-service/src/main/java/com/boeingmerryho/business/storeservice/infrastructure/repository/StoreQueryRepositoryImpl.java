@@ -16,18 +16,16 @@ import com.boeingmerryho.business.storeservice.utils.QueryDslUtils;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
 public class StoreQueryRepositoryImpl implements StoreQueryRepository {
 
-	private final EntityManager entityManager;
+	private final JPAQueryFactory queryFactory;
 
 	@Override
 	public Page<Store> search(StoreSearchCondition condition, Pageable pageable) {
-		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		QStore store = QStore.store;
 
 		BooleanBuilder where = buildCondition(store, condition);

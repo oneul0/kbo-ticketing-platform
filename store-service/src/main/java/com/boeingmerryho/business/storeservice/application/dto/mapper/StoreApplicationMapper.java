@@ -11,6 +11,7 @@ import com.boeingmerryho.business.storeservice.application.dto.response.StoreDet
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreDetailResponseServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreSearchAdminResponseServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreSearchResponseServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.response.StoreUpdateResponseServiceDto;
 import com.boeingmerryho.business.storeservice.domain.entity.Store;
 
 @Primary
@@ -37,4 +38,6 @@ public interface StoreApplicationMapper {
 	StoreSearchAdminResponseServiceDto toStoreSearchAdminResponseServiceDto(Store store);
 
 	StoreSearchResponseServiceDto toStoreSearchResponseServiceDto(Store store);
+
+	StoreUpdateResponseServiceDto toStoreUpdateResponseServiceDto(Store updated);
 }

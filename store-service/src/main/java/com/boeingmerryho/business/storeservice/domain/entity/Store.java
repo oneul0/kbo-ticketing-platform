@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import com.boeingmerryho.business.storeservice.application.dto.request.StoreUpdateRequestServiceDto;
+
 import io.github.boeingmerryho.commonlibrary.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,4 +57,13 @@ public class Store extends BaseEntity {
 		nullable = false
 	)
 	private Boolean isClosed;
+
+	public void update(StoreUpdateRequestServiceDto update) {
+		if (update.name() != null)
+			this.name = update.name();
+		if (update.openAt() != null)
+			this.openAt = update.openAt();
+		if (update.closedAt() != null)
+			this.closedAt = update.closedAt();
+	}
 }

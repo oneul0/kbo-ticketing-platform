@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.storeservice.domain.service;
+package com.boeingmerryho.business.storeservice.infrastructure.helper;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -7,7 +7,7 @@ import com.boeingmerryho.business.storeservice.application.dto.mapper.StoreAppli
 import com.boeingmerryho.business.storeservice.application.dto.query.StoreSearchCondition;
 import com.boeingmerryho.business.storeservice.application.dto.request.StoreCreateRequestServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.request.StoreSearchAdminRequestServiceDto;
-import com.boeingmerryho.business.storeservice.application.dto.request.StoreSearchRequestServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.request.StoreUpdateRequestServiceDto;
 import com.boeingmerryho.business.storeservice.domain.entity.Store;
 import com.boeingmerryho.business.storeservice.domain.repository.StoreQueryRepository;
 import com.boeingmerryho.business.storeservice.domain.repository.StoreRepository;
@@ -18,36 +18,34 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class StoreDomainService {
+public class StoreAdminHelper {
 
+	private final StoreApplicationMapper mapper;
 	private final StoreRepository storeRepository;
 	private final StoreQueryRepository storeQueryRepository;
-	private final StoreApplicationMapper mapper;
 
 	public Store save(StoreCreateRequestServiceDto requestDto) {
 		Store store = mapper.toEntity(requestDto);
 		return storeRepository.save(store);
 	}
 
-	public Store getActiveStoreById(Long id) {
-		return storeRepository.findByIdAndIsDeletedFalse(id)
+	public Page<Store> search(StoreSearchAdminRequestServiceDto requestServiceDto) {
+		StoreSearchCondition condition = new StoreSearchCondition(requestServiceDto.stadiumId(),
+			requestServiceDto.name(),
+			requestServiceDto.isClosed(), requestServiceDto.isDeleted());
+		return storeQueryRepository.search(condition, requestServiceDto.customPageable());
+	}
+
+	public Store updateStoreInfo(Long id, StoreUpdateRequestServiceDto requestDto) {
+		Store store = storeRepository.findByIdAndIsDeletedFalse(id)
 			.orElseThrow(() -> new GlobalException(StoreErrorCode.NOT_FOUND));
+		store.update(requestDto);
+
+		return store;
 	}
 
 	public Store getAnyStoreById(Long id) {
 		return storeRepository.findById(id)
 			.orElseThrow(() -> new GlobalException(StoreErrorCode.NOT_FOUND));
-	}
-
-	public Page<Store> search(StoreSearchRequestServiceDto requestServiceDto) {
-		var condition = new StoreSearchCondition(requestServiceDto.stadiumId(), requestServiceDto.name(),
-			requestServiceDto.isClosed(), false);
-		return storeQueryRepository.search(condition, requestServiceDto.customPageable());
-	}
-
-	public Page<Store> search(StoreSearchAdminRequestServiceDto requestServiceDto) {
-		var condition = new StoreSearchCondition(requestServiceDto.stadiumId(), requestServiceDto.name(),
-			requestServiceDto.isClosed(), requestServiceDto.isDeleted());
-		return storeQueryRepository.search(condition, requestServiceDto.customPageable());
 	}
 }

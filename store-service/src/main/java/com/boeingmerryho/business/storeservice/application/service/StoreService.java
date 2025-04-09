@@ -8,7 +8,7 @@ import com.boeingmerryho.business.storeservice.application.dto.request.StoreSear
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreDetailResponseServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreSearchResponseServiceDto;
 import com.boeingmerryho.business.storeservice.domain.entity.Store;
-import com.boeingmerryho.business.storeservice.domain.service.StoreDomainService;
+import com.boeingmerryho.business.storeservice.infrastructure.helper.StoreCommonHelper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,17 +16,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StoreService {
 
-	private final StoreDomainService storeDomainService;
+	private final StoreCommonHelper storeCommonHelper;
 	private final StoreApplicationMapper mapper;
 
 	public StoreDetailResponseServiceDto getStoreDetail(Long id) {
-		Store storeDetail = storeDomainService.getActiveStoreById(id);
+		Store storeDetail = storeCommonHelper.getActiveStoreById(id);
 		return mapper.toStoreDetailResponseServiceDto(storeDetail);
 	}
 
 	public Page<StoreSearchResponseServiceDto> searchStore(
 		StoreSearchRequestServiceDto requestServiceDto) {
-		Page<Store> stores = storeDomainService.search(requestServiceDto);
+		Page<Store> stores = storeCommonHelper.search(requestServiceDto);
 		return stores.map(mapper::toStoreSearchResponseServiceDto);
 	}
 }

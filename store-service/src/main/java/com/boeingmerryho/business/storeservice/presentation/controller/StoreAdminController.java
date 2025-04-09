@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,13 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreCreateResponseServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreSearchAdminResponseServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.response.StoreUpdateResponseServiceDto;
 import com.boeingmerryho.business.storeservice.application.service.StoreAdminService;
 import com.boeingmerryho.business.storeservice.presentation.StoreSuccessCode;
 import com.boeingmerryho.business.storeservice.presentation.dto.mapper.StorePresentationMapper;
 import com.boeingmerryho.business.storeservice.presentation.dto.request.StoreCreateRequestDto;
+import com.boeingmerryho.business.storeservice.presentation.dto.request.StoreUpdateRequestDto;
 import com.boeingmerryho.business.storeservice.presentation.dto.response.StoreCreateResponseDto;
 import com.boeingmerryho.business.storeservice.presentation.dto.response.StoreDetailAdminResponseDto;
 import com.boeingmerryho.business.storeservice.presentation.dto.response.StoreSearchAdminResponseDto;
+import com.boeingmerryho.business.storeservice.presentation.dto.response.StoreUpdateResponseDto;
 import com.boeingmerryho.business.storeservice.utils.PageableUtils;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
@@ -73,4 +77,17 @@ public class StoreAdminController {
 		return SuccessResponse.of(StoreSuccessCode.FETCHED_STORES,
 			responseServiceDto.map(mapper::toStoreSearchAdminResponseDto));
 	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<SuccessResponse<StoreUpdateResponseDto>> updateStore(
+		@PathVariable Long id,
+		@RequestBody StoreUpdateRequestDto requestDto
+	) {
+		StoreUpdateResponseServiceDto responseServiceDto = storeAdminService.updateStore(
+			id,
+			mapper.toStoreUpdateRequestServiceDto(requestDto));
+		StoreUpdateResponseDto responseDto = mapper.toStoreUpdateResponseDto(responseServiceDto);
+		return SuccessResponse.of(StoreSuccessCode.UPDATED_STORE, responseDto);
+	}
+
 }
