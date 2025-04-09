@@ -7,11 +7,13 @@ import com.boeingmerryho.business.seatservice.application.dto.mapper.SeatApplica
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatActiveServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatCreateServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatInActiveServiceRequestDto;
+import com.boeingmerryho.business.seatservice.application.dto.request.SeatServiceUpdateDto;
+import com.boeingmerryho.business.seatservice.application.dto.request.SeatUpdateServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatActiveServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatCreateServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatInActiveServiceResponseDto;
+import com.boeingmerryho.business.seatservice.application.dto.response.SeatUpdateServiceResponseDto;
 import com.boeingmerryho.business.seatservice.domain.Seat;
-import com.boeingmerryho.business.seatservice.infrastructure.SeatRepository;
 import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatServiceHelper;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class SeatAdminService {
-	private final SeatRepository seatRepository;
 	private final SeatServiceHelper seatServiceHelper;
 	private final SeatApplicationMapper seatApplicationMapper;
 
@@ -39,7 +40,7 @@ public class SeatAdminService {
 			.isActive(serviceCreate.isActive())
 			.build();
 
-		seatRepository.save(newSeat);
+		seatServiceHelper.save(newSeat);
 		log.info("seatNo: {}, 새로운 좌석 생성 완료", newSeatNo);
 
 		return seatApplicationMapper.toSeatCreateServiceResponseDto(newSeat);
@@ -63,6 +64,18 @@ public class SeatAdminService {
 		log.info("seatNo: {}, 좌석 이용 불가능 상태로 변경 완료", seat.getSeatNo());
 
 		return seatApplicationMapper.toSeatInActiveServiceResponseDto(seat);
+	}
+
+	@Transactional
+	public SeatUpdateServiceResponseDto updateSeat(SeatUpdateServiceRequestDto serviceDto) {
+		Seat seat = seatServiceHelper.getSeatById(serviceDto.id());
+
+		SeatServiceUpdateDto seatServiceUpdateDto = seatApplicationMapper.toSeatServiceUpdateDto(serviceDto);
+
+		seat.update(seatServiceUpdateDto);
+		log.info("seatId: {}, 좌석 정보 변경 완료", seat.getId());
+
+		return seatApplicationMapper.toSeatUpdateServiceResponseDto(seat);
 	}
 
 	private String makeSeatNo(Integer seatBlock, Integer seatColumn, Integer seatRow) {

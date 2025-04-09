@@ -11,15 +11,19 @@ import org.springframework.web.bind.annotation.RestController;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatActiveServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatCreateServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatInActiveServiceRequestDto;
+import com.boeingmerryho.business.seatservice.application.dto.request.SeatUpdateServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatActiveServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatCreateServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatInActiveServiceResponseDto;
+import com.boeingmerryho.business.seatservice.application.dto.response.SeatUpdateServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.service.SeatAdminService;
 import com.boeingmerryho.business.seatservice.presentation.SeatSuccessCode;
 import com.boeingmerryho.business.seatservice.presentation.dto.mapper.SeatPresentationMapper;
 import com.boeingmerryho.business.seatservice.presentation.dto.request.SeatCreateRequestDto;
+import com.boeingmerryho.business.seatservice.presentation.dto.request.SeatUpdateRequestDto;
 import com.boeingmerryho.business.seatservice.presentation.dto.response.SeatCreateResponseDto;
 import com.boeingmerryho.business.seatservice.presentation.dto.response.SeatResponseDto;
+import com.boeingmerryho.business.seatservice.presentation.dto.response.SeatUpdateResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +72,21 @@ public class SeatAdminController {
 
 		SeatInActiveServiceResponseDto seatInActiveServiceResponseDto = seatAdminService.inActiveSeat(serviceDto);
 		SeatResponseDto response = seatPresentationMapper.toSeatResponseDtoForInActive(seatInActiveServiceResponseDto);
+		return SuccessResponse.of(SeatSuccessCode.UPDATED_SEAT, response).getBody();
+	}
+
+	@Description(
+		"ADMIN - 좌석 수정하기"
+	)
+	@PutMapping("/{id}")
+	public SuccessResponse<SeatUpdateResponseDto> updateSeat(
+		@PathVariable Long id,
+		@RequestBody SeatUpdateRequestDto update
+	) {
+		SeatUpdateServiceRequestDto serviceDto = seatPresentationMapper.toSeatUpdateServiceRequestDto(id, update);
+
+		SeatUpdateServiceResponseDto seatUpdateServiceResponseDto = seatAdminService.updateSeat(serviceDto);
+		SeatUpdateResponseDto response = seatPresentationMapper.toSeatUpdateResponseDto(seatUpdateServiceResponseDto);
 		return SuccessResponse.of(SeatSuccessCode.UPDATED_SEAT, response).getBody();
 	}
 }
