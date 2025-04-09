@@ -65,7 +65,7 @@ public class UserHelper {
 		}
 	}
 
-	private boolean isEmpty(String field) {
+	public boolean isEmpty(String field) {
 		return field == null || field.trim().isEmpty();
 	}
 

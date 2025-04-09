@@ -122,7 +122,26 @@ public class UserService {
 
 	@Transactional
 	public UserAdminUpdateResponseDto updateUser(UserUpdateRequestServiceDto dto) {
-		throw new UnsupportedOperationException("Not implemented yet");
+
+		User user = userHelper.findUserById(dto.id(), userRepository);
+
+		if (!userHelper.isEmpty(dto.password())) {
+			String encodedPassword = userHelper.encodePassword(dto.password(), passwordEncoder);
+			user.updatePassword(encodedPassword);
+		}
+		if (!userHelper.isEmpty(dto.username())) {
+			user.updateUsername(dto.username());
+		}
+		if (!userHelper.isEmpty(dto.nickname())) {
+			user.updateNickname(dto.nickname());
+		}
+		if (dto.birth() != null) {
+			user.updateBirth(dto.birth());
+		}
+
+		userHelper.updateRedisUserInfo(user, redisUtil);
+
+		return userApplicationMapper.toUserAdminUpdateResponseDto(user.getId());
 	}
 
 	@Transactional
