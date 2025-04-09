@@ -17,7 +17,7 @@ public class StoreService {
 	private final StoreApplicationMapper mapper;
 
 	public StoreDetailResponseServiceDto getStoreDetail(Long id) {
-		Store storeDetail = storeDomainService.findById(id);
+		Store storeDetail = storeDomainService.getActiveStoreById(id);
 		return mapper.toStoreDetailResponseServiceDto(storeDetail);
 	}
 }

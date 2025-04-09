@@ -9,5 +9,7 @@ public interface StoreRepository {
 
 	boolean existsByStadiumIdAndNameAndIsDeletedFalse(Long stadiumId, String name);
 
+	Optional<Store> findById(Long id);
+
 	Optional<Store> findByIdAndIsDeletedFalse(Long id);
 }
