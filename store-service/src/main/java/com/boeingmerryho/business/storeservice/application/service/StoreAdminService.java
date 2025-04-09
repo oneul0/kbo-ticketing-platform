@@ -29,7 +29,7 @@ public class StoreAdminService {
 	}
 
 	public StoreDetailAdminResponseServiceDto getStoreDetail(Long id) {
-		Store storeDetail = storeDomainService.findById(id);
+		Store storeDetail = storeDomainService.getAnyStoreById(id);
 		return mapper.toStoreDetailAdminResponseServiceDto(storeDetail);
 	}
 }

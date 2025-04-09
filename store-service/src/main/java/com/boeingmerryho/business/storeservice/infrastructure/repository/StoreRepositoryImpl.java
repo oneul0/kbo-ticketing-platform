@@ -25,6 +25,11 @@ public class StoreRepositoryImpl implements StoreRepository {
 	}
 
 	@Override
+	public Optional<Store> findById(Long id) {
+		return storeJpaRepository.findById(id);
+	}
+
+	@Override
 	public Optional<Store> findByIdAndIsDeletedFalse(Long id) {
 		return storeJpaRepository.findByIdAndIsDeletedFalse(id);
 	}

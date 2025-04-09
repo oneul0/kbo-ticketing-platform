@@ -23,8 +23,13 @@ public class StoreDomainService {
 		return storeRepository.save(store);
 	}
 
-	public Store findById(Long id) {
+	public Store getActiveStoreById(Long id) {
 		return storeRepository.findByIdAndIsDeletedFalse(id)
+			.orElseThrow(() -> new GlobalException(StoreErrorCode.NOT_FOUND));
+	}
+
+	public Store getAnyStoreById(Long id) {
+		return storeRepository.findById(id)
 			.orElseThrow(() -> new GlobalException(StoreErrorCode.NOT_FOUND));
 	}
 }
