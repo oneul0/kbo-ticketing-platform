@@ -62,4 +62,10 @@ public class StoreAdminHelper {
 		store.close();
 		return store;
 	}
+
+	public void deleteStore(Long id) {
+		Store store = storeRepository.findByIdAndIsDeletedFalse(id)
+			.orElseThrow(() -> new GlobalException(StoreErrorCode.NOT_FOUND));
+		store.softDelete(1L);
+	}
 }

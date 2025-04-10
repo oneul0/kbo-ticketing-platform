@@ -76,4 +76,9 @@ public class StoreAdminService {
 	public void disableQueue(Long id) {
 		storeQueueAdminHelper.disableQueue(id);
 	}
+
+	@Transactional
+	public void deleteStore(Long id) {
+		storeAdminHelper.deleteStore(id);
+	}
 }

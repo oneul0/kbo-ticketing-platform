@@ -3,6 +3,7 @@ package com.boeingmerryho.business.storeservice.presentation.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -118,6 +119,12 @@ public class StoreAdminController {
 	public ResponseEntity<SuccessResponse<Void>> disableQueue(@PathVariable Long id) {
 		storeAdminService.disableQueue(id);
 		return SuccessResponse.of(StoreSuccessCode.QUEUE_DISABLED);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<SuccessResponse<Void>> deleteStore(@PathVariable Long id) {
+		storeAdminService.deleteStore(id);
+		return SuccessResponse.of(StoreSuccessCode.DELETE_STORE);
 	}
 
 }
