@@ -1,9 +1,12 @@
 package com.boeingmerryho.business.seatservice.application.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.seatservice.application.dto.mapper.SeatApplicationMapper;
+import com.boeingmerryho.business.seatservice.application.dto.request.CacheSeatCreateServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatActiveServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatCreateServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatDeleteServiceRequestDto;
@@ -15,6 +18,7 @@ import com.boeingmerryho.business.seatservice.application.dto.response.SeatCreat
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatInActiveServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatUpdateServiceResponseDto;
 import com.boeingmerryho.business.seatservice.domain.Seat;
+import com.boeingmerryho.business.seatservice.domain.service.CreateCacheSeatsService;
 import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatAdminServiceHelper;
 import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatCommonHelper;
 
@@ -28,6 +32,7 @@ public class SeatAdminService {
 	private final SeatCommonHelper seatCommonHelper;
 	private final SeatApplicationMapper seatApplicationMapper;
 	private final SeatAdminServiceHelper seatAdminServiceHelper;
+	private final CreateCacheSeatsService createCacheSeatsService;
 
 	@Transactional
 	public SeatCreateServiceResponseDto createSeat(SeatCreateServiceRequestDto serviceCreate) {
@@ -87,6 +92,14 @@ public class SeatAdminService {
 		seatAdminServiceHelper.delete(seat);
 
 		log.info("seatId: {}, 좌석 삭제 완료", seat.getId());
+	}
+
+	@Transactional
+	public void createCacheSeats(CacheSeatCreateServiceRequestDto create) {
+		List<Seat> seats = seatAdminServiceHelper.getSeatsByIsActiveIsTrue();
+		createCacheSeatsService.createSeatBucket(seats, create.date());
+
+		log.info("날짜: {} - 좌석 생성 완료", create.date());
 	}
 
 	private String makeSeatNo(Integer seatBlock, Integer seatColumn, Integer seatRow) {
