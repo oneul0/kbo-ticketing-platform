@@ -35,6 +35,11 @@ public enum ErrorCode implements BaseErrorCode {
 	MALFORMED_JWT("U-024", "JWT 토큰이 손상되었습니다.", HttpStatus.UNAUTHORIZED),
 	JWT_SIGNATURE_VALIDATION_FAIL("U-025", "JWT 검증에 실패했습니다.", HttpStatus.UNAUTHORIZED),
 
+	VERIFICATION_ALREADY_SENT("U-026", "이미 요청한 내역이 있습니다.", HttpStatus.UNAUTHORIZED),
+	VERIFICATION_FAIL("U-027", "인증 코드가 일치하지 않습니다.", HttpStatus.UNAUTHORIZED),
+
+	EMAIL_SEND_FAILED("U-028", "인증 코드를 위한 이메일 발송에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+
 	;
 
 	private final String errorCode;

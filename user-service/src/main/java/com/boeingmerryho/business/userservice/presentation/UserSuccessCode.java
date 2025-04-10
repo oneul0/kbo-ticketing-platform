@@ -18,6 +18,9 @@ public enum UserSuccessCode implements SuccessCode {
 
 	USER_LOGIN_SUCCESS("로그인에 성공했습니다.", HttpStatus.OK),
 	USER_LOGOUT_SUCCESS("로그아웃에 성공했습니다.", HttpStatus.OK),
+
+	VERIFICATION_EMAIL_SEND_SUCCESS("인증 메일 발송을 성공했습니다.", HttpStatus.OK),
+	USER_EMAIL_VERIFICATION_SUCCESS("인증 메일 발송을 성공했습니다.", HttpStatus.OK),
 	;
 
 	private final String message;

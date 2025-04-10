@@ -15,6 +15,8 @@ import com.boeingmerryho.business.userservice.application.dto.mapper.UserApplica
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminCheckEmailRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRoleRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminEmailVerificationCheckRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminEmailVerificationRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminFindRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminLoginRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminRefreshTokenRequestServiceDto;
@@ -27,6 +29,7 @@ import com.boeingmerryho.business.userservice.application.dto.request.other.User
 import com.boeingmerryho.business.userservice.application.dto.response.admin.UserAdminFindResponseDto;
 import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
 import com.boeingmerryho.business.userservice.application.dto.response.other.UserLoginResponseServiceDto;
+import com.boeingmerryho.business.userservice.application.utils.mail.EmailService;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.domain.UserSearchCriteria;
@@ -38,6 +41,7 @@ import com.boeingmerryho.business.userservice.presentation.dto.response.admin.Us
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminSearchResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateRoleResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminVerificationResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
@@ -55,6 +59,7 @@ public class UserAdminService {
 	private final PasswordEncoder passwordEncoder;
 
 	private final UserHelper userHelper;
+	private final EmailService emailService;
 
 	@Value("${admin.key}")
 	private String adminKey;
@@ -232,5 +237,26 @@ public class UserAdminService {
 		userHelper.updateRedisUserInfo(user);
 
 		return userApplicationMapper.toUserAdminUpdateResponseDto(user.getId());
+	}
+
+	public UserAdminVerificationResponseDto sendVerificationCode(
+		UserAdminEmailVerificationRequestServiceDto dto) {
+		userHelper.checkDuplicatedVerificationRequest(dto.email());
+		userHelper.verifyEmailFormat(dto.email());
+		String code = userHelper.generateVerificationCode();
+		userHelper.storeVerificationCode(dto.email(), code);
+		emailService.sendVerificationEmail(dto.email(), code);
+		return userApplicationMapper.toUserAdminVerificationResponseDto(dto.email()).success("인증 메일 발송 성공");
+	}
+
+	public UserAdminVerificationResponseDto verifyCode(
+		UserAdminEmailVerificationCheckRequestServiceDto dto) {
+		String storedCode = userHelper.getVerificationCode(dto.email());
+		if (storedCode == null || !storedCode.equals(dto.code())) {
+			throw new GlobalException(ErrorCode.VERIFICATION_FAIL);
+		}
+		userHelper.removeVerificationCode(dto.email());
+
+		return UserAdminVerificationResponseDto.success("메일 인증 성공");
 	}
 }

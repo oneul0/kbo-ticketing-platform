@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminCheckEmailRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRoleRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminEmailVerificationCheckRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminEmailVerificationRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminFindRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminLoginRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminRefreshTokenRequestServiceDto;
@@ -33,6 +35,8 @@ import com.boeingmerryho.business.userservice.application.service.UserAdminServi
 import com.boeingmerryho.business.userservice.config.pageable.PageableConfig;
 import com.boeingmerryho.business.userservice.presentation.UserSuccessCode;
 import com.boeingmerryho.business.userservice.presentation.dto.mapper.UserPresentationMapper;
+import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminEmailVerificationCheckRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminEmailVerificationRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminLoginRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminLogoutRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminRegisterRequestDto;
@@ -45,9 +49,11 @@ import com.boeingmerryho.business.userservice.presentation.dto.response.admin.Us
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminSearchResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateRoleResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminVerificationResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -160,6 +166,28 @@ public class UserAdminController {
 			email);
 		UserAdminCheckEmailResponseDto responseDto = userAdminService.checkEmail(requestServiceDto);
 		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_CHECK_SUCCESS, responseDto);
+	}
+
+	@Description("사용자 email 인증 발송 요청 api")
+	@PostMapping("/verify/send")
+	public ResponseEntity<SuccessResponse<UserAdminVerificationResponseDto>> sendVerificationCode(
+		@RequestBody @Valid UserAdminEmailVerificationRequestDto dto) {
+
+		UserAdminEmailVerificationRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminEmailVerificationRequestServiceDto(
+			dto);
+		UserAdminVerificationResponseDto responseDto = userAdminService.sendVerificationCode(requestServiceDto);
+		return SuccessResponse.of(UserSuccessCode.VERIFICATION_EMAIL_SEND_SUCCESS, responseDto);
+	}
+
+	@Description("사용자 email 인증 api")
+	@PostMapping("/verify/check")
+	public ResponseEntity<SuccessResponse<UserAdminVerificationResponseDto>> checkVerificationCode(
+		@RequestBody @Valid UserAdminEmailVerificationCheckRequestDto dto) {
+
+		UserAdminEmailVerificationCheckRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminEmailVerificationCheckRequestServiceDto(
+			dto);
+		UserAdminVerificationResponseDto responseDto = userAdminService.verifyCode(requestServiceDto);
+		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_VERIFICATION_SUCCESS, responseDto);
 	}
 
 	@Description("사용자 리프레시 토큰 재발급 api")

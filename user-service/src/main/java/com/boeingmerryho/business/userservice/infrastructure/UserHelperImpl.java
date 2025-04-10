@@ -2,6 +2,7 @@ package com.boeingmerryho.business.userservice.infrastructure;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -35,6 +36,7 @@ public class UserHelperImpl implements UserHelper {
 	private static final String USER_INFO_PREFIX = "user:info:";
 	private static final String USER_TOKEN_PREFIX = "user:token:";
 	private static final String BLACKLIST_PREFIX = "blacklist:";
+	private static final String VERIFICATION_PREFIX = "verification:email:";
 
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final JwtTokenProvider jwtTokenProvider;
@@ -199,6 +201,33 @@ public class UserHelperImpl implements UserHelper {
 			throw new GlobalException(ErrorCode.JWT_REQUIRED);
 		}
 		return new UserTokenResult(tokenKey, token);
+	}
+
+	//----mail
+	public String generateVerificationCode() {
+		return String.format("%06d", new Random().nextInt(1000000)); // 6자리 랜덤 숫자
+	}
+
+	public void storeVerificationCode(String email, String code) {
+		String key = VERIFICATION_PREFIX + email;
+		redisTemplate.opsForValue().set(key, code, 5, TimeUnit.MINUTES); // 5분 TTL
+	}
+
+	public String getVerificationCode(String email) {
+		String key = VERIFICATION_PREFIX + email;
+		return (String)redisTemplate.opsForValue().get(key);
+	}
+
+	public void removeVerificationCode(String email) {
+		String key = VERIFICATION_PREFIX + email;
+		redisTemplate.delete(key);
+	}
+
+	public void checkDuplicatedVerificationRequest(String email) {
+		String key = VERIFICATION_PREFIX + email;
+		if (redisTemplate.hasKey(key)) {
+			throw new GlobalException(ErrorCode.VERIFICATION_ALREADY_SENT);
+		}
 	}
 
 }

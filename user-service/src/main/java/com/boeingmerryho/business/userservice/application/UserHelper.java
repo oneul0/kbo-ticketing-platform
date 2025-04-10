@@ -68,5 +68,15 @@ public interface UserHelper {
 	void blacklistToken(String accessToken);
 
 	UserTokenResult getUserTokenFromRedis(Long userId);
+
+	String generateVerificationCode();
+
+	void storeVerificationCode(String email, String code);
+
+	String getVerificationCode(String email);
+
+	void removeVerificationCode(String email);
+
+	void checkDuplicatedVerificationRequest(String email);
 }
 
