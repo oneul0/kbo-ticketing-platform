@@ -29,6 +29,7 @@ public class AdminCheckInterceptor implements HandlerInterceptor {
 			log.info("login user : {}", userIdAttr);
 
 			if (userIdAttr == null) {
+				log.info("userIdAttr id null");
 				return false;
 			}
 
@@ -36,15 +37,18 @@ public class AdminCheckInterceptor implements HandlerInterceptor {
 			String redisKey = "user:info:" + userId;
 
 			if (!redisTemplate.hasKey(redisKey)) {
+				log.info("user info key not found in redis");
 				return false;
 			}
 
 			Map<Object, Object> userInfo = redisTemplate.opsForHash().entries(redisKey);
 			if (userInfo.isEmpty()) {
+				log.info("user info not found in redis");
 				return false;
 			}
 
 			if (!UserRoleType.ADMIN.name().equals(userInfo.get("role"))) {
+				log.info("user is not admin");
 				return false;
 			}
 

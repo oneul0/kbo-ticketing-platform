@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminCheckEmailRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRoleRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminEmailVerificationCheckRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminEmailVerificationRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminFindRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminLoginRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminRefreshTokenRequestServiceDto;
@@ -24,6 +26,8 @@ import com.boeingmerryho.business.userservice.application.dto.request.other.User
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserUpdateRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserWithdrawRequestServiceDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminEmailVerificationCheckRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminEmailVerificationRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminLoginRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminLogoutRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminRegisterRequestDto;
@@ -37,6 +41,8 @@ import com.boeingmerryho.business.userservice.presentation.dto.request.other.Use
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserRegisterRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserTokenRefreshRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserUpdateRequestDto;
+
+import jakarta.validation.Valid;
 
 @Mapper(componentModel = "spring")
 public interface UserPresentationMapper {
@@ -99,4 +105,10 @@ public interface UserPresentationMapper {
 	UserRefreshTokenRequestServiceDto toUserRefreshTokenRequestServiceDto(UserTokenRefreshRequestDto requestDto);
 
 	UserLogoutRequestServiceDto toUserAdminLogoutRequestServiceDto(UserAdminLogoutRequestDto requestDto, Long userId);
+
+	UserAdminEmailVerificationRequestServiceDto toUserAdminEmailVerificationRequestServiceDto(
+		@Valid UserAdminEmailVerificationRequestDto dto);
+
+	UserAdminEmailVerificationCheckRequestServiceDto toUserAdminEmailVerificationCheckRequestServiceDto(
+		@Valid UserAdminEmailVerificationCheckRequestDto dto);
 }

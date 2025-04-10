@@ -13,6 +13,7 @@ import com.boeingmerryho.business.userservice.presentation.dto.response.admin.Us
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminSearchResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateRoleResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminVerificationResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserCheckEmailResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserFindResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
@@ -42,4 +43,5 @@ public interface UserApplicationMapper {
 
 	UserAdminCheckEmailResponseDto toUserAdminCheckEmailResponseDto(Boolean isEmailDuplicated);
 
+	UserAdminVerificationResponseDto toUserAdminVerificationResponseDto(String email, String code);
 }
