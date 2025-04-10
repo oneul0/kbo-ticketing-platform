@@ -19,6 +19,8 @@ import com.boeingmerryho.business.userservice.application.dto.request.admin.User
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserCheckEmailRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserCreateRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserEmailVerificationCheckRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserEmailVerificationRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserFindRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserLoginRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
@@ -36,6 +38,8 @@ import com.boeingmerryho.business.userservice.presentation.dto.request.admin.Use
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminUpdateRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminUpdateRoleRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserCreateRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserEmailVerificationCheckRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserEmailVerificationRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLoginRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLogoutRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserRegisterRequestDto;
@@ -111,4 +115,10 @@ public interface UserPresentationMapper {
 
 	UserAdminEmailVerificationCheckRequestServiceDto toUserAdminEmailVerificationCheckRequestServiceDto(
 		@Valid UserAdminEmailVerificationCheckRequestDto dto);
+
+	UserEmailVerificationCheckRequestServiceDto toUserEmailVerificationCheckRequestServiceDto(
+		@Valid UserEmailVerificationCheckRequestDto dto);
+
+	UserEmailVerificationRequestServiceDto toUserEmailVerificationRequestServiceDto(
+		@Valid UserEmailVerificationRequestDto dto);
 }

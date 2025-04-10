@@ -246,7 +246,7 @@ public class UserAdminService {
 		String code = userHelper.generateVerificationCode();
 		userHelper.storeVerificationCode(dto.email(), code);
 		emailService.sendVerificationEmail(dto.email(), code);
-		return userApplicationMapper.toUserAdminVerificationResponseDto(dto.email(), code);
+		return userApplicationMapper.toUserAdminVerificationResponseDto(dto.email()).success("인증 메일 발송 성공");
 	}
 
 	public UserAdminVerificationResponseDto verifyCode(

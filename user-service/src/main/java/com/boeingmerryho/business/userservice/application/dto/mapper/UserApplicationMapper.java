@@ -17,6 +17,7 @@ import com.boeingmerryho.business.userservice.presentation.dto.response.admin.Us
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserCheckEmailResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserFindResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserVerificationResponseDto;
 
 @Mapper(componentModel = "spring")
 public interface UserApplicationMapper {
@@ -43,5 +44,7 @@ public interface UserApplicationMapper {
 
 	UserAdminCheckEmailResponseDto toUserAdminCheckEmailResponseDto(Boolean isEmailDuplicated);
 
-	UserAdminVerificationResponseDto toUserAdminVerificationResponseDto(String email, String code);
+	UserAdminVerificationResponseDto toUserAdminVerificationResponseDto(String email);
+
+	UserVerificationResponseDto toUserVerificationResponseDto(String email);
 }

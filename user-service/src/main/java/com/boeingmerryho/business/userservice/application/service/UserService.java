@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.boeingmerryho.business.userservice.application.UserHelper;
 import com.boeingmerryho.business.userservice.application.dto.mapper.UserApplicationMapper;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserCheckEmailRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserEmailVerificationCheckRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserEmailVerificationRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserFindRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserLoginRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
@@ -20,14 +22,18 @@ import com.boeingmerryho.business.userservice.application.dto.request.other.User
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
 import com.boeingmerryho.business.userservice.application.dto.response.other.UserLoginResponseServiceDto;
+import com.boeingmerryho.business.userservice.application.utils.mail.EmailService;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
+import com.boeingmerryho.business.userservice.exception.ErrorCode;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserCheckEmailResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserFindResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserRefreshTokenResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserVerificationResponseDto;
 
+import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,6 +47,7 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final UserHelper userHelper;
+	private final EmailService emailService;
 
 	@Transactional
 	public Long registerUser(UserRegisterRequestServiceDto dto) {
@@ -140,5 +147,25 @@ public class UserService {
 		String newAccessToken = userHelper.generateAccessToken(userId);
 
 		return new UserRefreshTokenResponseDto(newAccessToken);
+	}
+
+	public UserVerificationResponseDto sendVerificationCode(
+		UserEmailVerificationRequestServiceDto dto) {
+		userHelper.checkDuplicatedVerificationRequest(dto.email());
+		userHelper.verifyEmailFormat(dto.email());
+		String code = userHelper.generateVerificationCode();
+		userHelper.storeVerificationCode(dto.email(), code);
+		emailService.sendVerificationEmail(dto.email(), code);
+		return userApplicationMapper.toUserVerificationResponseDto(dto.email()).success("인증 메일 발송 성공");
+	}
+
+	public UserVerificationResponseDto verifyCode(UserEmailVerificationCheckRequestServiceDto dto) {
+		String storedCode = userHelper.getVerificationCode(dto.email());
+		if (storedCode == null || !storedCode.equals(dto.code())) {
+			throw new GlobalException(ErrorCode.VERIFICATION_FAIL);
+		}
+		userHelper.removeVerificationCode(dto.email());
+
+		return UserVerificationResponseDto.success("메일 인증 성공");
 	}
 }

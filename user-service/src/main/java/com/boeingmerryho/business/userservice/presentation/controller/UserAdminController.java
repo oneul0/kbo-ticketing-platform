@@ -187,7 +187,7 @@ public class UserAdminController {
 		UserAdminEmailVerificationCheckRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminEmailVerificationCheckRequestServiceDto(
 			dto);
 		UserAdminVerificationResponseDto responseDto = userAdminService.verifyCode(requestServiceDto);
-		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_CHECK_SUCCESS, responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_VERIFICATION_SUCCESS, responseDto);
 	}
 
 	@Description("사용자 리프레시 토큰 재발급 api")

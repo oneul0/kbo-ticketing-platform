@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserCheckEmailRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserEmailVerificationCheckRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserEmailVerificationRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserFindRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserLoginRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
@@ -23,6 +25,8 @@ import com.boeingmerryho.business.userservice.application.dto.request.other.User
 import com.boeingmerryho.business.userservice.application.service.UserService;
 import com.boeingmerryho.business.userservice.presentation.UserSuccessCode;
 import com.boeingmerryho.business.userservice.presentation.dto.mapper.UserPresentationMapper;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserEmailVerificationCheckRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserEmailVerificationRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLoginRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLogoutRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserRegisterRequestDto;
@@ -33,8 +37,10 @@ import com.boeingmerryho.business.userservice.presentation.dto.response.other.Us
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserFindResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserRefreshTokenResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserVerificationResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -133,6 +139,28 @@ public class UserController {
 		UserCheckEmailResponseDto responseDto = userService.checkEmail(
 			requestServiceDto);
 		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_CHECK_SUCCESS, responseDto);
+	}
+
+	@Description("사용자 email 인증 발송 요청 api")
+	@PostMapping("/verify/send")
+	public ResponseEntity<SuccessResponse<UserVerificationResponseDto>> sendVerificationCode(
+		@RequestBody @Valid UserEmailVerificationRequestDto dto) {
+
+		UserEmailVerificationRequestServiceDto requestServiceDto = userPresentationMapper.toUserEmailVerificationRequestServiceDto(
+			dto);
+		UserVerificationResponseDto responseDto = userService.sendVerificationCode(requestServiceDto);
+		return SuccessResponse.of(UserSuccessCode.VERIFICATION_EMAIL_SEND_SUCCESS, responseDto);
+	}
+
+	@Description("사용자 email 인증 api")
+	@PostMapping("/verify/check")
+	public ResponseEntity<SuccessResponse<UserVerificationResponseDto>> checkVerificationCode(
+		@RequestBody @Valid UserEmailVerificationCheckRequestDto dto) {
+
+		UserEmailVerificationCheckRequestServiceDto requestServiceDto = userPresentationMapper.toUserEmailVerificationCheckRequestServiceDto(
+			dto);
+		UserVerificationResponseDto responseDto = userService.verifyCode(requestServiceDto);
+		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_VERIFICATION_SUCCESS, responseDto);
 	}
 
 	@Description(
