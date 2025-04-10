@@ -2,12 +2,13 @@ package com.boeingmerryho.business.userservice.exception;
 
 import org.springframework.http.HttpStatus;
 
+import io.github.boeingmerryho.commonlibrary.exception.BaseErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ErrorCode {
+public enum ErrorCode implements BaseErrorCode {
 
 	NOT_FOUND("U-001", "해당 유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 	USERNAME_NULL("U-002", "Username이 비어 있습니다.", HttpStatus.BAD_REQUEST),
@@ -24,10 +25,21 @@ public enum ErrorCode {
 		HttpStatus.BAD_REQUEST),
 	ADMIN_REGISTER_KEY_NOT_MATCH("U-017", "ADMIN 인증을 위한 key값이 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
 
-	JWT_REQUIRED("U-018", "로그아웃을 위해 JWT 토큰이 필요합니다.", HttpStatus.UNAUTHORIZED),
-	JWT_NOT_FOUND("U-019", "로그인시 생성한 JWT 토큰이 없습니다.", HttpStatus.UNAUTHORIZED),
+	ROLE_ACTIVE_USERS_NOT_FOUND("U-018", "Role에 따른 활성화된 사용자가 없습니다.", HttpStatus.NOT_FOUND),
 
-	ROLE_ACTIVE_USERS_NOT_FOUND("U-020", "Role에 따른 활성화된 사용자 없음.", HttpStatus.NOT_FOUND),
+	JWT_REQUIRED("U-019", "로그아웃을 위해 JWT 토큰이 필요합니다.", HttpStatus.UNAUTHORIZED),
+	JWT_NOT_FOUND("U-020", "로그인시 생성한 JWT 토큰이 없습니다.", HttpStatus.UNAUTHORIZED),
+	JWT_INVALID("U-021", "JWT 토큰이 유효하지 않습니다.", HttpStatus.UNAUTHORIZED),
+	JWT_NOT_MATCH("U-022", "JWT 토큰이 일치하지 않습니다.", HttpStatus.UNAUTHORIZED),
+	JWT_EXPIRED("U-023", "JWT 토큰이 만료되었습니다.", HttpStatus.UNAUTHORIZED),
+	MALFORMED_JWT("U-024", "JWT 토큰이 손상되었습니다.", HttpStatus.UNAUTHORIZED),
+	JWT_SIGNATURE_VALIDATION_FAIL("U-025", "JWT 검증에 실패했습니다.", HttpStatus.UNAUTHORIZED),
+
+	VERIFICATION_ALREADY_SENT("U-026", "이미 요청한 내역이 있습니다.", HttpStatus.UNAUTHORIZED),
+	VERIFICATION_FAIL("U-027", "인증 코드가 일치하지 않습니다.", HttpStatus.UNAUTHORIZED),
+
+	EMAIL_SEND_FAILED("U-028", "인증 코드를 위한 이메일 발송에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+
 	;
 
 	private final String errorCode;

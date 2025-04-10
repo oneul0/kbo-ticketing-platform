@@ -1,6 +1,6 @@
 package com.boeingmerryho.business.userservice.domain;
 
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminSearchRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminSearchRequestServiceDto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

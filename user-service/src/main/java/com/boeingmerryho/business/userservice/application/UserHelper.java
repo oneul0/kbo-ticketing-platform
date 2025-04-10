@@ -2,172 +2,81 @@ package com.boeingmerryho.business.userservice.application;
 
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminRegisterRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserRegisterRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
-import com.boeingmerryho.business.userservice.application.utils.jwt.JwtTokenProvider;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
-import com.boeingmerryho.business.userservice.exception.UserException;
 
-import io.jsonwebtoken.Claims;
-import lombok.RequiredArgsConstructor;
+public interface UserHelper {
 
-@Component
-@RequiredArgsConstructor
-public class UserHelper {
+	User findUserById(Long id, UserRepository userRepository);
 
-	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
-	private static final Pattern PASSWORD_PATTERN = Pattern.compile(
-		"^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,15}$");
+	User findUserByEmail(String email, UserRepository userRepository);
 
-	private static final String USER_INFO_PREFIX = "user:info:";
-	private static final String USER_TOKEN_PREFIX = "user:token:";
-	private static final String BLACKLIST_PREFIX = "blacklist:";
+	void validateRegisterRequest(UserAdminRegisterRequestServiceDto dto, UserRepository userRepository);
 
-	private final RedisTemplate<String, Object> redisTemplate;
-	private final JwtTokenProvider jwtTokenProvider;
-	private final RedisUtil redisUtil;
+	void validateRegisterRequest(UserRegisterRequestServiceDto dto, UserRepository userRepository);
 
-	public User findUserById(Long id, UserRepository userRepository) {
-		return userRepository.findById(id)
-			.orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND));
-	}
+	void validateCommonFields(String email, String password, String username, String nickname, LocalDate birth);
 
-	public User findUserByEmail(String email, UserRepository userRepository) {
-		return userRepository.findByEmail(email)
-			.orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND));
-	}
+	void validateRequiredField(String field, ErrorCode errorCode);
 
-	public void validateRegisterRequest(UserAdminRegisterRequestServiceDto dto, UserRepository userRepository) {
-		validateCommonFields(dto.email(), dto.password(), dto.username(), dto.nickname(), dto.birth());
-		checkEmailExists(dto.email(), userRepository);
-	}
+	void validateRequiredField(LocalDate field, ErrorCode errorCode);
 
-	public void validateRegisterRequest(UserRegisterRequestServiceDto dto, UserRepository userRepository) {
-		validateCommonFields(dto.email(), dto.password(), dto.username(), dto.nickname(), dto.birth());
-		checkEmailExists(dto.email(), userRepository);
-	}
+	boolean isEmpty(String field);
 
-	private void validateCommonFields(String email, String password, String username, String nickname,
-		LocalDate birth) {
-		validateRequiredField(email, ErrorCode.EMAIL_NULL);
-		validateRequiredField(password, ErrorCode.PASSWORD_NULL);
-		validateRequiredField(username, ErrorCode.USERNAME_NULL);
-		validateRequiredField(nickname, ErrorCode.USERNAME_NULL);
-		validateRequiredField(birth, ErrorCode.USERNAME_NULL);
+	void verifyEmailFormat(String email);
 
-		verifyEmailFormat(email);
-		verifyPasswordFormat(password);
-	}
+	void verifyPasswordFormat(String password);
 
-	private void validateRequiredField(String field, ErrorCode errorCode) {
-		if (isEmpty(field)) {
-			throw new UserException(errorCode);
-		}
-	}
+	void checkEmailExists(String email, UserRepository userRepository);
 
-	private void validateRequiredField(LocalDate field, ErrorCode errorCode) {
-		if (field == null) {
-			throw new UserException(errorCode);
-		}
-	}
+	String encodePassword(String password, PasswordEncoder passwordEncoder);
 
-	public boolean isEmpty(String field) {
-		return field == null || field.trim().isEmpty();
-	}
+	void checkMasterRole(User user);
 
-	private void verifyEmailFormat(String email) {
-		if (!EMAIL_PATTERN.matcher(email).matches()) {
-			throw new UserException(ErrorCode.USERNAME_REGEX_NOT_MATCH);
-		}
-	}
+	void isAdminRole(UserRoleType type);
 
-	private void verifyPasswordFormat(String password) {
-		if (!PASSWORD_PATTERN.matcher(password).matches()) {
-			throw new UserException(ErrorCode.PASSWORD_REGEX_NOT_MATCH);
-		}
-	}
+	void isValidRefreshToken(String refreshToken);
 
-	public void checkEmailExists(String email, UserRepository userRepository) {
-		if (userRepository.existsByEmail(email)) {
-			throw new UserException(ErrorCode.ALREADY_EXISTS);
-		}
-	}
+	Long getUserIdFromToken(String refreshToken);
 
-	public String encodePassword(String password, PasswordEncoder passwordEncoder) {
-		return passwordEncoder.encode(password);
-	}
+	void isEqualStoredRefreshToken(Long userId, String refreshToken);
 
-	public void checkMasterRole(User user) {
-		if (user.isAdmin()) {
-			throw new UserException(ErrorCode.CANNOT_GRANT_MASTER_ROLE);
-		}
-	}
+	String generateAccessToken(Long userId);
 
-	public void isAdminRole(UserRoleType type) {
-		if (type.equals(UserRoleType.ADMIN)) {
-			throw new UserException(ErrorCode.CANNOT_GRANT_MASTER_ROLE);
-		}
-	}
+	void updateRedisUserInfo(User user);
 
-	//-----redis
+	Map<String, String> updateUserJwtTokenRedis(Long id);
 
-	public void updateRedisUserInfo(User user) {
-		redisUtil.updateUserInfo(user);
-	}
+	void clearRedisUserData(Long userId);
 
-	public Map<String, String> updateUserJwtTokenRedis(Long id) {
-		return redisUtil.updateUserJwtToken(id);
-	}
+	void deleteKeyFromRedis(String tokenKey);
 
-	public void clearRedisUserData(Long userId) {
-		redisTemplate.delete(USER_INFO_PREFIX + userId);
-		redisTemplate.delete(USER_TOKEN_PREFIX + userId);
-	}
+	void hasKeyInRedis(String key);
 
-	public void deleteKeyFromRedis(String tokenKey) {
-		redisTemplate.delete(tokenKey);
-	}
+	Map<Object, Object> getMapEntriesFromRedis(String key);
 
-	public void hasKeyInRedis(String key) {
-		if (!redisTemplate.hasKey(key)) {
-			throw new UserException(ErrorCode.NOT_FOUND);
-		}
-	}
+	void setOpsForValueRedis(String key, String value);
 
-	public Map<Object, Object> getMapEntriesFromRedis(String key) {
-		return redisTemplate.opsForHash().entries(key);
-	}
+	void blacklistToken(String accessToken);
 
-	public void setOpsForValueRedis(String key, String value) {
-		redisTemplate.opsForValue().set(key, value);
-	}
+	UserTokenResult getUserTokenFromRedis(Long userId);
 
-	public void blacklistToken(String accessToken) {
-		Claims claims = jwtTokenProvider.parseJwtToken(accessToken);
-		long ttlMillis = jwtTokenProvider.calculateTtlMillis(claims.getExpiration());
-		String blacklistKey = getBlacklistPrefix() + accessToken;
+	String generateVerificationCode();
 
-		setOpsForValueRedis(blacklistKey, "blacklisted");
-		redisTemplate.expire(blacklistKey, Math.max(ttlMillis, 1), TimeUnit.MILLISECONDS);
-	}
+	void storeVerificationCode(String email, String code);
 
-	public String getUserTokenPrefix() {
-		return USER_TOKEN_PREFIX;
-	}
+	String getVerificationCode(String email);
 
-	private String getBlacklistPrefix() {
-		return BLACKLIST_PREFIX;
-	}
+	void removeVerificationCode(String email);
 
+	void checkDuplicatedVerificationRequest(String email);
 }
+
