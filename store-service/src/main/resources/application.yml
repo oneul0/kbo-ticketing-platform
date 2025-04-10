@@ -1,0 +1,8 @@
+spring:
+  config:
+    import: "optional:configserver:http://localhost:8888/"
+    name: store-service
+  profiles:
+    active: dev
+  application:
+    name: store-service

@@ -28,6 +28,8 @@ ext {
 }
 
 dependencies {
+    // common-library
+    implementation 'io.github.boeingmerryho:common-library:1.0.4'
 
     // data
     runtimeOnly 'com.mysql:mysql-connector-j'

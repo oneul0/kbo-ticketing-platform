@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.seatservice.domain;
+package com.boeingmerryho.business.paymentservice.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -47,12 +47,19 @@ public abstract class BaseEntity {
     @Builder.Default
     private Boolean isDeleted = false;
 
+    /**
+     * 엔티티 soft delete
+     * @param deleteUserId 삭제자 id
+     */
     public void softDelete(Long deleteUserId) {
         this.deletedAt = LocalDateTime.now();
         this.deletedBy = deleteUserId;
         this.isDeleted = true;
     }
 
+    /**
+     * 엔티티 soft delete 취소
+     */
     public void restore() {
         this.deletedAt = null;
         this.deletedBy = null;
