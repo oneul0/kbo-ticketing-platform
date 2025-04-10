@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.userservice.application.UserHelper;
 import com.boeingmerryho.business.userservice.application.dto.mapper.UserApplicationMapper;
-import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminCheckEmailRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRoleRequestServiceDto;
@@ -24,9 +23,10 @@ import com.boeingmerryho.business.userservice.application.dto.request.admin.User
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminUpdateRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminUpdateRoleRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminWithdrawRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.admin.UserAdminFindResponseDto;
-import com.boeingmerryho.business.userservice.application.dto.response.other.UserLoginResponseServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
+import com.boeingmerryho.business.userservice.application.dto.response.other.UserLoginResponseServiceDto;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.domain.UserSearchCriteria;
@@ -169,8 +169,20 @@ public class UserAdminService {
 		userHelper.clearRedisUserData(user.getId());
 	}
 
+	@Transactional
 	public UserAdminRefreshTokenResponseDto refreshToken(UserAdminRefreshTokenRequestServiceDto dto) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		String refreshToken = dto.refreshToken();
+
+		log.debug("refresh requested refreshToken : {}", refreshToken);
+		userHelper.isValidRefreshToken(refreshToken);
+
+		Long userId = userHelper.getUserIdFromToken(refreshToken);
+
+		userHelper.isEqualStoredRefreshToken(userId, refreshToken);
+
+		String newAccessToken = userHelper.generateAccessToken(userId);
+
+		return new UserAdminRefreshTokenResponseDto(newAccessToken);
 	}
 
 	@Transactional

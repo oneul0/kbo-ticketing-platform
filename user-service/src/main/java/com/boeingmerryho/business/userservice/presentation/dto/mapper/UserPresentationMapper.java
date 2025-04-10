@@ -4,15 +4,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Pageable;
 
-import com.boeingmerryho.business.userservice.application.dto.request.other.UserCheckEmailRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.other.UserCreateRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.other.UserFindRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.other.UserLoginRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.other.UserRefreshTokenRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.other.UserUpdateRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.other.UserWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminCheckEmailRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRoleRequestServiceDto;
@@ -24,11 +15,22 @@ import com.boeingmerryho.business.userservice.application.dto.request.admin.User
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminUpdateRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminUpdateRoleRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminWithdrawRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserCheckEmailRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserCreateRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserFindRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserLoginRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserRefreshTokenRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserUpdateRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminLoginRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminRegisterRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminSearchRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminTokenRefreshRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminUpdateRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminUpdateRoleRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserTokenRefreshRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserCreateRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLoginRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserRegisterRequestDto;
@@ -87,9 +89,10 @@ public interface UserPresentationMapper {
 
 	UserAdminCheckEmailRequestServiceDto toUserAdminCheckEmailRequestServiceDto(String email);
 
-	UserAdminRefreshTokenRequestServiceDto toUserAdminRefreshTokenRequestServiceDto(String refreshToken);
+	UserAdminRefreshTokenRequestServiceDto toUserAdminRefreshTokenRequestServiceDto(
+		UserAdminTokenRefreshRequestDto refreshToken);
 
 	UserCheckEmailRequestServiceDto toUserCheckEmailRequestServiceDto(String email);
 
-	UserRefreshTokenRequestServiceDto toUserRefreshTokenRequestServiceDto(String refreshToken);
+	UserRefreshTokenRequestServiceDto toUserRefreshTokenRequestServiceDto(UserTokenRefreshRequestDto requestDto);
 }

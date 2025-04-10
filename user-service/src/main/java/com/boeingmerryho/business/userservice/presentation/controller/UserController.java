@@ -22,6 +22,7 @@ import com.boeingmerryho.business.userservice.application.dto.request.other.User
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.service.UserService;
 import com.boeingmerryho.business.userservice.presentation.dto.mapper.UserPresentationMapper;
+import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserTokenRefreshRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLoginRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserRegisterRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserUpdateRequestDto;
@@ -132,12 +133,12 @@ public class UserController {
 	@Description(
 		"사용자 리프레시 토큰 재발급 api"
 	)
-	@GetMapping("/refresh")
+	@PostMapping("/refresh")
 	public ResponseEntity<UserRefreshTokenResponseDto> refreshToken(
-		@RequestParam(value = "refreshToken") String refreshToken) {
+		@RequestBody UserTokenRefreshRequestDto requestDto) {
 
 		UserRefreshTokenRequestServiceDto requestServiceDto = userPresentationMapper.toUserRefreshTokenRequestServiceDto(
-			refreshToken);
+			requestDto);
 		UserRefreshTokenResponseDto responseDto = userService.refreshToken(requestServiceDto);
 		return ResponseEntity.ok(responseDto);
 	}

@@ -9,8 +9,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
 import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
 import com.boeingmerryho.business.userservice.application.utils.jwt.JwtTokenProvider;
@@ -38,6 +38,7 @@ public class UserHelper {
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final RedisUtil redisUtil;
+	private final UserRepository userRepository;
 
 	public User findUserById(Long id, UserRepository userRepository) {
 		return userRepository.findById(id)
@@ -119,6 +120,30 @@ public class UserHelper {
 		if (type.equals(UserRoleType.ADMIN)) {
 			throw new UserException(ErrorCode.CANNOT_GRANT_MASTER_ROLE);
 		}
+	}
+
+	//-----jwt
+	public void isValidRefreshToken(String refreshToken) {
+		jwtTokenProvider.validateRefreshToken(refreshToken);
+	}
+
+	public Long getUserIdFromToken(String refreshToken) {
+		return Long.valueOf(jwtTokenProvider.getUserIdFromToken(refreshToken));
+	}
+
+	public void isEqualStoredRefreshToken(Long userId, String refreshToken) {
+		String redisKey = USER_TOKEN_PREFIX + userId;
+		String storedRefreshToken = (String)redisTemplate.opsForHash().get(redisKey, "refreshToken");
+
+		if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
+			throw new UserException(ErrorCode.JWT_NOT_MATCH);
+		}
+
+		findUserById(userId, userRepository);
+	}
+
+	public String generateAccessToken(Long userId) {
+		return jwtTokenProvider.generateAccessToken(userId);
 	}
 
 	//-----redis

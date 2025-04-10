@@ -129,6 +129,17 @@ public class UserService {
 	}
 
 	public UserRefreshTokenResponseDto refreshToken(UserRefreshTokenRequestServiceDto dto) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		String refreshToken = dto.refreshToken();
+
+		log.debug("refresh requested refreshToken : {}", refreshToken);
+		userHelper.isValidRefreshToken(refreshToken);
+
+		Long userId = userHelper.getUserIdFromToken(refreshToken);
+
+		userHelper.isEqualStoredRefreshToken(userId, refreshToken);
+
+		String newAccessToken = userHelper.generateAccessToken(userId);
+
+		return new UserRefreshTokenResponseDto(newAccessToken);
 	}
 }

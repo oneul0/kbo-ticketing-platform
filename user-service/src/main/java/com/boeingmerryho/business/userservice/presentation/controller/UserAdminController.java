@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminCheckEmailRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRoleRequestServiceDto;
@@ -28,12 +27,14 @@ import com.boeingmerryho.business.userservice.application.dto.request.admin.User
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminUpdateRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminUpdateRoleRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminWithdrawRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.service.UserAdminService;
 import com.boeingmerryho.business.userservice.config.pageable.PageableConfig;
 import com.boeingmerryho.business.userservice.presentation.dto.mapper.UserPresentationMapper;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminLoginRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminRegisterRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminSearchRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminTokenRefreshRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminUpdateRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminUpdateRoleRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminCheckEmailResponseDto;
@@ -44,7 +45,9 @@ import com.boeingmerryho.business.userservice.presentation.dto.response.admin.Us
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/v1/users")
@@ -153,12 +156,12 @@ public class UserAdminController {
 	}
 
 	@Description("사용자 리프레시 토큰 재발급 api")
-	@GetMapping("/refresh")
+	@PostMapping("/refresh")
 	public ResponseEntity<UserAdminRefreshTokenResponseDto> refreshToken(
-		@RequestParam(value = "refreshToken") String refreshToken) {
-
+		@RequestBody UserAdminTokenRefreshRequestDto requestDto) {
+		log.info("refreshed token : {}", requestDto.refreshToken());
 		UserAdminRefreshTokenRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminRefreshTokenRequestServiceDto(
-			refreshToken);
+			requestDto);
 		UserAdminRefreshTokenResponseDto responseDto = userAdminService.refreshToken(requestServiceDto);
 		return ResponseEntity.ok(responseDto);
 	}

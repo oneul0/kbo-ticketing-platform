@@ -38,7 +38,9 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 		"/api/v1/users/login",
 		"/admin/v1/users/login",
 		"/admin/v1/users/check",
-		"/api/v1/users/check"
+		"/api/v1/users/check",
+		"/admin/v1/users/refresh",
+		"/api/v1/users/refresh"
 	);
 
 	private final RedisTemplate<String, Object> redisTemplate;
