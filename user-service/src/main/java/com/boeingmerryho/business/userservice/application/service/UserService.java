@@ -18,8 +18,8 @@ import com.boeingmerryho.business.userservice.application.dto.request.other.User
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserUpdateRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserWithdrawRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.response.other.UserLoginResponseServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
+import com.boeingmerryho.business.userservice.application.dto.response.other.UserLoginResponseServiceDto;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
@@ -61,7 +61,7 @@ public class UserService {
 	}
 
 	public UserLoginResponseDto loginUser(UserLoginRequestServiceDto dto) {
-		User user = userHelper.findUserByEmail(dto.username(), userRepository);
+		User user = userHelper.findUserByEmail(dto.email(), userRepository);
 		userHelper.updateRedisUserInfo(user);
 
 		Map<String, String> tokenMap = userHelper.updateUserJwtTokenRedis(user.getId());
