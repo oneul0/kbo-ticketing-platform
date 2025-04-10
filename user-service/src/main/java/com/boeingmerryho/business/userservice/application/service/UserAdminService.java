@@ -33,7 +33,6 @@ import com.boeingmerryho.business.userservice.domain.UserSearchCriteria;
 import com.boeingmerryho.business.userservice.domain.repository.CustomUserRepository;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
-import com.boeingmerryho.business.userservice.exception.UserException;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminCheckEmailResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminRefreshTokenResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminSearchResponseDto;
@@ -41,6 +40,7 @@ import com.boeingmerryho.business.userservice.presentation.dto.response.admin.Us
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateRoleResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
 
+import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,7 +77,7 @@ public class UserAdminService {
 
 	private void validateAdminKey(String key) {
 		if (key == null || !key.equals(adminKey)) {
-			throw new UserException(ErrorCode.ADMIN_REGISTER_KEY_NOT_MATCH);
+			throw new GlobalException(ErrorCode.ADMIN_REGISTER_KEY_NOT_MATCH);
 		}
 	}
 

@@ -18,8 +18,8 @@ import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
-import com.boeingmerryho.business.userservice.exception.UserException;
 
+import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
@@ -42,12 +42,12 @@ public class UserHelper {
 
 	public User findUserById(Long id, UserRepository userRepository) {
 		return userRepository.findById(id)
-			.orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND));
+			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 	}
 
 	public User findUserByEmail(String email, UserRepository userRepository) {
 		return userRepository.findByEmail(email)
-			.orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND));
+			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 	}
 
 	public void validateRegisterRequest(UserAdminRegisterRequestServiceDto dto, UserRepository userRepository) {
@@ -74,13 +74,13 @@ public class UserHelper {
 
 	private void validateRequiredField(String field, ErrorCode errorCode) {
 		if (isEmpty(field)) {
-			throw new UserException(errorCode);
+			throw new GlobalException(errorCode);
 		}
 	}
 
 	private void validateRequiredField(LocalDate field, ErrorCode errorCode) {
 		if (field == null) {
-			throw new UserException(errorCode);
+			throw new GlobalException(errorCode);
 		}
 	}
 
@@ -90,19 +90,19 @@ public class UserHelper {
 
 	private void verifyEmailFormat(String email) {
 		if (!EMAIL_PATTERN.matcher(email).matches()) {
-			throw new UserException(ErrorCode.USERNAME_REGEX_NOT_MATCH);
+			throw new GlobalException(ErrorCode.USERNAME_REGEX_NOT_MATCH);
 		}
 	}
 
 	private void verifyPasswordFormat(String password) {
 		if (!PASSWORD_PATTERN.matcher(password).matches()) {
-			throw new UserException(ErrorCode.PASSWORD_REGEX_NOT_MATCH);
+			throw new GlobalException(ErrorCode.PASSWORD_REGEX_NOT_MATCH);
 		}
 	}
 
 	public void checkEmailExists(String email, UserRepository userRepository) {
 		if (userRepository.existsByEmail(email)) {
-			throw new UserException(ErrorCode.ALREADY_EXISTS);
+			throw new GlobalException(ErrorCode.ALREADY_EXISTS);
 		}
 	}
 
@@ -112,13 +112,13 @@ public class UserHelper {
 
 	public void checkMasterRole(User user) {
 		if (user.isAdmin()) {
-			throw new UserException(ErrorCode.CANNOT_GRANT_MASTER_ROLE);
+			throw new GlobalException(ErrorCode.CANNOT_GRANT_MASTER_ROLE);
 		}
 	}
 
 	public void isAdminRole(UserRoleType type) {
 		if (type.equals(UserRoleType.ADMIN)) {
-			throw new UserException(ErrorCode.CANNOT_GRANT_MASTER_ROLE);
+			throw new GlobalException(ErrorCode.CANNOT_GRANT_MASTER_ROLE);
 		}
 	}
 
@@ -136,7 +136,7 @@ public class UserHelper {
 		String storedRefreshToken = (String)redisTemplate.opsForHash().get(redisKey, "refreshToken");
 
 		if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
-			throw new UserException(ErrorCode.JWT_NOT_MATCH);
+			throw new GlobalException(ErrorCode.JWT_NOT_MATCH);
 		}
 
 		findUserById(userId, userRepository);
@@ -167,7 +167,7 @@ public class UserHelper {
 
 	public void hasKeyInRedis(String key) {
 		if (!redisTemplate.hasKey(key)) {
-			throw new UserException(ErrorCode.NOT_FOUND);
+			throw new GlobalException(ErrorCode.NOT_FOUND);
 		}
 	}
 
@@ -195,7 +195,7 @@ public class UserHelper {
 
 		Map<Object, Object> token = getMapEntriesFromRedis(tokenKey);
 		if (token == null || token.isEmpty()) {
-			throw new UserException(ErrorCode.JWT_REQUIRED);
+			throw new GlobalException(ErrorCode.JWT_REQUIRED);
 		}
 		return new UserTokenResult(tokenKey, token);
 	}
