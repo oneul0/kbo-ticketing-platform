@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
 import com.boeingmerryho.infrastructure.gatewayservice.exception.ErrorCode;
-import com.boeingmerryho.infrastructure.gatewayservice.exception.GatewayException;
 
+import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -67,7 +67,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			log.warn("JWT 토큰이 없습니다.");
-			throw new GatewayException(ErrorCode.JWT_NOT_FOUND);
+			throw new GlobalException(ErrorCode.JWT_NOT_FOUND);
 		}
 
 		try {
@@ -81,7 +81,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
 			if (isTokenBlacklisted(token)) {
 				log.error("JWT가 블랙리스트에 존재합니다.");
-				throw new GatewayException(ErrorCode.JWT_BLACKLISTED);
+				throw new GlobalException(ErrorCode.JWT_BLACKLISTED);
 			}
 
 			ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
@@ -94,13 +94,13 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
 		} catch (ExpiredJwtException e) {
 			log.error("JWT 만료됨: {}", e.getMessage());
-			throw new GatewayException(ErrorCode.JWT_EXPIRED);
+			throw new GlobalException(ErrorCode.JWT_EXPIRED);
 		} catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
 			log.error("잘못된 JWT: {}", e.getMessage());
-			throw new GatewayException(ErrorCode.WRONG_JWT);
+			throw new GlobalException(ErrorCode.WRONG_JWT);
 		} catch (Exception e) {
 			log.error("JWT 검증 중 오류 발생: {}", e.getMessage());
-			throw new GatewayException(ErrorCode.JWT_VERIFIED_FAIL);
+			throw new GlobalException(ErrorCode.JWT_VERIFIED_FAIL);
 		}
 	}
 

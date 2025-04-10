@@ -2,12 +2,13 @@ package com.boeingmerryho.infrastructure.gatewayservice.exception;
 
 import org.springframework.http.HttpStatus;
 
+import io.github.boeingmerryho.commonlibrary.exception.BaseErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ErrorCode {
+public enum ErrorCode implements BaseErrorCode {
 
 	JWT_NOT_FOUND("GW-001", "JWT 토큰이 필요합니다.", HttpStatus.UNAUTHORIZED),
 	JWT_BLACKLISTED("GW-002", "JWT가 블랙리스트에 존재합니다.", HttpStatus.UNAUTHORIZED),
