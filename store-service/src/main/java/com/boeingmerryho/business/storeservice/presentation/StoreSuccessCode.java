@@ -11,6 +11,8 @@ public enum StoreSuccessCode implements SuccessCode {
 	FETCHED_STORES("매장 정보들을 불러왔습니다.", HttpStatus.OK),
 	OPEN_STORE("매장이 오픈되었습니다.", HttpStatus.OK),
 	CLOSE_STORE("매장이 마감되었습니다.", HttpStatus.OK),
+	QUEUE_ENABLED("줄서기 가능 상태로 전환되었습니다.", HttpStatus.OK),
+	QUEUE_DISABLED("줄서기 불가능 상태로 전환되었습니다.", HttpStatus.OK),
 	;
 
 	private final String message;

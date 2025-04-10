@@ -13,6 +13,7 @@ import com.boeingmerryho.business.storeservice.application.dto.response.StoreSea
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreUpdateResponseServiceDto;
 import com.boeingmerryho.business.storeservice.domain.entity.Store;
 import com.boeingmerryho.business.storeservice.infrastructure.helper.StoreAdminHelper;
+import com.boeingmerryho.business.storeservice.infrastructure.helper.StoreQueueAdminHelper;
 import com.boeingmerryho.business.storeservice.infrastructure.helper.StoreValidator;
 
 import jakarta.transaction.Transactional;
@@ -25,6 +26,7 @@ public class StoreAdminService {
 	private final StoreAdminHelper storeAdminHelper;
 	private final StoreApplicationMapper mapper;
 	private final StoreValidator validator;
+	private final StoreQueueAdminHelper storeQueueAdminHelper;
 
 	@Transactional
 	public StoreCreateResponseServiceDto createStore(StoreCreateRequestServiceDto requestServiceDto) {
@@ -36,7 +38,10 @@ public class StoreAdminService {
 
 	public StoreDetailAdminResponseServiceDto getStoreDetail(Long id) {
 		Store storeDetail = storeAdminHelper.getAnyStoreById(id);
-		return mapper.toStoreDetailAdminResponseServiceDto(storeDetail);
+
+		boolean isQueueAvailable = storeQueueAdminHelper.isQueueAvailable(storeDetail.getId());
+
+		return mapper.toStoreDetailAdminResponseServiceDto(storeDetail, isQueueAvailable);
 	}
 
 	public Page<StoreSearchAdminResponseServiceDto> searchStore(
@@ -62,5 +67,13 @@ public class StoreAdminService {
 	public StoreUpdateResponseServiceDto closeStore(Long id) {
 		Store closed = storeAdminHelper.updateStoreClose(id);
 		return mapper.toStoreUpdateResponseServiceDto(closed);
+	}
+
+	public void enableQueue(Long id) {
+		storeQueueAdminHelper.enableQueue(id);
+	}
+
+	public void disableQueue(Long id) {
+		storeQueueAdminHelper.disableQueue(id);
 	}
 }

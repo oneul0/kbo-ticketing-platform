@@ -108,4 +108,16 @@ public class StoreAdminController {
 		return SuccessResponse.of(StoreSuccessCode.CLOSE_STORE, responseDto);
 	}
 
+	@PutMapping("/{id}/queue/enable")
+	public ResponseEntity<SuccessResponse<Void>> enableQueue(@PathVariable Long id) {
+		storeAdminService.enableQueue(id);
+		return SuccessResponse.of(StoreSuccessCode.QUEUE_ENABLED);
+	}
+
+	@PutMapping("/{id}/queue/disable")
+	public ResponseEntity<SuccessResponse<Void>> disableQueue(@PathVariable Long id) {
+		storeAdminService.disableQueue(id);
+		return SuccessResponse.of(StoreSuccessCode.QUEUE_DISABLED);
+	}
+
 }

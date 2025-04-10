@@ -9,6 +9,7 @@ import com.boeingmerryho.business.storeservice.application.dto.response.StoreDet
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreSearchResponseServiceDto;
 import com.boeingmerryho.business.storeservice.domain.entity.Store;
 import com.boeingmerryho.business.storeservice.infrastructure.helper.StoreCommonHelper;
+import com.boeingmerryho.business.storeservice.infrastructure.helper.StoreQueueAdminHelper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,11 +18,14 @@ import lombok.RequiredArgsConstructor;
 public class StoreService {
 
 	private final StoreCommonHelper storeCommonHelper;
+	private final StoreQueueAdminHelper storeQueueAdminHelper;
 	private final StoreApplicationMapper mapper;
 
 	public StoreDetailResponseServiceDto getStoreDetail(Long id) {
 		Store storeDetail = storeCommonHelper.getActiveStoreById(id);
-		return mapper.toStoreDetailResponseServiceDto(storeDetail);
+
+		boolean isQueueAvailable = storeQueueAdminHelper.isQueueAvailable(storeDetail.getId());
+		return mapper.toStoreDetailResponseServiceDto(storeDetail, isQueueAvailable);
 	}
 
 	public Page<StoreSearchResponseServiceDto> searchStore(

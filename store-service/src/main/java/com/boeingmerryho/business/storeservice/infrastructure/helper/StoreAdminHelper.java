@@ -1,7 +1,7 @@
 package com.boeingmerryho.business.storeservice.infrastructure.helper;
 
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.boeingmerryho.business.storeservice.application.dto.mapper.StoreApplicationMapper;
 import com.boeingmerryho.business.storeservice.application.dto.query.StoreSearchCondition;
@@ -16,7 +16,7 @@ import com.boeingmerryho.business.storeservice.exception.StoreErrorCode;
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class StoreAdminHelper {
 
