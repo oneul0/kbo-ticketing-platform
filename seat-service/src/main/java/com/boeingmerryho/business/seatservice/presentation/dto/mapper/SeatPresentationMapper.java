@@ -1,7 +1,10 @@
 package com.boeingmerryho.business.seatservice.presentation.dto.mapper;
 
+import java.time.LocalDate;
+
 import org.mapstruct.Mapper;
 
+import com.boeingmerryho.business.seatservice.application.dto.request.CacheSeatCreateServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatActiveServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatCreateServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatDeleteServiceRequestDto;
@@ -36,4 +39,6 @@ public interface SeatPresentationMapper {
 	SeatUpdateResponseDto toSeatUpdateResponseDto(SeatUpdateServiceResponseDto seatUpdateServiceResponseDto);
 
 	SeatDeleteServiceRequestDto toSeatDeleteServiceRequestDto(Long id);
+
+	CacheSeatCreateServiceRequestDto toCacheSeatCreateServiceRequestDto(LocalDate date);
 }

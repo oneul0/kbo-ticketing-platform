@@ -2,9 +2,9 @@ package com.boeingmerryho.business.seatservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
-@FeignClient
+@EnableDiscoveryClient
 @SpringBootApplication
 public class SeatServiceApplication {
 	public static void main(String[] args) {
