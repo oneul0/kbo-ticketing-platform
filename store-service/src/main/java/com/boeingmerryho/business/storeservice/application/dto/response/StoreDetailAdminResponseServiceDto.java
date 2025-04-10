@@ -9,6 +9,7 @@ public record StoreDetailAdminResponseServiceDto(
 	LocalDateTime openAt,
 	LocalDateTime closedAt,
 	Boolean isClosed,
-	Boolean isDeleted
+	Boolean isDeleted,
+	Boolean isQueueAvailable
 ) {
 }

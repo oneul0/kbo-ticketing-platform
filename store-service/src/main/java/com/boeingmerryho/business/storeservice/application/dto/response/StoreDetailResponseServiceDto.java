@@ -8,6 +8,7 @@ public record StoreDetailResponseServiceDto(
 	String name,
 	LocalDateTime openAt,
 	LocalDateTime closedAt,
-	Boolean isClosed
+	Boolean isClosed,
+	Boolean isQueueAvailable
 ) {
 }

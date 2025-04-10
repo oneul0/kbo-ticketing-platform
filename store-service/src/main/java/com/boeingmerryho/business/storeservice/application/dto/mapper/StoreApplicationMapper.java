@@ -31,9 +31,10 @@ public interface StoreApplicationMapper {
 	@BeanMapping(ignoreByDefault = true)
 	StoreCreateResponseServiceDto toStoreCreateResponseServiceDto(Store savedStore);
 
-	StoreDetailAdminResponseServiceDto toStoreDetailAdminResponseServiceDto(Store storeDetail);
+	StoreDetailAdminResponseServiceDto toStoreDetailAdminResponseServiceDto(Store storeDetail,
+		boolean isQueueAvailable);
 
-	StoreDetailResponseServiceDto toStoreDetailResponseServiceDto(Store storeDetail);
+	StoreDetailResponseServiceDto toStoreDetailResponseServiceDto(Store storeDetail, boolean isQueueAvailable);
 
 	StoreSearchAdminResponseServiceDto toStoreSearchAdminResponseServiceDto(Store store);
 
