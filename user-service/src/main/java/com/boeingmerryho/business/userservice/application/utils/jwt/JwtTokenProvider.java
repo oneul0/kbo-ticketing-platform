@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
-import com.boeingmerryho.business.userservice.exception.UserException;
 
+import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -72,7 +72,7 @@ public class JwtTokenProvider {
 		try {
 			if (token == null || token.trim().isEmpty()) {
 				log.warn("Token is null or empty");
-				throw new UserException(ErrorCode.JWT_INVALID);
+				throw new GlobalException(ErrorCode.JWT_INVALID);
 			}
 			Jwts.parser()
 				.setSigningKey(secretKey.getBytes())
@@ -81,16 +81,16 @@ public class JwtTokenProvider {
 			return true;
 		} catch (ExpiredJwtException e) {
 			log.warn("Expired refresh token: {}", e.getMessage());
-			throw new UserException(ErrorCode.JWT_EXPIRED);
+			throw new GlobalException(ErrorCode.JWT_EXPIRED);
 		} catch (MalformedJwtException e) {
 			log.warn("Malformed JWT token: {}", e.getMessage());
-			throw new UserException(ErrorCode.MALFORMED_JWT);
+			throw new GlobalException(ErrorCode.MALFORMED_JWT);
 		} catch (JwtException e) {
 			log.warn("JWT validation error: {}", e.getMessage());
-			throw new UserException(ErrorCode.JWT_INVALID);
+			throw new GlobalException(ErrorCode.JWT_INVALID);
 		} catch (IllegalArgumentException e) {
 			log.warn("Illegal argument for JWT: {}", e.getMessage());
-			throw new UserException(ErrorCode.JWT_INVALID);
+			throw new GlobalException(ErrorCode.JWT_INVALID);
 		}
 	}
 

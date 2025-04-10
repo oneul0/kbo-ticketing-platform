@@ -21,6 +21,7 @@ import com.boeingmerryho.business.userservice.application.dto.request.other.User
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserUpdateRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.service.UserService;
+import com.boeingmerryho.business.userservice.presentation.UserSuccessCode;
 import com.boeingmerryho.business.userservice.presentation.dto.mapper.UserPresentationMapper;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLoginRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLogoutRequestDto;
@@ -33,6 +34,7 @@ import com.boeingmerryho.business.userservice.presentation.dto.response.other.Us
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserRefreshTokenResponseDto;
 
+import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,21 +55,21 @@ public class UserController {
 		UserRegisterRequestServiceDto requestServiceDto = userPresentationMapper.toUserRegisterRequestServiceDto(
 			requestDto);
 		Long registeredUserId = userService.registerUser(requestServiceDto);
-		return ResponseEntity.ok().body(registeredUserId);
+		return SuccessResponse.of(UserSuccessCode.USER_REGISTER_SUCCESS, registeredUserId);
 	}
 
 	@GetMapping("/me")
 	@Description(
 		"user id로 본인 id 조회"
 	)
-	public ResponseEntity<UserFindResponseDto> findUser(
+	public ResponseEntity<SuccessResponse<UserFindResponseDto>> findUser(
 		@RequestAttribute("userId") Long userId
 	) {
 		log.debug("search userId:{}", userId);
 		UserFindRequestServiceDto requestServiceDto = userPresentationMapper.toUserSearchRequestServiceDto(userId);
 		UserFindResponseDto responseDto = userService.findUser(requestServiceDto);
 		log.debug(responseDto.toString());
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_FIND_SUCCESS, responseDto);
 	}
 
 	@Description(
@@ -79,7 +81,7 @@ public class UserController {
 		UserUpdateRequestServiceDto requestServiceDto = userPresentationMapper.toUserUpdateRequestServiceDto(
 			requestDto, id);
 		UserAdminUpdateResponseDto responseDto = userService.updateMe(requestServiceDto);
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_UPDATE_SUCCESS, responseDto);
 	}
 
 	@Description(
@@ -89,20 +91,20 @@ public class UserController {
 	public ResponseEntity<?> withdrawUser(@RequestAttribute("userId") Long id) {
 		UserWithdrawRequestServiceDto requestServiceDto = userPresentationMapper.toUserWithdrawRequestServiceDto(
 			id);
-		userService.withdrawUser(requestServiceDto);
-		return ResponseEntity.ok().build();
+		Long withdrawUserId = userService.withdrawUser(requestServiceDto);
+		return SuccessResponse.of(UserSuccessCode.USER_WITHDRAW_SUCCESS, withdrawUserId);
 	}
 
 	@Description(
 		"username, password를 입력받아 로그인"
 	)
 	@PostMapping("/login")
-	public ResponseEntity<UserLoginResponseDto> loginUser(
+	public ResponseEntity<SuccessResponse<UserLoginResponseDto>> loginUser(
 		@RequestBody UserLoginRequestDto requestDto) {
 		UserLoginRequestServiceDto requestServiceDto = userPresentationMapper.toUserLoginRequestServiceDto(
 			requestDto);
 		UserLoginResponseDto responseDto = userService.loginUser(requestServiceDto);
-		return ResponseEntity.ok().body(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_LOGIN_SUCCESS, responseDto);
 	}
 
 	@PostMapping("/logout")
@@ -116,33 +118,33 @@ public class UserController {
 		UserLogoutRequestServiceDto requestServiceDto = userPresentationMapper.toUserLogoutRequestServiceDto(requestDto,
 			userId);
 		userService.logoutUser(requestServiceDto);
-		return ResponseEntity.ok().build();
+		return SuccessResponse.of(UserSuccessCode.USER_LOGOUT_SUCCESS);
 	}
 
 	@Description(
 		"사용자 email 중복 체크 api"
 	)
 	@GetMapping("/check")
-	public ResponseEntity<UserCheckEmailResponseDto> checkEmail(
+	public ResponseEntity<SuccessResponse<UserCheckEmailResponseDto>> checkEmail(
 		@RequestParam(value = "email") String email) {
 
 		UserCheckEmailRequestServiceDto requestServiceDto = userPresentationMapper.toUserCheckEmailRequestServiceDto(
 			email);
 		UserCheckEmailResponseDto responseDto = userService.checkEmail(
 			requestServiceDto);
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_CHECK_SUCCESS, responseDto);
 	}
 
 	@Description(
 		"사용자 리프레시 토큰 재발급 api"
 	)
 	@PostMapping("/refresh")
-	public ResponseEntity<UserRefreshTokenResponseDto> refreshToken(
+	public ResponseEntity<SuccessResponse<UserRefreshTokenResponseDto>> refreshToken(
 		@RequestBody UserTokenRefreshRequestDto requestDto) {
 
 		UserRefreshTokenRequestServiceDto requestServiceDto = userPresentationMapper.toUserRefreshTokenRequestServiceDto(
 			requestDto);
 		UserRefreshTokenResponseDto responseDto = userService.refreshToken(requestServiceDto);
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_TOKEN_ISSUE_SUCCESS, responseDto);
 	}
 }
