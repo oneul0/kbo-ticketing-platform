@@ -19,12 +19,14 @@ public interface PaymentApplicationMapper {
 	@Mapping(target = "userId", source = "paymentDetail.payment.userId")
 	@Mapping(target = "paymentId", source = "paymentDetail.payment.id")
 	@Mapping(target = "price", source = "paymentDetail.payment.totalPrice")
-	PaymentDetailResponseServiceDto toPaymentDetailResponseServiceDto(PaymentDetail paymentDetail);
+	@Mapping(target = "discountType", source = "paymentDetail.payment.discountType")
+	PaymentDetailAdminResponseServiceDto toPaymentDetailAdminResponseServiceDto(PaymentDetail paymentDetail);
 
 	@Mapping(target = "userId", source = "paymentDetail.payment.userId")
 	@Mapping(target = "paymentId", source = "paymentDetail.payment.id")
 	@Mapping(target = "price", source = "paymentDetail.payment.totalPrice")
-	PaymentDetailAdminResponseServiceDto toPaymentDetailAdminResponseServiceDto(PaymentDetail paymentDetail);
+	@Mapping(target = "discountType", source = "paymentDetail.payment.discountType")
+	PaymentDetailResponseServiceDto toPaymentDetailResponseServiceDto(PaymentDetail paymentDetail);
 
 	PaymentTicketCancelResponseServiceDto toPaymentTicketCancelResponseServiceDto(Long id);
 

@@ -1,10 +1,6 @@
 package com.boeingmerryho.business.paymentservice.infrastructure.repository;
 
-import static com.boeingmerryho.business.paymentservice.domain.entity.QPayment.*;
-import static com.boeingmerryho.business.paymentservice.domain.entity.QPaymentDetail.*;
-
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -13,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.boeingmerryho.business.paymentservice.domain.context.PaymentDetailSearchContext;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
+import com.boeingmerryho.business.paymentservice.domain.entity.QPayment;
 import com.boeingmerryho.business.paymentservice.domain.entity.QPaymentDetail;
 import com.boeingmerryho.business.paymentservice.utils.QueryDslUtils;
 import com.querydsl.core.BooleanBuilder;
@@ -26,29 +23,8 @@ import lombok.RequiredArgsConstructor;
 public class PaymentQueryRepository {
 	private final JPAQueryFactory queryFactory;
 
-	public Optional<PaymentDetail> findPaymentDetailByIdAndIsDeletedFalse(Long id) {
-
-		return Optional.ofNullable(
-			queryFactory.selectFrom(paymentDetail)
-				.where(
-					eqId(id),
-					eqIsDeleted(Boolean.FALSE)
-				)
-				.fetchOne()
-		);
-	}
-
-	public Optional<PaymentDetail> findPaymentDetailById(Long id) {
-		QPaymentDetail paymentDetail = QPaymentDetail.paymentDetail;
-
-		return Optional.ofNullable(
-			queryFactory.selectFrom(paymentDetail)
-				.where(
-					eqId(id)
-				)
-				.fetchOne()
-		);
-	}
+	QPayment payment = QPayment.payment;
+	QPaymentDetail paymentDetail = QPaymentDetail.paymentDetail;
 
 	public Page<PaymentDetail> searchPaymentDetail(PaymentDetailSearchContext context) {
 		BooleanBuilder builder = new BooleanBuilder();
@@ -99,7 +75,6 @@ public class PaymentQueryRepository {
 			return null;
 		}
 		return paymentDetail.payment.userId.eq(userId);
-
 	}
 
 	private BooleanExpression eqId(Long id) {

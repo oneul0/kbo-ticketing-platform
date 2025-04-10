@@ -29,18 +29,8 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 	}
 
 	@Override
-	public Optional<PaymentDetail> findPaymentDetailByIdAndIsDeleted(Long id) {
-		return paymentQueryRepository.findPaymentDetailByIdAndIsDeletedFalse(id);
-	}
-
-	@Override
 	public Page<PaymentDetail> searchPaymentDetail(PaymentDetailSearchContext context) {
 		return paymentQueryRepository.searchPaymentDetail(context);
-	}
-
-	@Override
-	public Optional<PaymentDetail> findPaymentDetailById(Long id) {
-		return paymentQueryRepository.findPaymentDetailById(id);
 	}
 
 }

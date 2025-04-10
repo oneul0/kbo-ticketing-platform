@@ -15,6 +15,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.domain.context.PaymentDetailSearchContext;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
+import com.boeingmerryho.business.paymentservice.domain.repository.PaymentDetailRepository;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentAdminService {
 	private final PaymentRepository paymentRepository;
+	private final PaymentDetailRepository paymentDetailRepository;
 	private final PaymentApplicationMapper mapper;
 
 	@Transactional
@@ -60,7 +62,7 @@ public class PaymentAdminService {
 
 	@Transactional(readOnly = true)
 	public PaymentDetailAdminResponseServiceDto getPaymentDetail(PaymentDetailRequestServiceDto requestServiceDto) {
-		PaymentDetail paymentDetail = paymentRepository.findPaymentDetailById(requestServiceDto.id())
+		PaymentDetail paymentDetail = paymentDetailRepository.findById(requestServiceDto.id())
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
 
 		return mapper.toPaymentDetailAdminResponseServiceDto(paymentDetail);

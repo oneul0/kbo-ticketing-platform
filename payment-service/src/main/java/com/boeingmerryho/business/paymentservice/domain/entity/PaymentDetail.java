@@ -1,6 +1,5 @@
 package com.boeingmerryho.business.paymentservice.domain.entity;
 
-import com.boeingmerryho.business.paymentservice.domain.type.DiscountType;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 
 import jakarta.persistence.AttributeOverride;
@@ -50,12 +49,8 @@ public class PaymentDetail {
 	private Integer discountPrice;
 
 	@Column(nullable = false)
-	private PaymentMethod method;
-
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	@Builder.Default
-	private DiscountType discountType = DiscountType.NONE;
+	private PaymentMethod method;
 
 	@Column(nullable = false)
 	private Integer discountAmount;

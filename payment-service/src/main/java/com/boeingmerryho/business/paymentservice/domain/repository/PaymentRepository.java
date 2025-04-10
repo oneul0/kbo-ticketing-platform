@@ -13,9 +13,6 @@ public interface PaymentRepository {
 
 	Optional<Payment> findById(Long id);
 
-	Optional<PaymentDetail> findPaymentDetailByIdAndIsDeleted(Long id);
-
 	Page<PaymentDetail> searchPaymentDetail(PaymentDetailSearchContext searchContext);
 
-	Optional<PaymentDetail> findPaymentDetailById(Long id);
 }

@@ -1,8 +1,9 @@
 package com.boeingmerryho.business.paymentservice.application;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +11,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayA
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayApproveResponse;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayReadyRequest;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayReadyResponse;
+import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPaymentSession;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentApproveRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailSearchRequestServiceDto;
@@ -22,9 +24,12 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.domain.context.PaymentDetailSearchContext;
+import com.boeingmerryho.business.paymentservice.domain.entity.KakaoPayInfo;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
+import com.boeingmerryho.business.paymentservice.domain.repository.PaymentDetailRepository;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
+import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
 import com.boeingmerryho.business.paymentservice.exception.ErrorCode;
@@ -50,60 +55,96 @@ public class PaymentService {
 	String redirectUrl;
 
 	private final PaymentRepository paymentRepository;
+	private final PaymentDetailRepository paymentDetailRepository;
 	private final KakaoFeignService kakaoFeignService;
 	private final PaymentApplicationMapper paymentApplicationMapper;
+	private final KakaoPaymentHelper kakaoPaymentHelper;
 
+	@Transactional(readOnly = true)
 	public PaymentReadyResponseServiceDto readyPayment(PaymentReadyRequestServiceDto requestServiceDto) {
 
-		// Payment payment = paymentRepository.findById(requestServiceDto.paymentId())
-		// 	.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
-		//
-		// KakaoPayReadyRequest request = KakaoPayReadyRequest.builder()
-		// 	.cid(cid)
-		// 	.partner_order_id(String.valueOf(requestServiceDto.paymentId()))
-		// 	.partner_user_id(String.valueOf(requestServiceDto.userId()))
-		// 	.item_name(String.valueOf(payment.getType()))
-		// 	.quantity(requestServiceDto.tickets().size())
-		// 	.total_amount(payment.getDiscountPrice())
-		// 	.tax_free_amount(0)
-		// 	.approval_url(redirectUrl + "/api/v1/payments/approve")
-		// 	.cancel_url(redirectUrl + "/kakao/payments/ready/cancel")
-		// 	.fail_url(redirectUrl + "/kakao/payments/ready/fail")
-		// 	.build();
+		Payment payment = paymentRepository.findById(requestServiceDto.paymentId())
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
 
 		KakaoPayReadyRequest request = KakaoPayReadyRequest.builder()
 			.cid(cid)
-			.partnerOrderId("order_id1")
-			.partnerUserId("user_id1")
-			.itemName("item_id")
-			.quantity(2)
-			.totalAmount(1000)
+			.partnerOrderId(payment.getId() + UUID.randomUUID().toString())
+			.partnerUserId(requestServiceDto.userId().toString())
+			.itemName(requestServiceDto.type())
+			.quantity(requestServiceDto.tickets().size())
+			.totalAmount(requestServiceDto.price())
 			.taxFreeAmount(0)
 			.approvalUrl(redirectUrl + "/api/v1/payments/approve")
 			.cancelUrl(redirectUrl + "/kakao/payments/ready/cancel")
 			.failUrl(redirectUrl + "/kakao/payments/ready/fail")
 			.build();
 
-		KakaoPayReadyResponse response = kakaoFeignService.ready(authPrefix + secretKey, "application/json", request);
+		KakaoPayReadyResponse response = kakaoFeignService.ready(
+			authPrefix + secretKey,
+			"application/json",
+			request);
 
-		// TODO Redis에 결제 승인 단계에서 필요한 정보들 미리 저장해두기
+		kakaoPaymentHelper.savePaymentInfo(
+			String.valueOf(requestServiceDto.paymentId()),
+			KakaoPaymentSession.builder()
+				.cid(cid)
+				.tid(response.getTid())
+				.partnerOrderId(request.getPartnerOrderId())
+				.partnerUserId(request.getPartnerUserId())
+				.tickets(requestServiceDto.tickets())
+				.totalAmount(requestServiceDto.price())
+				.quantity(requestServiceDto.tickets().size())
+				.itemName(requestServiceDto.type())
+				.createdAt(response.getCreatedAt().toString())
+				.build()
+		);
+
 		return paymentApplicationMapper.toPaymentReadyResponseServiceDto(response);
 	}
 
+	@Transactional
 	public PaymentApproveResponseServiceDto approvePayment(PaymentApproveRequestServiceDto requestServiceDto) {
-		// TODO Redis에서 결제 승인에 필요한 정보들 불러오기
+		KakaoPaymentSession paymentSession = kakaoPaymentHelper.getPaymentInfo(
+				String.valueOf(requestServiceDto.paymentId()))
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
+
+		System.out.println(paymentSession.getPartnerOrderId());
 		KakaoPayApproveRequest request = KakaoPayApproveRequest.builder()
-			.cid(cid)
-			.tid("T7f7981a1b530bd8f5d0")
-			.partnerOrderId("order_id1")
-			.partnerUserId("user_id1")
+			.cid(paymentSession.getCid())
+			.tid(paymentSession.getTid())
+			.partnerOrderId(paymentSession.getPartnerOrderId())
+			.partnerUserId(paymentSession.getPartnerUserId())
 			.pgToken(requestServiceDto.pgToken())
 			.build();
 
-		KakaoPayApproveResponse response = kakaoFeignService.approve(authPrefix + secretKey, "application/json",
-			request);
+		KakaoPayApproveResponse response = kakaoFeignService.approve(
+			authPrefix + secretKey,
+			"application/json",
+			request
+		);
 
-		// TODO DB에 결제 내역 저장하기
+		Payment payment = paymentRepository.findById(requestServiceDto.paymentId())
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
+
+		// kakaopay logic
+		paymentDetailRepository.save(
+			PaymentDetail.builder()
+				.kakaoPayInfo(
+					KakaoPayInfo.builder()
+						.cid(paymentSession.getCid())
+						.tid(paymentSession.getTid())
+						.build()
+				)
+				.payment(payment)
+				.discountPrice(payment.getDiscountPrice() - response.getAmount().getDiscount())
+				.method(PaymentMethod.KAKAOPAY)
+				.discountAmount(
+					payment.getTotalPrice() - payment.getDiscountPrice() - response.getAmount().getDiscount())
+				.build()
+		);
+
+		payment.confirmPayment();
+
 		return paymentApplicationMapper.toPaymentApproveResponseServiceDto(response);
 	}
 
@@ -118,7 +159,6 @@ public class PaymentService {
 	}
 
 	private static void assertCancellablePayment(Payment payment) {
-
 		if (!payment.validateStatus(PaymentStatus.CONFIRMED)) {
 			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
 		}
@@ -140,7 +180,7 @@ public class PaymentService {
 	@Transactional(readOnly = true)
 	public PaymentDetailResponseServiceDto getPaymentDetail(
 		PaymentDetailRequestServiceDto requestServiceDto) {
-		PaymentDetail paymentDetail = paymentRepository.findPaymentDetailByIdAndIsDeleted(requestServiceDto.id())
+		PaymentDetail paymentDetail = paymentDetailRepository.findById(requestServiceDto.id())
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
 		return paymentApplicationMapper.toPaymentDetailResponseServiceDto(paymentDetail);
 	}
@@ -149,27 +189,18 @@ public class PaymentService {
 	public Page<PaymentDetailResponseServiceDto> searchPaymentDetail(
 		PaymentDetailSearchRequestServiceDto requestServiceDto) {
 		Page<PaymentDetail> paymentDetails = paymentRepository.searchPaymentDetail(
-			createSearchContext(
-				requestServiceDto.id(),
-				requestServiceDto.paymentId(),
-				requestServiceDto.customPageable(),
-				requestServiceDto.isDeleted()
-			)
+			createSearchContext(requestServiceDto)
 		);
 		return paymentDetails.map(paymentApplicationMapper::toPaymentDetailResponseServiceDto);
 	}
 
 	private PaymentDetailSearchContext createSearchContext(
-		Long id,
-		Long paymentId,
-		Pageable customPageable,
-		Boolean isDeleted
-	) {
+		PaymentDetailSearchRequestServiceDto requestServiceDto) {
 		return PaymentDetailSearchContext.builder()
-			.id(id)
-			.paymentId(paymentId)
-			.customPageable(customPageable)
-			.isDeleted(isDeleted)
+			.id(requestServiceDto.id())
+			.paymentId(requestServiceDto.paymentId())
+			.customPageable(requestServiceDto.customPageable())
+			.isDeleted(requestServiceDto.isDeleted())
 			.build();
 	}
 }
