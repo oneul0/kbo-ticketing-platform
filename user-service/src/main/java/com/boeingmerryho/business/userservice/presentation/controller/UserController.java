@@ -12,25 +12,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.boeingmerryho.business.userservice.application.dto.request.UserCheckEmailRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserFindRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserLoginRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserLogoutRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserRefreshTokenRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserRegisterRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserUpdateRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserWithdrawRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserCheckEmailRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserEmailVerificationCheckRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserEmailVerificationRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserFindRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserLoginRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserRefreshTokenRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserUpdateRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.service.UserService;
+import com.boeingmerryho.business.userservice.presentation.UserSuccessCode;
 import com.boeingmerryho.business.userservice.presentation.dto.mapper.UserPresentationMapper;
-import com.boeingmerryho.business.userservice.presentation.dto.request.UserLoginRequestDto;
-import com.boeingmerryho.business.userservice.presentation.dto.request.UserRegisterRequestDto;
-import com.boeingmerryho.business.userservice.presentation.dto.request.UserUpdateRequestDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminUpdateResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserCheckEmailResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserFindResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserLoginResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserRefreshTokenResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserEmailVerificationCheckRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserEmailVerificationRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLoginRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLogoutRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserRegisterRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserTokenRefreshRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserUpdateRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserCheckEmailResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserFindResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserRefreshTokenResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserVerificationResponseDto;
 
+import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,21 +61,21 @@ public class UserController {
 		UserRegisterRequestServiceDto requestServiceDto = userPresentationMapper.toUserRegisterRequestServiceDto(
 			requestDto);
 		Long registeredUserId = userService.registerUser(requestServiceDto);
-		return ResponseEntity.ok().body(registeredUserId);
+		return SuccessResponse.of(UserSuccessCode.USER_REGISTER_SUCCESS, registeredUserId);
 	}
 
 	@GetMapping("/me")
 	@Description(
 		"user id로 본인 id 조회"
 	)
-	public ResponseEntity<UserFindResponseDto> findUser(
+	public ResponseEntity<SuccessResponse<UserFindResponseDto>> findUser(
 		@RequestAttribute("userId") Long userId
 	) {
 		log.debug("search userId:{}", userId);
 		UserFindRequestServiceDto requestServiceDto = userPresentationMapper.toUserSearchRequestServiceDto(userId);
 		UserFindResponseDto responseDto = userService.findUser(requestServiceDto);
 		log.debug(responseDto.toString());
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_FIND_SUCCESS, responseDto);
 	}
 
 	@Description(
@@ -77,7 +87,7 @@ public class UserController {
 		UserUpdateRequestServiceDto requestServiceDto = userPresentationMapper.toUserUpdateRequestServiceDto(
 			requestDto, id);
 		UserAdminUpdateResponseDto responseDto = userService.updateMe(requestServiceDto);
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_UPDATE_SUCCESS, responseDto);
 	}
 
 	@Description(
@@ -87,20 +97,20 @@ public class UserController {
 	public ResponseEntity<?> withdrawUser(@RequestAttribute("userId") Long id) {
 		UserWithdrawRequestServiceDto requestServiceDto = userPresentationMapper.toUserWithdrawRequestServiceDto(
 			id);
-		userService.withdrawUser(requestServiceDto);
-		return ResponseEntity.ok().build();
+		Long withdrawUserId = userService.withdrawUser(requestServiceDto);
+		return SuccessResponse.of(UserSuccessCode.USER_WITHDRAW_SUCCESS, withdrawUserId);
 	}
 
 	@Description(
 		"username, password를 입력받아 로그인"
 	)
 	@PostMapping("/login")
-	public ResponseEntity<UserLoginResponseDto> loginUser(
+	public ResponseEntity<SuccessResponse<UserLoginResponseDto>> loginUser(
 		@RequestBody UserLoginRequestDto requestDto) {
 		UserLoginRequestServiceDto requestServiceDto = userPresentationMapper.toUserLoginRequestServiceDto(
 			requestDto);
 		UserLoginResponseDto responseDto = userService.loginUser(requestServiceDto);
-		return ResponseEntity.ok().body(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_LOGIN_SUCCESS, responseDto);
 	}
 
 	@PostMapping("/logout")
@@ -108,37 +118,61 @@ public class UserController {
 		"로그인했던 사용자 id를 받아 로그아웃"
 	)
 	public ResponseEntity<?> logoutUser(
-		@RequestAttribute("userId") Long userId
+		@RequestAttribute("userId") Long userId,
+		@RequestBody UserLogoutRequestDto requestDto
 	) {
-		UserLogoutRequestServiceDto requestServiceDto = userPresentationMapper.toUserLogoutRequestServiceDto(userId);
+		UserLogoutRequestServiceDto requestServiceDto = userPresentationMapper.toUserLogoutRequestServiceDto(requestDto,
+			userId);
 		userService.logoutUser(requestServiceDto);
-		return ResponseEntity.ok().build();
+		return SuccessResponse.of(UserSuccessCode.USER_LOGOUT_SUCCESS);
 	}
 
 	@Description(
 		"사용자 email 중복 체크 api"
 	)
 	@GetMapping("/check")
-	public ResponseEntity<UserCheckEmailResponseDto> checkEmail(
+	public ResponseEntity<SuccessResponse<UserCheckEmailResponseDto>> checkEmail(
 		@RequestParam(value = "email") String email) {
 
 		UserCheckEmailRequestServiceDto requestServiceDto = userPresentationMapper.toUserCheckEmailRequestServiceDto(
 			email);
 		UserCheckEmailResponseDto responseDto = userService.checkEmail(
 			requestServiceDto);
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_CHECK_SUCCESS, responseDto);
+	}
+
+	@Description("사용자 email 인증 발송 요청 api")
+	@PostMapping("/verify/send")
+	public ResponseEntity<SuccessResponse<UserVerificationResponseDto>> sendVerificationCode(
+		@RequestBody @Valid UserEmailVerificationRequestDto dto) {
+
+		UserEmailVerificationRequestServiceDto requestServiceDto = userPresentationMapper.toUserEmailVerificationRequestServiceDto(
+			dto);
+		UserVerificationResponseDto responseDto = userService.sendVerificationCode(requestServiceDto);
+		return SuccessResponse.of(UserSuccessCode.VERIFICATION_EMAIL_SEND_SUCCESS, responseDto);
+	}
+
+	@Description("사용자 email 인증 api")
+	@PostMapping("/verify/check")
+	public ResponseEntity<SuccessResponse<UserVerificationResponseDto>> checkVerificationCode(
+		@RequestBody @Valid UserEmailVerificationCheckRequestDto dto) {
+
+		UserEmailVerificationCheckRequestServiceDto requestServiceDto = userPresentationMapper.toUserEmailVerificationCheckRequestServiceDto(
+			dto);
+		UserVerificationResponseDto responseDto = userService.verifyCode(requestServiceDto);
+		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_VERIFICATION_SUCCESS, responseDto);
 	}
 
 	@Description(
 		"사용자 리프레시 토큰 재발급 api"
 	)
-	@GetMapping("/refresh")
-	public ResponseEntity<UserRefreshTokenResponseDto> refreshToken(
-		@RequestParam(value = "refreshToken") String refreshToken) {
+	@PostMapping("/refresh")
+	public ResponseEntity<SuccessResponse<UserRefreshTokenResponseDto>> refreshToken(
+		@RequestBody UserTokenRefreshRequestDto requestDto) {
 
 		UserRefreshTokenRequestServiceDto requestServiceDto = userPresentationMapper.toUserRefreshTokenRequestServiceDto(
-			refreshToken);
+			requestDto);
 		UserRefreshTokenResponseDto responseDto = userService.refreshToken(requestServiceDto);
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_TOKEN_ISSUE_SUCCESS, responseDto);
 	}
 }

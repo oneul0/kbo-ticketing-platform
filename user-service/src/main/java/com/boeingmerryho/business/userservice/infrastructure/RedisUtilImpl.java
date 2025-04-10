@@ -20,13 +20,19 @@ public class RedisUtilImpl implements RedisUtil {
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final JwtTokenProvider jwtTokenProvider;
 
+	private static final String USER_INFO_PREFIX = "user:info:";
+	private static final String USER_TOKEN_PREFIX = "user:token:";
+
 	@Override
 	public void updateUserInfo(User user) {
-		String userInfoKey = "user:info:" + user.getId();
+		String userInfoKey = USER_INFO_PREFIX + user.getId();
 		Map<String, Object> userInfoMap = new ConcurrentHashMap<>();
 
+		userInfoMap.put("email", user.getEmail());
 		userInfoMap.put("username", user.getUsername());
+		userInfoMap.put("nickname", user.getNickname());
 		userInfoMap.put("role", user.getRole());
+		userInfoMap.put("birth", user.getBirth());
 
 		long expirationTime = jwtTokenProvider.getRefreshTokenExpiration();
 		redisTemplate.delete(userInfoKey);
@@ -39,7 +45,7 @@ public class RedisUtilImpl implements RedisUtil {
 		String accessToken = jwtTokenProvider.generateAccessToken(id);
 		String refreshToken = jwtTokenProvider.generateRefreshToken(id);
 
-		String tokenKey = "user:token:" + id;
+		String tokenKey = USER_TOKEN_PREFIX + id;
 
 		Map<String, String> tokenMap = new HashMap<>();
 		tokenMap.put("accessToken", accessToken);
