@@ -36,9 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserService {
 
-	private static final String USER_TOKEN_PREFIX = "user:token:";
-	private static final String BLACKLIST_PREFIX = "blacklist:";
-
 	private final UserRepository userRepository;
 	private final UserApplicationMapper userApplicationMapper;
 	private final PasswordEncoder passwordEncoder;
