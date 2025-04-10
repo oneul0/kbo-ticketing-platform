@@ -9,6 +9,7 @@ import com.boeingmerryho.business.ticketservice.application.admin.dto.mapper.Adm
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketDeleteRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketIdRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketSearchRequestServiceDto;
+import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketStatusUpdateRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.response.AdminTicketResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.domain.Ticket;
 import com.boeingmerryho.business.ticketservice.domain.TicketSearchCriteria;
@@ -52,6 +53,19 @@ public class AdminTicketService {
 			.status(requestDto.status())
 			.isDeleted(requestDto.isDeleted())
 			.build();
+	}
+
+	@Transactional
+	public AdminTicketResponseServiceDto updateTicketStatus(
+		Long id,
+		AdminTicketStatusUpdateRequestServiceDto requestDto
+	) {
+		Ticket ticket = ticketRepository.findById(id)
+			.orElseThrow(() -> new TicketException(ErrorCode.TICKET_NOT_FOUND));
+
+		ticket.updateStatus(requestDto.status());
+
+		return mapper.toAdminTicketResponseServiceDto(ticket);
 	}
 
 	@Transactional

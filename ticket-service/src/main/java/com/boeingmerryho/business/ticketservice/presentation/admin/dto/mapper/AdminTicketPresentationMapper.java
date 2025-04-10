@@ -5,8 +5,10 @@ import org.mapstruct.Mapper;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketDeleteRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketIdRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketSearchRequestServiceDto;
+import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketStatusUpdateRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.response.AdminTicketResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.presentation.admin.dto.request.AdminTicketSearchRequestDto;
+import com.boeingmerryho.business.ticketservice.presentation.admin.dto.request.AdminTicketStatusUpdateRequestDto;
 import com.boeingmerryho.business.ticketservice.presentation.admin.dto.response.AdminTicketResponseDto;
 
 @Mapper(componentModel = "spring")
@@ -19,4 +21,8 @@ public interface AdminTicketPresentationMapper {
 	AdminTicketSearchRequestServiceDto toAdminTicketSearchRequestServiceDto(AdminTicketSearchRequestDto dto);
 
 	AdminTicketDeleteRequestServiceDto toAdminTicketDeleteRequestServiceDto(Long id);
+
+	AdminTicketStatusUpdateRequestServiceDto toAdminTicketStatusUpdateRequestServiceDto(
+		AdminTicketStatusUpdateRequestDto requestDto
+	);
 }

@@ -1,5 +1,8 @@
 package com.boeingmerryho.business.ticketservice.domain;
 
+import com.boeingmerryho.business.ticketservice.exception.ErrorCode;
+import com.boeingmerryho.business.ticketservice.exception.TicketException;
+
 import io.github.boeingmerryho.commonlibrary.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,4 +39,16 @@ public class Ticket extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private TicketStatus status;
 
+	public void updateStatus(String status) {
+		try {
+			this.status = TicketStatus.valueOf(status);
+		} catch (IllegalArgumentException e) {
+			throw new TicketException(ErrorCode.INVALID_TICKET_STATUS);
+		}
+	}
+
+	public void softDelete(Long deletedBy) {
+		super.softDelete(deletedBy);
+		this.status = TicketStatus.CANCELLED;
+	}
 }

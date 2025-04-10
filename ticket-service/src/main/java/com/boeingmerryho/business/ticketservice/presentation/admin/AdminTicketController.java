@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +17,7 @@ import com.boeingmerryho.business.ticketservice.application.admin.dto.response.A
 import com.boeingmerryho.business.ticketservice.presentation.TicketSuccessCode;
 import com.boeingmerryho.business.ticketservice.presentation.admin.dto.mapper.AdminTicketPresentationMapper;
 import com.boeingmerryho.business.ticketservice.presentation.admin.dto.request.AdminTicketSearchRequestDto;
+import com.boeingmerryho.business.ticketservice.presentation.admin.dto.request.AdminTicketStatusUpdateRequestDto;
 import com.boeingmerryho.business.ticketservice.utils.PageableUtils;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
@@ -64,6 +67,20 @@ public class AdminTicketController {
 		return SuccessResponse.of(
 			TicketSuccessCode.TICKET_SEARCH,
 			responseDto.map(mapper::toAdminTicketResponseDto)
+		);
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<?> updateTicketStatus(
+		@PathVariable Long id,
+		@RequestBody AdminTicketStatusUpdateRequestDto requestDto
+	) {
+		AdminTicketResponseServiceDto responseDto = ticketService
+			.updateTicketStatus(id, mapper.toAdminTicketStatusUpdateRequestServiceDto(requestDto));
+
+		return SuccessResponse.of(
+			TicketSuccessCode.TICKET_STATUS_UPDATE,
+			mapper.toAdminTicketResponseDto(responseDto)
 		);
 	}
 
