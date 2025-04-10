@@ -124,19 +124,21 @@ public class UserAdminService {
 	}
 
 	@Transactional
-	public void deleteUserRole(UserAdminDeleteRoleRequestServiceDto dto) {
+	public Long deleteUserRole(UserAdminDeleteRoleRequestServiceDto dto) {
 		User user = userHelper.findUserById(dto.id(), userRepository);
 
 		user.deleteRoleType();
 		userHelper.updateRedisUserInfo(user);
+		return user.getId();
 	}
 
 	@Transactional
-	public void deleteUser(UserAdminDeleteRequestServiceDto dto) {
+	public Long deleteUser(UserAdminDeleteRequestServiceDto dto) {
 		User user = userHelper.findUserById(dto.id(), userRepository);
 		user.softDelete(user.getId());
 
 		userHelper.clearRedisUserData(user.getId());
+		return user.getId();
 	}
 
 	public void logoutUser(UserLogoutRequestServiceDto dto) {
@@ -162,11 +164,12 @@ public class UserAdminService {
 	}
 
 	@Transactional
-	public void withdrawUser(UserAdminWithdrawRequestServiceDto dto) {
+	public Long withdrawUser(UserAdminWithdrawRequestServiceDto dto) {
 		User user = userHelper.findUserById(dto.id(), userRepository);
 		user.softDelete(user.getId());
 
 		userHelper.clearRedisUserData(user.getId());
+		return user.getId();
 	}
 
 	@Transactional

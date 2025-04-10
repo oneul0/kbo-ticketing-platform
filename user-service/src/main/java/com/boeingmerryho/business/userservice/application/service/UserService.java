@@ -114,11 +114,13 @@ public class UserService {
 	}
 
 	@Transactional
-	public void withdrawUser(UserWithdrawRequestServiceDto dto) {
+	public Long withdrawUser(UserWithdrawRequestServiceDto dto) {
 		User user = userHelper.findUserById(dto.id(), userRepository);
 		user.softDelete(user.getId());
 
 		userHelper.clearRedisUserData(user.getId());
+
+		return user.getId();
 	}
 
 	@Transactional(readOnly = true)

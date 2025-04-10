@@ -28,8 +28,10 @@ import com.boeingmerryho.business.userservice.application.dto.request.admin.User
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminUpdateRoleRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.response.admin.UserAdminFindResponseDto;
 import com.boeingmerryho.business.userservice.application.service.UserAdminService;
 import com.boeingmerryho.business.userservice.config.pageable.PageableConfig;
+import com.boeingmerryho.business.userservice.presentation.UserSuccessCode;
 import com.boeingmerryho.business.userservice.presentation.dto.mapper.UserPresentationMapper;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminLoginRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminLogoutRequestDto;
@@ -45,6 +47,7 @@ import com.boeingmerryho.business.userservice.presentation.dto.response.admin.Us
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateRoleResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
 
+import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,27 +63,29 @@ public class UserAdminController {
 
 	@Description("username, password, email, key를 입력 받아 회원가입")
 	@PostMapping("/register")
-	public ResponseEntity<Long> registerAdminUser(@RequestBody UserAdminRegisterRequestDto requestDto) {
+	public ResponseEntity<SuccessResponse<Long>> registerAdminUser(
+		@RequestBody UserAdminRegisterRequestDto requestDto) {
 		UserAdminRegisterRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminSignUpServiceDto(
 			requestDto);
 		Long registeredUserId = userAdminService.registerUserAdmin(requestServiceDto);
-		return ResponseEntity.ok().body(registeredUserId);
+		return SuccessResponse.of(UserSuccessCode.USER_REGISTER_SUCCESS, registeredUserId);
 	}
 
 	@Description("모든 사용자 리스트 중 id가 일치하는 사용자 조회")
 	@GetMapping("/{id}")
-	public ResponseEntity<?> findUser(@PathVariable Long id) {
+	public ResponseEntity<SuccessResponse<UserAdminFindResponseDto>> findUser(@PathVariable Long id) {
 		UserAdminFindRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminFindRequestServiceDto(id);
-		return ResponseEntity.ok(userAdminService.findUserAdmin(requestServiceDto));
+		return SuccessResponse.of(UserSuccessCode.USER_FIND_SUCCESS, userAdminService.findUserAdmin(requestServiceDto));
 	}
 
 	@Description("업데이트 할 사용자 정보를 파라미터로 받아 정보 갱신")
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserAdminUpdateRequestDto requestDto) {
+	public ResponseEntity<SuccessResponse<UserAdminUpdateResponseDto>> updateUser(@PathVariable Long id,
+		@RequestBody UserAdminUpdateRequestDto requestDto) {
 		UserAdminUpdateRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminUpdateRequestServiceDto(
 			requestDto, id);
 		UserAdminUpdateResponseDto responseDto = userAdminService.updateUser(requestServiceDto);
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_UPDATE_SUCCESS, responseDto);
 	}
 
 	@Description("본인 정보 수정")
@@ -90,35 +95,35 @@ public class UserAdminController {
 		UserAdminUpdateRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminUpdateRequestServiceDto(
 			requestDto, id);
 		UserAdminUpdateResponseDto responseDto = userAdminService.updateMe(requestServiceDto);
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_UPDATE_SUCCESS, responseDto);
 	}
 
 	@Description("사용자 권한 변경")
 	@PutMapping("/roles/{id}")
-	public ResponseEntity<UserAdminUpdateRoleResponseDto> updateRoleUserMaster(@PathVariable Long id,
+	public ResponseEntity<SuccessResponse<UserAdminUpdateRoleResponseDto>> updateRoleUserMaster(@PathVariable Long id,
 		@RequestBody UserAdminUpdateRoleRequestDto requestDto) {
 		UserAdminUpdateRoleRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminUpdateRoleRequestServiceDto(
 			requestDto, id);
 		UserAdminUpdateRoleResponseDto responseDto = userAdminService.updateUserRole(requestServiceDto);
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_UPDATE_SUCCESS, responseDto);
 	}
 
-	@Description("사용자 삭제")
+	@Description("회원 탈퇴(본인)")
 	@DeleteMapping("/me")
 	public ResponseEntity<?> withdrawUserMaster(@PathVariable Long id) {
 		UserAdminWithdrawRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminWithdrawRequestServiceDto(
 			id);
-		userAdminService.withdrawUser(requestServiceDto);
-		return ResponseEntity.ok().build();
+		Long withdrawId = userAdminService.withdrawUser(requestServiceDto);
+		return SuccessResponse.of(UserSuccessCode.USER_WITHDRAW_SUCCESS, withdrawId);
 	}
 
-	@Description("회원 탈퇴(본인)")
+	@Description("사용자 삭제")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteUserMaster(@RequestAttribute("userId") Long id) {
 		UserAdminDeleteRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminDeleteRequestServiceDto(
 			id);
-		userAdminService.deleteUser(requestServiceDto);
-		return ResponseEntity.ok().build();
+		Long deletedId = userAdminService.deleteUser(requestServiceDto);
+		return SuccessResponse.of(UserSuccessCode.USER_DELETE_SUCCESS, deletedId);
 	}
 
 	@Description("사용자 권한 회수(삭제)")
@@ -126,13 +131,13 @@ public class UserAdminController {
 	public ResponseEntity<?> deleteRoleUserMaster(@PathVariable Long id) {
 		UserAdminDeleteRoleRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminDeleteRoleRequestServiceDto(
 			id);
-		userAdminService.deleteUserRole(requestServiceDto);
-		return ResponseEntity.ok().build();
+		Long deletedId = userAdminService.deleteUserRole(requestServiceDto);
+		return SuccessResponse.of(UserSuccessCode.USER_ROLE_DELETED_SUCCESS, deletedId);
 	}
 
 	@Description("사용자 정보를 선택적으로 파라미터로 받아 검색하는 api")
 	@GetMapping("/search")
-	public ResponseEntity<Page<UserAdminSearchResponseDto>> searchUsers(
+	public ResponseEntity<SuccessResponse<Page<UserAdminSearchResponseDto>>> searchUsers(
 		@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
 		@RequestParam(value = "size", required = false) Integer size,
 		@RequestParam(value = "sortDirection", required = false) String sortDirection,
@@ -143,37 +148,39 @@ public class UserAdminController {
 		UserAdminSearchRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminSearchRequestServiceDto(
 			requestDto, customPageable);
 		Page<UserAdminSearchResponseDto> responseDtos = userAdminService.searchUsers(requestServiceDto, customPageable);
-		return ResponseEntity.ok(responseDtos);
+		return SuccessResponse.of(UserSuccessCode.USER_SEARCH_SUCCESS, responseDtos);
 	}
 
 	@Description("사용자 email 중복 체크 api")
 	@GetMapping("/check")
-	public ResponseEntity<UserAdminCheckEmailResponseDto> checkEmail(@RequestParam(value = "email") String email) {
+	public ResponseEntity<SuccessResponse<UserAdminCheckEmailResponseDto>> checkEmail(
+		@RequestParam(value = "email") String email) {
 
 		UserAdminCheckEmailRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminCheckEmailRequestServiceDto(
 			email);
 		UserAdminCheckEmailResponseDto responseDto = userAdminService.checkEmail(requestServiceDto);
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_CHECK_SUCCESS, responseDto);
 	}
 
 	@Description("사용자 리프레시 토큰 재발급 api")
 	@PostMapping("/refresh")
-	public ResponseEntity<UserAdminRefreshTokenResponseDto> refreshToken(
+	public ResponseEntity<SuccessResponse<UserAdminRefreshTokenResponseDto>> refreshToken(
 		@RequestBody UserAdminTokenRefreshRequestDto requestDto) {
 		log.info("refreshed token : {}", requestDto.refreshToken());
 		UserAdminRefreshTokenRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminRefreshTokenRequestServiceDto(
 			requestDto);
 		UserAdminRefreshTokenResponseDto responseDto = userAdminService.refreshToken(requestServiceDto);
-		return ResponseEntity.ok(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_TOKEN_ISSUE_SUCCESS, responseDto);
 	}
 
 	@Description("email, password를 입력받아 로그인")
 	@PostMapping("/login")
-	public ResponseEntity<UserLoginResponseDto> loginUser(@RequestBody UserAdminLoginRequestDto requestDto) {
+	public ResponseEntity<SuccessResponse<UserLoginResponseDto>> loginUser(
+		@RequestBody UserAdminLoginRequestDto requestDto) {
 		UserAdminLoginRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminLoginRequestServiceDto(
 			requestDto);
 		UserLoginResponseDto responseDto = userAdminService.loginUserAdmin(requestServiceDto);
-		return ResponseEntity.ok().body(responseDto);
+		return SuccessResponse.of(UserSuccessCode.USER_LOGIN_SUCCESS, responseDto);
 	}
 
 	@Description("로그인했던 사용자 id를 받아 로그아웃")
@@ -186,7 +193,7 @@ public class UserAdminController {
 		UserLogoutRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminLogoutRequestServiceDto(
 			requestDto, Long.valueOf(userId));
 		userAdminService.logoutUser(requestServiceDto);
-		return ResponseEntity.ok().build();
+		return SuccessResponse.of(UserSuccessCode.USER_LOGOUT_SUCCESS);
 	}
 
 }
