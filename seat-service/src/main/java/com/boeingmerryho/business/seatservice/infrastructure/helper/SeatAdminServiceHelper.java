@@ -1,5 +1,7 @@
 package com.boeingmerryho.business.seatservice.infrastructure.helper;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import com.boeingmerryho.business.seatservice.domain.Seat;
@@ -16,5 +18,9 @@ public class SeatAdminServiceHelper {
 
 	public void delete(Seat seat) {
 		seatRepository.delete(seat);
+	}
+
+	public List<Seat> getSeatsByIsActiveIsTrue() {
+		return seatRepository.findAllByIsActiveIsTrue();
 	}
 }

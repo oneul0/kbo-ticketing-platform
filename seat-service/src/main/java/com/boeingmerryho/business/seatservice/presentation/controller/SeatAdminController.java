@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.boeingmerryho.business.seatservice.application.dto.request.CacheSeatCreateServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatActiveServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatCreateServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatDeleteServiceRequestDto;
@@ -22,6 +23,7 @@ import com.boeingmerryho.business.seatservice.application.dto.response.SeatUpdat
 import com.boeingmerryho.business.seatservice.application.service.SeatAdminService;
 import com.boeingmerryho.business.seatservice.presentation.SeatSuccessCode;
 import com.boeingmerryho.business.seatservice.presentation.dto.mapper.SeatPresentationMapper;
+import com.boeingmerryho.business.seatservice.presentation.dto.request.CacheSeatCreateRequestDto;
 import com.boeingmerryho.business.seatservice.presentation.dto.request.SeatCreateRequestDto;
 import com.boeingmerryho.business.seatservice.presentation.dto.request.SeatUpdateRequestDto;
 import com.boeingmerryho.business.seatservice.presentation.dto.response.SeatCreateResponseDto;
@@ -102,5 +104,18 @@ public class SeatAdminController {
 
 		seatAdminService.deleteSeat(serviceDto);
 		return SuccessResponse.of(SeatSuccessCode.DELETED_SEAT, null);
+	}
+
+	@Description(
+		"ADMIN - 입력 받은 날짜로 예약 가능 좌석 생성하기"
+	)
+	@PostMapping("/create/buckets")
+	public ResponseEntity<SuccessResponse<Void>> createCacheSeats(@RequestBody CacheSeatCreateRequestDto create) {
+		CacheSeatCreateServiceRequestDto serviceDto = seatPresentationMapper.toCacheSeatCreateServiceRequestDto(
+			create.date()
+		);
+
+		seatAdminService.createCacheSeats(serviceDto);
+		return SuccessResponse.of(SeatSuccessCode.CREATED_SEAT, null);
 	}
 }
