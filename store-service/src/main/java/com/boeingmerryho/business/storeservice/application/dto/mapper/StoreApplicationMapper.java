@@ -7,6 +7,11 @@ import org.springframework.context.annotation.Primary;
 
 import com.boeingmerryho.business.storeservice.application.dto.request.StoreCreateRequestServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreCreateResponseServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.response.StoreDetailAdminResponseServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.response.StoreDetailResponseServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.response.StoreSearchAdminResponseServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.response.StoreSearchResponseServiceDto;
+import com.boeingmerryho.business.storeservice.application.dto.response.StoreUpdateResponseServiceDto;
 import com.boeingmerryho.business.storeservice.domain.entity.Store;
 
 @Primary
@@ -25,4 +30,15 @@ public interface StoreApplicationMapper {
 
 	@BeanMapping(ignoreByDefault = true)
 	StoreCreateResponseServiceDto toStoreCreateResponseServiceDto(Store savedStore);
+
+	StoreDetailAdminResponseServiceDto toStoreDetailAdminResponseServiceDto(Store storeDetail,
+		boolean isQueueAvailable);
+
+	StoreDetailResponseServiceDto toStoreDetailResponseServiceDto(Store storeDetail, boolean isQueueAvailable);
+
+	StoreSearchAdminResponseServiceDto toStoreSearchAdminResponseServiceDto(Store store);
+
+	StoreSearchResponseServiceDto toStoreSearchResponseServiceDto(Store store);
+
+	StoreUpdateResponseServiceDto toStoreUpdateResponseServiceDto(Store updated);
 }
