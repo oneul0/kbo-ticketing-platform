@@ -9,6 +9,8 @@ public enum StoreSuccessCode implements SuccessCode {
 	UPDATED_STORE("매장이 성공적으로 수정되었습니다.", HttpStatus.OK),
 	FETCHED_STORE("매장 정보를 불러왔습니다.", HttpStatus.OK),
 	FETCHED_STORES("매장 정보들을 불러왔습니다.", HttpStatus.OK),
+	OPEN_STORE("매장이 오픈되었습니다.", HttpStatus.OK),
+	CLOSE_STORE("매장이 마감되었습니다.", HttpStatus.OK),
 	;
 
 	private final String message;

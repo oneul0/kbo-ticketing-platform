@@ -90,4 +90,22 @@ public class StoreAdminController {
 		return SuccessResponse.of(StoreSuccessCode.UPDATED_STORE, responseDto);
 	}
 
+	@PutMapping("/{id}/open")
+	public ResponseEntity<SuccessResponse<StoreUpdateResponseDto>> openStore(
+		@PathVariable Long id
+	) {
+		StoreUpdateResponseServiceDto responseDtoService = storeAdminService.openStore(id);
+		StoreUpdateResponseDto responseDto = mapper.toStoreUpdateResponseDto(responseDtoService);
+		return SuccessResponse.of(StoreSuccessCode.OPEN_STORE, responseDto);
+	}
+
+	@PutMapping("/{id}/close")
+	public ResponseEntity<SuccessResponse<StoreUpdateResponseDto>> closeStore(
+		@PathVariable Long id
+	) {
+		StoreUpdateResponseServiceDto responseDtoService = storeAdminService.closeStore(id);
+		StoreUpdateResponseDto responseDto = mapper.toStoreUpdateResponseDto(responseDtoService);
+		return SuccessResponse.of(StoreSuccessCode.CLOSE_STORE, responseDto);
+	}
+
 }

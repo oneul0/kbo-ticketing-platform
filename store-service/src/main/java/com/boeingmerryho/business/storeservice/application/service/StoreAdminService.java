@@ -51,4 +51,16 @@ public class StoreAdminService {
 		Store updated = storeAdminHelper.updateStoreInfo(id, requestDto);
 		return mapper.toStoreUpdateResponseServiceDto(updated);
 	}
+
+	@Transactional
+	public StoreUpdateResponseServiceDto openStore(Long id) {
+		Store opened = storeAdminHelper.updateStoreOpen(id);
+		return mapper.toStoreUpdateResponseServiceDto(opened);
+	}
+
+	@Transactional
+	public StoreUpdateResponseServiceDto closeStore(Long id) {
+		Store closed = storeAdminHelper.updateStoreClose(id);
+		return mapper.toStoreUpdateResponseServiceDto(closed);
+	}
 }

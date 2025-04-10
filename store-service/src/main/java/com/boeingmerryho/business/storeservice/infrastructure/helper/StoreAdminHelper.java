@@ -48,4 +48,18 @@ public class StoreAdminHelper {
 		return storeRepository.findById(id)
 			.orElseThrow(() -> new GlobalException(StoreErrorCode.NOT_FOUND));
 	}
+
+	public Store updateStoreOpen(Long id) {
+		Store store = storeRepository.findByIdAndIsDeletedFalse(id)
+			.orElseThrow(() -> new GlobalException(StoreErrorCode.NOT_FOUND));
+		store.open();
+		return store;
+	}
+
+	public Store updateStoreClose(Long id) {
+		Store store = storeRepository.findByIdAndIsDeletedFalse(id)
+			.orElseThrow(() -> new GlobalException(StoreErrorCode.NOT_FOUND));
+		store.close();
+		return store;
+	}
 }
