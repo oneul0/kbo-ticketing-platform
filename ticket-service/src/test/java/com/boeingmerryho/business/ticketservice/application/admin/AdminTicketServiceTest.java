@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import java.util.List;
 import java.util.Optional;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,11 +19,14 @@ import org.springframework.data.domain.Pageable;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.mapper.AdminTicketApplicationMapper;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketIdRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketSearchRequestServiceDto;
+import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketStatusUpdateRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.response.AdminTicketResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.domain.Ticket;
 import com.boeingmerryho.business.ticketservice.domain.TicketSearchCriteria;
 import com.boeingmerryho.business.ticketservice.domain.TicketStatus;
 import com.boeingmerryho.business.ticketservice.domain.repository.TicketRepository;
+import com.boeingmerryho.business.ticketservice.exception.ErrorCode;
+import com.boeingmerryho.business.ticketservice.exception.TicketException;
 import com.boeingmerryho.business.ticketservice.utils.PageableUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,12 +41,10 @@ class AdminTicketServiceTest {
 	@Mock
 	private AdminTicketApplicationMapper mapper;
 
-	@DisplayName("관리자는 티켓 ID를 통해 티켓을 조회할 수 있다.")
-	@Test
-	void admin_find_ticket_by_id_test() {
-	    // Given
-		Long ticketId = 1L;
-		Ticket ticket = Ticket.builder()
+	private final Long ticketId = 1L;
+
+	private Ticket setUpTicket() {
+		return Ticket.builder()
 			.id(ticketId)
 			.matchId(1L)
 			.seatId(1L)
@@ -52,26 +52,35 @@ class AdminTicketServiceTest {
 			.ticketNo("20250405-1-1-111")
 			.status(TicketStatus.PENDING)
 			.build();
+	}
 
+	private AdminTicketResponseServiceDto setUpResponseDto(Ticket ticket, TicketStatus status) {
+		return new AdminTicketResponseServiceDto(
+			ticket.getId(),
+			ticket.getMatchId(),
+			ticket.getSeatId(),
+			ticket.getUserId(),
+			ticket.getTicketNo(),
+			status.name(),
+			ticket.getIsDeleted()
+		);
+	}
+
+	@DisplayName("관리자는 티켓 ID를 통해 티켓을 조회할 수 있다.")
+	@Test
+	void admin_find_ticket_by_id_test() {
+		// Given
+		Ticket ticket = setUpTicket();
 		AdminTicketIdRequestServiceDto requestDto = new AdminTicketIdRequestServiceDto(ticketId);
+		AdminTicketResponseServiceDto responseDto = setUpResponseDto(ticket, ticket.getStatus());
 
 		when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(ticket));
-		when(mapper.toAdminTicketResponseServiceDto(ticket)).thenReturn(
-			new AdminTicketResponseServiceDto(
-				ticketId,
-				ticket.getMatchId(),
-				ticket.getSeatId(),
-				ticket.getUserId(),
-				ticket.getTicketNo(),
-				ticket.getStatus().name(),
-				ticket.getIsDeleted()
-			)
-		);
+		when(mapper.toAdminTicketResponseServiceDto(ticket)).thenReturn(responseDto);
 
 		// When
 		AdminTicketResponseServiceDto response = adminTicketService.getTicketById(requestDto);
 
-	    // Then
+		// Then
 		assertThat(response).isNotNull()
 			.extracting(
 				AdminTicketResponseServiceDto::id,
@@ -82,7 +91,7 @@ class AdminTicketServiceTest {
 				AdminTicketResponseServiceDto::status,
 				AdminTicketResponseServiceDto::isDeleted)
 			.containsExactly(
-				ticketId,
+				ticket.getId(),
 				ticket.getMatchId(),
 				ticket.getSeatId(),
 				ticket.getUserId(),
@@ -95,27 +104,14 @@ class AdminTicketServiceTest {
 	@DisplayName("관리자는 조건을 통해 티켓을 조회할 수 있다.")
 	@Test
 	void admin_search_ticket_test() {
-	    // Given
-		Long ticketId = 1L;
-		Ticket ticket = Ticket.builder()
-			.id(ticketId)
-			.matchId(1L)
-			.seatId(1L)
-			.userId(1L)
-			.ticketNo("20250405-1-1-111")
-			.status(TicketStatus.PENDING)
-			.build();
-
+		// Given
+		Ticket ticket = setUpTicket();
 		Pageable pageable = PageableUtils.customPageable(0, 10, "createdAt", "desc");
 		AdminTicketSearchRequestServiceDto requestDto = new AdminTicketSearchRequestServiceDto(
 			null, 1L, null, null, null, null, null
 		);
-		AdminTicketResponseServiceDto responseDto = new AdminTicketResponseServiceDto(
-			1L, 1L, 1L, 1L, "20250405-1-1-111", TicketStatus.PENDING.name(), false
-		);
-
-		List<Ticket> tickets = List.of(ticket);
-		Page<Ticket> ticketPage = new PageImpl<>(tickets, pageable, tickets.size());
+		AdminTicketResponseServiceDto responseDto = setUpResponseDto(ticket, ticket.getStatus());
+		Page<Ticket> ticketPage = new PageImpl<>(List.of(ticket), pageable, 1);
 
 		when(ticketRepository.findByCriteria(any(TicketSearchCriteria.class), eq(pageable)))
 			.thenReturn(ticketPage);
@@ -124,7 +120,7 @@ class AdminTicketServiceTest {
 		// When
 		Page<AdminTicketResponseServiceDto> result = adminTicketService.searchTickets(requestDto, pageable);
 
-	    // Then
+		// Then
 		assertThat(result).isNotNull();
 		assertThat(result.getContent()).hasSize(1);
 		assertThat(result.getContent().get(0)).isEqualTo(responseDto);
@@ -133,4 +129,43 @@ class AdminTicketServiceTest {
 		verify(mapper).toAdminTicketResponseServiceDto(ticket);
 	}
 
+	@DisplayName("관리자는 티켓의 상태를 변경할 수 있다.")
+	@Test
+	void admin_update_ticket_status_test() {
+		// Given
+		Ticket ticket = setUpTicket();
+		AdminTicketStatusUpdateRequestServiceDto requestDto = new AdminTicketStatusUpdateRequestServiceDto(
+			TicketStatus.CANCELLED.name()
+		);
+		AdminTicketResponseServiceDto responseDto = setUpResponseDto(ticket, TicketStatus.CANCELLED);
+
+		when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(ticket));
+		when(mapper.toAdminTicketResponseServiceDto(ticket)).thenReturn(responseDto);
+
+		// When
+		AdminTicketResponseServiceDto result = adminTicketService.updateTicketStatus(ticketId, requestDto);
+
+		// Then
+		assertThat(result).isNotNull()
+			.extracting(AdminTicketResponseServiceDto::status)
+			.isEqualTo(TicketStatus.CANCELLED.name());
+	}
+
+	@DisplayName("올바르지 않은 티켓 상태로 업데이트 시도 시 예외가 발생한다.")
+	@Test
+	void invalid_status_update_exception_test() {
+		// Given
+		Ticket ticket = setUpTicket();
+		AdminTicketStatusUpdateRequestServiceDto requestDto =
+			new AdminTicketStatusUpdateRequestServiceDto("INVALID_STATUS");
+
+		when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(ticket));
+
+		// When & Then
+		assertThatThrownBy(() -> adminTicketService.updateTicketStatus(ticketId, requestDto))
+			.isInstanceOfSatisfying(
+				TicketException.class,
+				ex -> assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_TICKET_STATUS)
+			);
+	}
 }
