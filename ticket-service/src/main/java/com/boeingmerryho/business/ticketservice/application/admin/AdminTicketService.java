@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.ticketservice.application.admin.dto.mapper.AdminTicketApplicationMapper;
+import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketDeleteRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketIdRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketSearchRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.response.AdminTicketResponseServiceDto;
@@ -51,5 +52,14 @@ public class AdminTicketService {
 			.status(requestDto.status())
 			.isDeleted(requestDto.isDeleted())
 			.build();
+	}
+
+	@Transactional
+	public void softDeleteTicketById(AdminTicketDeleteRequestServiceDto requestDto) {
+		Ticket ticket = ticketRepository.findById(requestDto.id())
+			.orElseThrow(() -> new TicketException(ErrorCode.TICKET_NOT_FOUND));
+
+		// TODO : request Header 에서 사용자 Id 정보 받기
+		ticket.softDelete(null);
 	}
 }

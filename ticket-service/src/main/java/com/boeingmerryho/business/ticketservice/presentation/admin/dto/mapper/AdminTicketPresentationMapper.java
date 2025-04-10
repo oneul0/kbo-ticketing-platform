@@ -2,6 +2,7 @@ package com.boeingmerryho.business.ticketservice.presentation.admin.dto.mapper;
 
 import org.mapstruct.Mapper;
 
+import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketDeleteRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketIdRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketSearchRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.response.AdminTicketResponseServiceDto;
@@ -16,4 +17,6 @@ public interface AdminTicketPresentationMapper {
 	AdminTicketResponseDto toAdminTicketResponseDto(AdminTicketResponseServiceDto dto);
 
 	AdminTicketSearchRequestServiceDto toAdminTicketSearchRequestServiceDto(AdminTicketSearchRequestDto dto);
+
+	AdminTicketDeleteRequestServiceDto toAdminTicketDeleteRequestServiceDto(Long id);
 }
