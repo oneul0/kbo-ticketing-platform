@@ -22,9 +22,10 @@ import com.boeingmerryho.business.userservice.application.dto.request.other.User
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.service.UserService;
 import com.boeingmerryho.business.userservice.presentation.dto.mapper.UserPresentationMapper;
-import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserTokenRefreshRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLoginRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLogoutRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserRegisterRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserTokenRefreshRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserUpdateRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserCheckEmailResponseDto;
@@ -109,9 +110,11 @@ public class UserController {
 		"로그인했던 사용자 id를 받아 로그아웃"
 	)
 	public ResponseEntity<?> logoutUser(
-		@RequestAttribute("userId") Long userId
+		@RequestAttribute("userId") Long userId,
+		@RequestBody UserLogoutRequestDto requestDto
 	) {
-		UserLogoutRequestServiceDto requestServiceDto = userPresentationMapper.toUserLogoutRequestServiceDto(userId);
+		UserLogoutRequestServiceDto requestServiceDto = userPresentationMapper.toUserLogoutRequestServiceDto(requestDto,
+			userId);
 		userService.logoutUser(requestServiceDto);
 		return ResponseEntity.ok().build();
 	}

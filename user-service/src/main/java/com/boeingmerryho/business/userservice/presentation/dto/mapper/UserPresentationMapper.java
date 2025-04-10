@@ -25,15 +25,17 @@ import com.boeingmerryho.business.userservice.application.dto.request.other.User
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserUpdateRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminLoginRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminLogoutRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminRegisterRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminSearchRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminTokenRefreshRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminUpdateRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminUpdateRoleRequestDto;
-import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserTokenRefreshRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserCreateRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLoginRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLogoutRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserRegisterRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserTokenRefreshRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserUpdateRequestDto;
 
 @Mapper(componentModel = "spring")
@@ -74,7 +76,7 @@ public interface UserPresentationMapper {
 	UserAdminDeleteRequestServiceDto toUserAdminDeleteRequestServiceDto(Long id);
 
 	@Mapping(target = "id", source = "userId")
-	UserLogoutRequestServiceDto toUserLogoutRequestServiceDto(Long userId);
+	UserLogoutRequestServiceDto toUserLogoutRequestServiceDto(UserLogoutRequestDto requestDto, Long userId);
 
 	UserAdminLoginRequestServiceDto toUserAdminLoginRequestServiceDto(UserAdminLoginRequestDto requestDto);
 
@@ -95,4 +97,6 @@ public interface UserPresentationMapper {
 	UserCheckEmailRequestServiceDto toUserCheckEmailRequestServiceDto(String email);
 
 	UserRefreshTokenRequestServiceDto toUserRefreshTokenRequestServiceDto(UserTokenRefreshRequestDto requestDto);
+
+	UserLogoutRequestServiceDto toUserAdminLogoutRequestServiceDto(UserAdminLogoutRequestDto requestDto, Long userId);
 }
