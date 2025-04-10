@@ -33,7 +33,7 @@ public class PaymentAdminController {
 	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(@PathVariable Long id) {
 		PaymentTicketCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelTicketPayment(
 			mapper.toPaymentTicketCancelRequestServiceDto(id));
-		return SuccessResponse.of(PaymentSuccessCode.REQUESTED_REFUND_TICKET,
+		return SuccessResponse.of(PaymentSuccessCode.TICKET_REFUND_REQUESTED,
 			mapper.toPaymentTicketCancelResponseDto(responseServiceDto));
 	}
 
@@ -42,7 +42,7 @@ public class PaymentAdminController {
 		@PathVariable Long id) {
 		PaymentMembershipCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelMembershipPayment(
 			mapper.toPaymentMembershipCancelRequestServiceDto(id));
-		return SuccessResponse.of(PaymentSuccessCode.REQUESTED_REFUND_MEMBERSHIP,
+		return SuccessResponse.of(PaymentSuccessCode.MEMBERSHIP_REFUND_REQUESTED,
 			mapper.toPaymentMembershipCancelResponseDto(responseServiceDto));
 	}
 

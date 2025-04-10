@@ -52,16 +52,10 @@ public class Payment extends BaseEntity {
 	}
 
 	public boolean validateStatus(PaymentStatus status) {
-		if (this.status == status) {
-			return true;
-		}
-		return false;
+		return this.status == status;
 	}
 
 	public boolean validateType(PaymentType type) {
-		if (this.type == type) {
-			return true;
-		}
-		return false;
+		return this.type == type;
 	}
 }

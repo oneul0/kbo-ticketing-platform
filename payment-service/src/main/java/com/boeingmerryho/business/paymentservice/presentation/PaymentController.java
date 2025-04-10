@@ -5,21 +5,29 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.paymentservice.application.PaymentService;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.request.PaymentReadyRequestDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentApproveResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentMembershipCancelResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentReadyResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentTicketCancelResponseDto;
 import com.boeingmerryho.business.paymentservice.utils.PageableUtils;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,32 +35,60 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentController {
 	private final PaymentService paymentService;
-	private final PaymentPresentationMapper mapper;
+	private final PaymentPresentationMapper paymentPresentationMapper;
+
+	/**
+	 * 결제 요청 (결제 정보를 바탕으로 서버에 결제를 요청한다.)
+	 */
+	@PostMapping("/ready")
+	public ResponseEntity<SuccessResponse<PaymentReadyResponseDto>> readyPayment(
+		@RequestBody @Valid PaymentReadyRequestDto requestDto) {
+		PaymentReadyResponseServiceDto responseServiceDto = paymentService.readyPayment(
+			paymentPresentationMapper.toPaymentReadyRequestServiceDto(1L, requestDto));    // TODO userId
+
+		return SuccessResponse.of(PaymentSuccessCode.PAYMENT_READY_REQUESTED,
+			paymentPresentationMapper.toPaymentReadyResponseDto(responseServiceDto));
+	}
+
+	/**
+	 * 결제 승인 요청 (pg_token 값을 기반으로 결제 승인을 요청한다.)
+	 */
+	@GetMapping("/approve")
+	public ResponseEntity<SuccessResponse<PaymentApproveResponseDto>> approvePayment(
+		@RequestParam("pg_token") String pgToken,
+		@RequestParam("paymentId") Long paymentId
+	) {
+		PaymentApproveResponseServiceDto responseServiceDto = paymentService.approvePayment(
+			paymentPresentationMapper.toPaymentApproveRequestServiceDto(1L, pgToken, paymentId));    // TODO userId
+
+		return SuccessResponse.of(PaymentSuccessCode.PAYMENT_APPROVED,
+			paymentPresentationMapper.toPaymentApproveResponseDto(responseServiceDto));
+	}
 
 	@PutMapping("/{id}/cancel/tickets")
 	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(@PathVariable Long id) {
 		PaymentTicketCancelResponseServiceDto responseServiceDto = paymentService.cancelTicketPayment(
-			mapper.toPaymentTicketCancelRequestServiceDto(id));
-		return SuccessResponse.of(PaymentSuccessCode.REQUESTED_REFUND_TICKET,
-			mapper.toPaymentTicketCancelResponseDto(responseServiceDto));
+			paymentPresentationMapper.toPaymentTicketCancelRequestServiceDto(id));
+		return SuccessResponse.of(PaymentSuccessCode.TICKET_REFUND_REQUESTED,
+			paymentPresentationMapper.toPaymentTicketCancelResponseDto(responseServiceDto));
 	}
 
 	@PutMapping("/{id}/cancel/memberships")
 	public ResponseEntity<SuccessResponse<PaymentMembershipCancelResponseDto>> cancelMembershipPayment(
 		@PathVariable Long id) {
 		PaymentMembershipCancelResponseServiceDto responseServiceDto = paymentService.cancelMembershipPayment(
-			mapper.toPaymentMembershipCancelRequestServiceDto(id));
-		return SuccessResponse.of(PaymentSuccessCode.REQUESTED_REFUND_MEMBERSHIP,
-			mapper.toPaymentMembershipCancelResponseDto(responseServiceDto));
+			paymentPresentationMapper.toPaymentMembershipCancelRequestServiceDto(id));
+		return SuccessResponse.of(PaymentSuccessCode.MEMBERSHIP_REFUND_REQUESTED,
+			paymentPresentationMapper.toPaymentMembershipCancelResponseDto(responseServiceDto));
 	}
 
 	@GetMapping("/details/{id}")
 	public ResponseEntity<SuccessResponse<PaymentDetailResponseDto>> getPaymentDetail(@PathVariable Long id) {
 
 		PaymentDetailResponseServiceDto responseServiceDto = paymentService.getPaymentDetail(
-			mapper.toPaymentDetailRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentDetailRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
-			mapper.toPaymentDetailResponseDto(responseServiceDto));
+			paymentPresentationMapper.toPaymentDetailResponseDto(responseServiceDto));
 
 	}
 
@@ -71,10 +107,10 @@ public class PaymentController {
 		Long userId = 1L;
 
 		Page<PaymentDetailResponseServiceDto> responseServiceDto = paymentService.searchPaymentDetail(
-			mapper.toPaymentDetailSearchRequestServiceDto(pageable, id, userId, paymentId,
+			paymentPresentationMapper.toPaymentDetailSearchRequestServiceDto(pageable, id, userId, paymentId,
 				Boolean.FALSE));    // TODO userId
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
-			responseServiceDto.map(mapper::toPaymentDetailResponseDto));
+			responseServiceDto.map(paymentPresentationMapper::toPaymentDetailResponseDto));
 
 	}
 
