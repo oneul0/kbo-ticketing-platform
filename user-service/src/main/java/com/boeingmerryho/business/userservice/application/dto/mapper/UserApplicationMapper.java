@@ -5,17 +5,19 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import com.boeingmerryho.business.userservice.application.dto.response.UserAdminFindResponseDto;
-import com.boeingmerryho.business.userservice.application.dto.response.UserLoginResponseServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.response.admin.UserAdminFindResponseDto;
+import com.boeingmerryho.business.userservice.application.dto.response.other.UserLoginResponseServiceDto;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminCheckEmailResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminSearchResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminUpdateResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminUpdateRoleResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserCheckEmailResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserFindResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserLoginResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminCheckEmailResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminSearchResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateRoleResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminVerificationResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserCheckEmailResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserFindResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserVerificationResponseDto;
 
 @Mapper(componentModel = "spring")
 public interface UserApplicationMapper {
@@ -42,4 +44,7 @@ public interface UserApplicationMapper {
 
 	UserAdminCheckEmailResponseDto toUserAdminCheckEmailResponseDto(Boolean isEmailDuplicated);
 
+	UserAdminVerificationResponseDto toUserAdminVerificationResponseDto(String email);
+
+	UserVerificationResponseDto toUserVerificationResponseDto(String email);
 }

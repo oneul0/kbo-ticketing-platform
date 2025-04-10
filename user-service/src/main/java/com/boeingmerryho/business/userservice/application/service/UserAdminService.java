@@ -12,34 +12,39 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.userservice.application.UserHelper;
 import com.boeingmerryho.business.userservice.application.dto.mapper.UserApplicationMapper;
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminCheckEmailRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminDeleteRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminDeleteRoleRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminFindRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminLoginRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminRefreshTokenRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminRegisterRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminSearchRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminUpdateRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminUpdateRoleRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminWithdrawRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserLogoutRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.response.UserAdminFindResponseDto;
-import com.boeingmerryho.business.userservice.application.dto.response.UserLoginResponseServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminCheckEmailRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRoleRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminEmailVerificationCheckRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminEmailVerificationRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminFindRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminLoginRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminRefreshTokenRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminSearchRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminUpdateRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminUpdateRoleRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminWithdrawRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.response.admin.UserAdminFindResponseDto;
+import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
+import com.boeingmerryho.business.userservice.application.dto.response.other.UserLoginResponseServiceDto;
+import com.boeingmerryho.business.userservice.application.utils.mail.EmailService;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.domain.UserSearchCriteria;
 import com.boeingmerryho.business.userservice.domain.repository.CustomUserRepository;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
-import com.boeingmerryho.business.userservice.exception.UserException;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminCheckEmailResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminRefreshTokenResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminSearchResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminUpdateResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminUpdateRoleResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserLoginResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminCheckEmailResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminRefreshTokenResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminSearchResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateRoleResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminVerificationResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
 
+import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,6 +59,7 @@ public class UserAdminService {
 	private final PasswordEncoder passwordEncoder;
 
 	private final UserHelper userHelper;
+	private final EmailService emailService;
 
 	@Value("${admin.key}")
 	private String adminKey;
@@ -76,7 +82,7 @@ public class UserAdminService {
 
 	private void validateAdminKey(String key) {
 		if (key == null || !key.equals(adminKey)) {
-			throw new UserException(ErrorCode.ADMIN_REGISTER_KEY_NOT_MATCH);
+			throw new GlobalException(ErrorCode.ADMIN_REGISTER_KEY_NOT_MATCH);
 		}
 	}
 
@@ -123,44 +129,31 @@ public class UserAdminService {
 	}
 
 	@Transactional
-	public void deleteUserRole(UserAdminDeleteRoleRequestServiceDto dto) {
+	public Long deleteUserRole(UserAdminDeleteRoleRequestServiceDto dto) {
 		User user = userHelper.findUserById(dto.id(), userRepository);
 
 		user.deleteRoleType();
 		userHelper.updateRedisUserInfo(user);
+		return user.getId();
 	}
 
 	@Transactional
-	public void deleteUser(UserAdminDeleteRequestServiceDto dto) {
+	public Long deleteUser(UserAdminDeleteRequestServiceDto dto) {
 		User user = userHelper.findUserById(dto.id(), userRepository);
 		user.softDelete(user.getId());
 
 		userHelper.clearRedisUserData(user.getId());
+		return user.getId();
 	}
 
 	public void logoutUser(UserLogoutRequestServiceDto dto) {
 		Long userId = dto.id();
-		String tokenKey = userHelper.getUserTokenPrefix() + userId;
 
-		Map<Object, Object> token = getUserTokenFromRedis(tokenKey);
-		String accessToken = extractAccessToken(token);
+		UserTokenResult result = userHelper.getUserTokenFromRedis(userId);
+		String accessToken = (String)result.token().get("accessToken");
 		userHelper.blacklistToken(accessToken);
 
-		userHelper.deleteKeyFromRedis(tokenKey);
-	}
-
-	private Map<Object, Object> getUserTokenFromRedis(String tokenKey) {
-		userHelper.hasKeyInRedis(tokenKey);
-
-		Map<Object, Object> token = userHelper.getMapEntriesFromRedis(tokenKey);
-		if (token == null || token.isEmpty()) {
-			throw new UserException(ErrorCode.JWT_REQUIRED);
-		}
-		return token;
-	}
-
-	private String extractAccessToken(Map<Object, Object> token) {
-		return (String)token.get("accessToken");
+		userHelper.deleteKeyFromRedis(result.tokenKey());
 	}
 
 	public UserLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto dto) {
@@ -176,15 +169,28 @@ public class UserAdminService {
 	}
 
 	@Transactional
-	public void withdrawUser(UserAdminWithdrawRequestServiceDto dto) {
+	public Long withdrawUser(UserAdminWithdrawRequestServiceDto dto) {
 		User user = userHelper.findUserById(dto.id(), userRepository);
 		user.softDelete(user.getId());
 
 		userHelper.clearRedisUserData(user.getId());
+		return user.getId();
 	}
 
+	@Transactional
 	public UserAdminRefreshTokenResponseDto refreshToken(UserAdminRefreshTokenRequestServiceDto dto) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		String refreshToken = dto.refreshToken();
+
+		log.debug("refresh requested refreshToken : {}", refreshToken);
+		userHelper.isValidRefreshToken(refreshToken);
+
+		Long userId = userHelper.getUserIdFromToken(refreshToken);
+
+		userHelper.isEqualStoredRefreshToken(userId, refreshToken);
+
+		String newAccessToken = userHelper.generateAccessToken(userId);
+
+		return new UserAdminRefreshTokenResponseDto(newAccessToken);
 	}
 
 	@Transactional
@@ -231,5 +237,26 @@ public class UserAdminService {
 		userHelper.updateRedisUserInfo(user);
 
 		return userApplicationMapper.toUserAdminUpdateResponseDto(user.getId());
+	}
+
+	public UserAdminVerificationResponseDto sendVerificationCode(
+		UserAdminEmailVerificationRequestServiceDto dto) {
+		userHelper.checkDuplicatedVerificationRequest(dto.email());
+		userHelper.verifyEmailFormat(dto.email());
+		String code = userHelper.generateVerificationCode();
+		userHelper.storeVerificationCode(dto.email(), code);
+		emailService.sendVerificationEmail(dto.email(), code);
+		return userApplicationMapper.toUserAdminVerificationResponseDto(dto.email()).success("인증 메일 발송 성공");
+	}
+
+	public UserAdminVerificationResponseDto verifyCode(
+		UserAdminEmailVerificationCheckRequestServiceDto dto) {
+		String storedCode = userHelper.getVerificationCode(dto.email());
+		if (storedCode == null || !storedCode.equals(dto.code())) {
+			throw new GlobalException(ErrorCode.VERIFICATION_FAIL);
+		}
+		userHelper.removeVerificationCode(dto.email());
+
+		return UserAdminVerificationResponseDto.success("메일 인증 성공");
 	}
 }
