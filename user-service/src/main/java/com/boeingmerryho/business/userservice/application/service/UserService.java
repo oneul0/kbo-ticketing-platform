@@ -10,24 +10,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.userservice.application.UserHelper;
 import com.boeingmerryho.business.userservice.application.dto.mapper.UserApplicationMapper;
-import com.boeingmerryho.business.userservice.application.dto.request.UserCheckEmailRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserFindRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserLoginRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserLogoutRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserRefreshTokenRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserRegisterRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserUpdateRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserWithdrawRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.response.UserLoginResponseServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserCheckEmailRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserFindRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserLoginRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserRefreshTokenRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserUpdateRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserWithdrawRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.response.other.UserLoginResponseServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
-import com.boeingmerryho.business.userservice.exception.ErrorCode;
-import com.boeingmerryho.business.userservice.exception.UserException;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminUpdateResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserCheckEmailResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserFindResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserLoginResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserRefreshTokenResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserCheckEmailResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserFindResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserRefreshTokenResponseDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,27 +73,13 @@ public class UserService {
 	}
 
 	public void logoutUser(UserLogoutRequestServiceDto dto) {
-		String tokenKey = USER_TOKEN_PREFIX + dto.id();
-		Map<Object, Object> token = getUserTokenFromRedis(tokenKey);
-		String accessToken = extractAccessToken(token);
+		Long userId = dto.id();
 
+		UserTokenResult result = userHelper.getUserTokenFromRedis(userId);
+		String accessToken = (String)result.token().get("accessToken");
 		userHelper.blacklistToken(accessToken);
-		redisTemplate.delete(tokenKey);
-	}
 
-	private Map<Object, Object> getUserTokenFromRedis(String tokenKey) {
-		if (!redisTemplate.hasKey(tokenKey)) {
-			throw new UserException(ErrorCode.NOT_FOUND);
-		}
-		Map<Object, Object> token = redisTemplate.opsForHash().entries(tokenKey);
-		if (token == null || token.isEmpty()) {
-			throw new UserException(ErrorCode.JWT_REQUIRED);
-		}
-		return token;
-	}
-
-	private String extractAccessToken(Map<Object, Object> token) {
-		return (String)token.get("accessToken");
+		userHelper.deleteKeyFromRedis(result.tokenKey());
 	}
 
 	@Transactional(readOnly = true)
