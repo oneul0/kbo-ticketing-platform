@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.boeingmerryho.business.ticketservice.application.admin.dto.mapper.AdminTicketApplicationMapper;
+import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketDeleteRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketIdRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketSearchRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketStatusUpdateRequestServiceDto;
@@ -89,7 +90,8 @@ class AdminTicketServiceTest {
 				AdminTicketResponseServiceDto::userId,
 				AdminTicketResponseServiceDto::ticketNo,
 				AdminTicketResponseServiceDto::status,
-				AdminTicketResponseServiceDto::isDeleted)
+				AdminTicketResponseServiceDto::isDeleted
+			)
 			.containsExactly(
 				ticket.getId(),
 				ticket.getMatchId(),
@@ -166,6 +168,30 @@ class AdminTicketServiceTest {
 			.isInstanceOfSatisfying(
 				TicketException.class,
 				ex -> assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_TICKET_STATUS)
+			);
+	}
+
+	@DisplayName("관리자는 티켓을 soft delete 할 수 있다.")
+	@Test
+	void admin_ticket_soft_delete_test() {
+	    // Given
+	    Ticket ticket = setUpTicket();
+		AdminTicketDeleteRequestServiceDto requestDto = new AdminTicketDeleteRequestServiceDto(ticketId);
+
+	    when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(ticket));
+
+	    // When
+		adminTicketService.softDeleteTicketById(requestDto);
+
+	    // Then
+		assertThat(ticket).isNotNull()
+			.extracting(
+				Ticket::getIsDeleted,
+				Ticket::getStatus
+			)
+			.containsExactly(
+				true,
+				TicketStatus.CANCELLED
 			);
 	}
 }
