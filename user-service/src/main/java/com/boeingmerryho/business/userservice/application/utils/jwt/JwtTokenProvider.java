@@ -1,17 +1,24 @@
 package com.boeingmerryho.business.userservice.application.utils.jwt;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.boeingmerryho.business.userservice.exception.ErrorCode;
+import com.boeingmerryho.business.userservice.exception.UserException;
+
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class JwtTokenProvider {
 
@@ -44,11 +51,10 @@ public class JwtTokenProvider {
 		return refreshTokenExpiration;
 	}
 
-	// JWT 토큰 파싱
 	public Claims parseJwtToken(String token) {
 		try {
 			return Jwts.parser()
-				.setSigningKey(Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8)))
+				.setSigningKey(Base64.getEncoder().encodeToString(secretKey.getBytes()))
 				.parseClaimsJws(token)
 				.getBody();
 		} catch (Exception e) {
@@ -56,10 +62,43 @@ public class JwtTokenProvider {
 		}
 	}
 
-	// 남은 TTL 계산
 	public long calculateTtlMillis(Date expiration) {
 		long currentTimeMillis = System.currentTimeMillis();
 		long expirationTimeMillis = expiration.getTime();
 		return Math.max(0, expirationTimeMillis - currentTimeMillis); // 음수가 되지 않도록
+	}
+
+	public boolean validateRefreshToken(String token) {
+		try {
+			if (token == null || token.trim().isEmpty()) {
+				log.warn("Token is null or empty");
+				throw new UserException(ErrorCode.JWT_INVALID);
+			}
+			Jwts.parser()
+				.setSigningKey(secretKey.getBytes())
+				.parseClaimsJws(token);
+			log.debug("Refresh token validated successfully");
+			return true;
+		} catch (ExpiredJwtException e) {
+			log.warn("Expired refresh token: {}", e.getMessage());
+			throw new UserException(ErrorCode.JWT_EXPIRED);
+		} catch (MalformedJwtException e) {
+			log.warn("Malformed JWT token: {}", e.getMessage());
+			throw new UserException(ErrorCode.MALFORMED_JWT);
+		} catch (JwtException e) {
+			log.warn("JWT validation error: {}", e.getMessage());
+			throw new UserException(ErrorCode.JWT_INVALID);
+		} catch (IllegalArgumentException e) {
+			log.warn("Illegal argument for JWT: {}", e.getMessage());
+			throw new UserException(ErrorCode.JWT_INVALID);
+		}
+	}
+
+	public String getUserIdFromToken(String token) {
+		return Jwts.parser()
+			.setSigningKey(secretKey.getBytes())
+			.parseClaimsJws(token)
+			.getBody()
+			.getSubject();
 	}
 }

@@ -9,8 +9,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.boeingmerryho.business.userservice.application.dto.request.UserAdminRegisterRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
 import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
 import com.boeingmerryho.business.userservice.application.utils.jwt.JwtTokenProvider;
 import com.boeingmerryho.business.userservice.domain.User;
@@ -37,6 +38,7 @@ public class UserHelper {
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final RedisUtil redisUtil;
+	private final UserRepository userRepository;
 
 	public User findUserById(Long id, UserRepository userRepository) {
 		return userRepository.findById(id)
@@ -120,6 +122,30 @@ public class UserHelper {
 		}
 	}
 
+	//-----jwt
+	public void isValidRefreshToken(String refreshToken) {
+		jwtTokenProvider.validateRefreshToken(refreshToken);
+	}
+
+	public Long getUserIdFromToken(String refreshToken) {
+		return Long.valueOf(jwtTokenProvider.getUserIdFromToken(refreshToken));
+	}
+
+	public void isEqualStoredRefreshToken(Long userId, String refreshToken) {
+		String redisKey = USER_TOKEN_PREFIX + userId;
+		String storedRefreshToken = (String)redisTemplate.opsForHash().get(redisKey, "refreshToken");
+
+		if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
+			throw new UserException(ErrorCode.JWT_NOT_MATCH);
+		}
+
+		findUserById(userId, userRepository);
+	}
+
+	public String generateAccessToken(Long userId) {
+		return jwtTokenProvider.generateAccessToken(userId);
+	}
+
 	//-----redis
 
 	public void updateRedisUserInfo(User user) {
@@ -156,18 +182,22 @@ public class UserHelper {
 	public void blacklistToken(String accessToken) {
 		Claims claims = jwtTokenProvider.parseJwtToken(accessToken);
 		long ttlMillis = jwtTokenProvider.calculateTtlMillis(claims.getExpiration());
-		String blacklistKey = getBlacklistPrefix() + accessToken;
+		String blacklistKey = BLACKLIST_PREFIX + accessToken;
 
 		setOpsForValueRedis(blacklistKey, "blacklisted");
 		redisTemplate.expire(blacklistKey, Math.max(ttlMillis, 1), TimeUnit.MILLISECONDS);
+
 	}
 
-	public String getUserTokenPrefix() {
-		return USER_TOKEN_PREFIX;
-	}
+	public UserTokenResult getUserTokenFromRedis(Long userId) {
+		String tokenKey = USER_TOKEN_PREFIX + userId;
+		hasKeyInRedis(tokenKey);
 
-	private String getBlacklistPrefix() {
-		return BLACKLIST_PREFIX;
+		Map<Object, Object> token = getMapEntriesFromRedis(tokenKey);
+		if (token == null || token.isEmpty()) {
+			throw new UserException(ErrorCode.JWT_REQUIRED);
+		}
+		return new UserTokenResult(tokenKey, token);
 	}
 
 }

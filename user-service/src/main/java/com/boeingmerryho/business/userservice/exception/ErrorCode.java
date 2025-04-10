@@ -24,10 +24,16 @@ public enum ErrorCode {
 		HttpStatus.BAD_REQUEST),
 	ADMIN_REGISTER_KEY_NOT_MATCH("U-017", "ADMIN 인증을 위한 key값이 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
 
-	JWT_REQUIRED("U-018", "로그아웃을 위해 JWT 토큰이 필요합니다.", HttpStatus.UNAUTHORIZED),
-	JWT_NOT_FOUND("U-019", "로그인시 생성한 JWT 토큰이 없습니다.", HttpStatus.UNAUTHORIZED),
+	ROLE_ACTIVE_USERS_NOT_FOUND("U-018", "Role에 따른 활성화된 사용자가 없습니다.", HttpStatus.NOT_FOUND),
 
-	ROLE_ACTIVE_USERS_NOT_FOUND("U-020", "Role에 따른 활성화된 사용자 없음.", HttpStatus.NOT_FOUND),
+	JWT_REQUIRED("U-019", "로그아웃을 위해 JWT 토큰이 필요합니다.", HttpStatus.UNAUTHORIZED),
+	JWT_NOT_FOUND("U-020", "로그인시 생성한 JWT 토큰이 없습니다.", HttpStatus.UNAUTHORIZED),
+	JWT_INVALID("U-021", "JWT 토큰이 유효하지 않습니다.", HttpStatus.UNAUTHORIZED),
+	JWT_NOT_MATCH("U-022", "JWT 토큰이 일치하지 않습니다.", HttpStatus.UNAUTHORIZED),
+	JWT_EXPIRED("U-023", "JWT 토큰이 만료되었습니다.", HttpStatus.UNAUTHORIZED),
+	MALFORMED_JWT("U-024", "JWT 토큰이 손상되었습니다.", HttpStatus.UNAUTHORIZED),
+	JWT_SIGNATURE_VALIDATION_FAIL("U-025", "JWT 검증에 실패했습니다.", HttpStatus.UNAUTHORIZED),
+
 	;
 
 	private final String errorCode;

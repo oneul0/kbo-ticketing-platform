@@ -12,24 +12,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.boeingmerryho.business.userservice.application.dto.request.UserCheckEmailRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserFindRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserLoginRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserLogoutRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserRefreshTokenRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserRegisterRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserUpdateRequestServiceDto;
-import com.boeingmerryho.business.userservice.application.dto.request.UserWithdrawRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserCheckEmailRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserFindRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserLoginRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserRefreshTokenRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserUpdateRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.other.UserWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.service.UserService;
 import com.boeingmerryho.business.userservice.presentation.dto.mapper.UserPresentationMapper;
-import com.boeingmerryho.business.userservice.presentation.dto.request.UserLoginRequestDto;
-import com.boeingmerryho.business.userservice.presentation.dto.request.UserRegisterRequestDto;
-import com.boeingmerryho.business.userservice.presentation.dto.request.UserUpdateRequestDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserAdminUpdateResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserCheckEmailResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserFindResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserLoginResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.UserRefreshTokenResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLoginRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserLogoutRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserRegisterRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserTokenRefreshRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.request.other.UserUpdateRequestDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserCheckEmailResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserFindResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserRefreshTokenResponseDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -108,9 +110,11 @@ public class UserController {
 		"로그인했던 사용자 id를 받아 로그아웃"
 	)
 	public ResponseEntity<?> logoutUser(
-		@RequestAttribute("userId") Long userId
+		@RequestAttribute("userId") Long userId,
+		@RequestBody UserLogoutRequestDto requestDto
 	) {
-		UserLogoutRequestServiceDto requestServiceDto = userPresentationMapper.toUserLogoutRequestServiceDto(userId);
+		UserLogoutRequestServiceDto requestServiceDto = userPresentationMapper.toUserLogoutRequestServiceDto(requestDto,
+			userId);
 		userService.logoutUser(requestServiceDto);
 		return ResponseEntity.ok().build();
 	}
@@ -132,12 +136,12 @@ public class UserController {
 	@Description(
 		"사용자 리프레시 토큰 재발급 api"
 	)
-	@GetMapping("/refresh")
+	@PostMapping("/refresh")
 	public ResponseEntity<UserRefreshTokenResponseDto> refreshToken(
-		@RequestParam(value = "refreshToken") String refreshToken) {
+		@RequestBody UserTokenRefreshRequestDto requestDto) {
 
 		UserRefreshTokenRequestServiceDto requestServiceDto = userPresentationMapper.toUserRefreshTokenRequestServiceDto(
-			refreshToken);
+			requestDto);
 		UserRefreshTokenResponseDto responseDto = userService.refreshToken(requestServiceDto);
 		return ResponseEntity.ok(responseDto);
 	}
