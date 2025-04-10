@@ -1,5 +1,6 @@
 package com.boeingmerryho.business.storeservice.domain.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.boeingmerryho.business.storeservice.domain.entity.Store;
@@ -13,4 +14,5 @@ public interface StoreRepository {
 
 	Optional<Store> findByIdAndIsDeletedFalse(Long id);
 
+	List<Store> findAllByIsDeletedFalse();
 }
