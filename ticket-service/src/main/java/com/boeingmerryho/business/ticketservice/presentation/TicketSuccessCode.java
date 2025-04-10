@@ -9,7 +9,8 @@ import lombok.RequiredArgsConstructor;
 public enum TicketSuccessCode implements SuccessCode {
 
 	TICKET_FOUND(HttpStatus.OK, "티켓 조회 성공"),
-	TICKET_SEARCH_SUCCESS(HttpStatus.OK, "티켓 검색 성공"),
+	TICKET_SEARCH(HttpStatus.OK, "티켓 검색 성공"),
+	TICKET_DELETE(HttpStatus.OK, "티켓 삭제 성공"),
 	;
 
 	private final HttpStatus status;

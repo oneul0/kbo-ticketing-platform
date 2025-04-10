@@ -1,9 +1,9 @@
 package com.boeingmerryho.business.ticketservice.presentation.admin;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.ticketservice.application.admin.AdminTicketService;
-import com.boeingmerryho.business.ticketservice.application.admin.dto.request.AdminTicketSearchRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.admin.dto.response.AdminTicketResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.presentation.TicketSuccessCode;
 import com.boeingmerryho.business.ticketservice.presentation.admin.dto.mapper.AdminTicketPresentationMapper;
@@ -63,8 +62,14 @@ public class AdminTicketController {
 			.searchTickets(mapper.toAdminTicketSearchRequestServiceDto(requestDto), pageable);
 
 		return SuccessResponse.of(
-			TicketSuccessCode.TICKET_SEARCH_SUCCESS,
+			TicketSuccessCode.TICKET_SEARCH,
 			responseDto.map(mapper::toAdminTicketResponseDto)
 		);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteTicket(@PathVariable Long id) {
+		ticketService.softDeleteTicketById(mapper.toAdminTicketDeleteRequestServiceDto(id));
+		return SuccessResponse.of(TicketSuccessCode.TICKET_DELETE);
 	}
 }
