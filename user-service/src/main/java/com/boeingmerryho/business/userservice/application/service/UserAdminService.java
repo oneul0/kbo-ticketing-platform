@@ -154,6 +154,7 @@ public class UserAdminService {
 		userHelper.blacklistToken(accessToken);
 
 		userHelper.deleteKeyFromRedis(result.tokenKey());
+		//todo: redis에 있는 사용자-멤버십 정보 삭제
 	}
 
 	public UserLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto dto) {
@@ -167,7 +168,7 @@ public class UserAdminService {
 		);
 
 		userHelper.getNotifyLoginResponse(user.getId());
-		
+
 		return userApplicationMapper.toUserLoginResponseDto(serviceDto);
 	}
 

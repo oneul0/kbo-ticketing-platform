@@ -87,6 +87,7 @@ public class UserService {
 		userHelper.blacklistToken(accessToken);
 
 		userHelper.deleteKeyFromRedis(result.tokenKey());
+		//todo: redis에 있는 사용자-멤버십 정보 삭제
 	}
 
 	@Transactional(readOnly = true)
