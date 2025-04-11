@@ -5,7 +5,11 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import com.boeingmerryho.business.storeservice.application.dto.request.StoreUpdateRequestServiceDto;
+import com.boeingmerryho.business.storeservice.exception.StoreErrorCode;
+
 import io.github.boeingmerryho.commonlibrary.entity.BaseEntity;
+import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -55,4 +59,27 @@ public class Store extends BaseEntity {
 		nullable = false
 	)
 	private Boolean isClosed;
+
+	public void update(StoreUpdateRequestServiceDto update) {
+		if (update.name() != null)
+			this.name = update.name();
+		if (update.openAt() != null)
+			this.openAt = update.openAt();
+		if (update.closedAt() != null)
+			this.closedAt = update.closedAt();
+	}
+
+	public void open() {
+		if (Boolean.FALSE.equals(isClosed)) {
+			throw new GlobalException(StoreErrorCode.ALREADY_OPENED);
+		}
+		this.isClosed = false;
+	}
+
+	public void close() {
+		if (Boolean.TRUE.equals(isClosed)) {
+			throw new GlobalException(StoreErrorCode.ALREADY_CLOSED);
+		}
+		this.isClosed = true;
+	}
 }
