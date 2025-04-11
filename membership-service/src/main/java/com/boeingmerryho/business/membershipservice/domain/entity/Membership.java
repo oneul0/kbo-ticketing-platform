@@ -5,9 +5,13 @@ import java.time.Year;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import com.boeingmerryho.business.membershipservice.domain.type.MembershipType;
+
 import io.github.boeingmerryho.commonlibrary.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,19 +34,16 @@ public class Membership extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(
-		nullable = false
-	)
+	@Column(nullable = false)
 	private Year season;
 
-	@Column(
-		nullable = false
-	)
-	private String name;
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private MembershipType name;
 
-	@Column(
-		nullable = false
-	)
+	@Column(nullable = false)
 	private Double discount;
 
+	// @OneToMany(mappedBy = "membership")
+	// private List<MembershipUser> users = new ArrayList<>();
 }
