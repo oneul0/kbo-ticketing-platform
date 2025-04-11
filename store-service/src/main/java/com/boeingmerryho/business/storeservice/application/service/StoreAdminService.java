@@ -2,6 +2,7 @@ package com.boeingmerryho.business.storeservice.application.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.storeservice.application.dto.mapper.StoreApplicationMapper;
 import com.boeingmerryho.business.storeservice.application.dto.request.StoreCreateRequestServiceDto;
@@ -16,16 +17,15 @@ import com.boeingmerryho.business.storeservice.infrastructure.helper.StoreAdminH
 import com.boeingmerryho.business.storeservice.infrastructure.helper.StoreQueueAdminHelper;
 import com.boeingmerryho.business.storeservice.infrastructure.helper.StoreValidator;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class StoreAdminService {
 
-	private final StoreAdminHelper storeAdminHelper;
-	private final StoreApplicationMapper mapper;
 	private final StoreValidator validator;
+	private final StoreApplicationMapper mapper;
+	private final StoreAdminHelper storeAdminHelper;
 	private final StoreQueueAdminHelper storeQueueAdminHelper;
 
 	@Transactional
@@ -36,6 +36,7 @@ public class StoreAdminService {
 		return mapper.toStoreCreateResponseServiceDto(saved);
 	}
 
+	@Transactional(readOnly = true)
 	public StoreDetailAdminResponseServiceDto getStoreDetail(Long id) {
 		Store storeDetail = storeAdminHelper.getAnyStoreById(id);
 
@@ -44,6 +45,7 @@ public class StoreAdminService {
 		return mapper.toStoreDetailAdminResponseServiceDto(storeDetail, isQueueAvailable);
 	}
 
+	@Transactional(readOnly = true)
 	public Page<StoreSearchAdminResponseServiceDto> searchStore(
 		StoreSearchAdminRequestServiceDto requestServiceDto) {
 		Page<Store> stores = storeAdminHelper.search(requestServiceDto);

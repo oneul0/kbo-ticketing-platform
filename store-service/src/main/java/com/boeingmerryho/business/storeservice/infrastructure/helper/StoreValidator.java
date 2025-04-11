@@ -14,8 +14,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StoreValidator {
 
-	private final StoreRepository storeRepository;
 	private final StadiumReader stadiumReader;
+	private final StoreRepository storeRepository;
 
 	public void validateNotDuplicated(Long stadiumId, String name) {
 		if (!stadiumReader.existsById(stadiumId)) {
