@@ -78,5 +78,7 @@ public interface UserHelper {
 	void removeVerificationCode(String email);
 
 	void checkDuplicatedVerificationRequest(String email);
+
+	String getNotifyLoginResponse(Long id);
 }
 

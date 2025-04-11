@@ -165,6 +165,9 @@ public class UserAdminService {
 			tokenMap.get("accessToken"),
 			tokenMap.get("refreshToken")
 		);
+
+		userHelper.getNotifyLoginResponse(user.getId());
+		
 		return userApplicationMapper.toUserLoginResponseDto(serviceDto);
 	}
 
