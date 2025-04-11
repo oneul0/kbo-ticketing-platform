@@ -2,6 +2,7 @@ package com.boeingmerryho.business.storeservice.application.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.storeservice.application.dto.mapper.StoreApplicationMapper;
 import com.boeingmerryho.business.storeservice.application.dto.request.StoreSearchRequestServiceDto;
@@ -17,10 +18,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StoreService {
 
+	private final StoreApplicationMapper mapper;
 	private final StoreCommonHelper storeCommonHelper;
 	private final StoreQueueAdminHelper storeQueueAdminHelper;
-	private final StoreApplicationMapper mapper;
 
+	@Transactional(readOnly = true)
 	public StoreDetailResponseServiceDto getStoreDetail(Long id) {
 		Store storeDetail = storeCommonHelper.getActiveStoreById(id);
 
@@ -28,6 +30,7 @@ public class StoreService {
 		return mapper.toStoreDetailResponseServiceDto(storeDetail, isQueueAvailable);
 	}
 
+	@Transactional(readOnly = true)
 	public Page<StoreSearchResponseServiceDto> searchStore(
 		StoreSearchRequestServiceDto requestServiceDto) {
 		Page<Store> stores = storeCommonHelper.search(requestServiceDto);

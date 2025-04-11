@@ -37,8 +37,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StoreAdminController {
 
-	private final StoreAdminService storeAdminService;
 	private final StorePresentationMapper mapper;
+	private final StoreAdminService storeAdminService;
 
 	@PostMapping
 	public ResponseEntity<SuccessResponse<StoreCreateResponseDto>> createStore(
