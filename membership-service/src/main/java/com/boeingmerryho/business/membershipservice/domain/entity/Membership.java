@@ -3,6 +3,7 @@ package com.boeingmerryho.business.membershipservice.domain.entity;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUpdateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.type.MembershipType;
 
 import io.github.boeingmerryho.commonlibrary.entity.BaseEntity;
@@ -41,6 +42,16 @@ public class Membership extends BaseEntity {
 
 	@Column(nullable = false)
 	private Double discount;
+
+	public void update(MembershipUpdateRequestServiceDto update) {
+		if (update.season() != null)
+			this.season = update.season();
+		if (update.name() != null)
+			this.name = update.name();
+		if (update.discount() != null)
+			this.discount = update.discount();
+
+	}
 
 	// @OneToMany(mappedBy = "membership")
 	// private List<MembershipUser> users = new ArrayList<>();

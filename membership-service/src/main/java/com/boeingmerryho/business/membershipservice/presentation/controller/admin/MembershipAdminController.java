@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,13 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipCreateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipSearchAdminResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUpdateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.service.admin.MembershipAdminService;
 import com.boeingmerryho.business.membershipservice.presentation.dto.MembershipSuccessCode;
 import com.boeingmerryho.business.membershipservice.presentation.dto.mapper.MembershipPresentationMapper;
 import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipCreateRequestDto;
+import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipUpdateRequestDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipCreateResponseDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipDetailAdminResponseDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipSearchAdminResponseDto;
+import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipUpdateResponseDto;
 import com.boeingmerryho.business.membershipservice.utils.PageableUtils;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
@@ -72,5 +76,17 @@ public class MembershipAdminController {
 			mapper.toMembershipSearchAdminRequestServiceDto(pageable, name, season, minDiscount, maxDiscount));
 		return SuccessResponse.of(MembershipSuccessCode.FETCHED_MEMBERSHIPS,
 			responseServiceDto.map(mapper::toMembershipSearchAdminResponseDto));
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<SuccessResponse<MembershipUpdateResponseDto>> updateMembership(
+		@PathVariable Long id,
+		@RequestBody MembershipUpdateRequestDto requestDto
+	) {
+		MembershipUpdateResponseServiceDto responseServiceDto = membershipAdminService.updateMembership(
+			id,
+			mapper.toMembershipUpdateRequestServiceDto(requestDto));
+		MembershipUpdateResponseDto responseDto = mapper.toMembershipUpdateResponseDto(responseServiceDto);
+		return SuccessResponse.of(MembershipSuccessCode.UPDATED_STORE, responseDto);
 	}
 }

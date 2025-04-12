@@ -14,4 +14,6 @@ public interface MembershipRepository {
 	Optional<Membership> findById(Long id);
 
 	List<Membership> findAllBySeason(Integer currentYear);
+
+	Optional<Membership> findByIdAndIsDeletedFalse(Long id);
 }

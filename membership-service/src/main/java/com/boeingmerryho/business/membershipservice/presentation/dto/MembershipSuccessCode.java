@@ -8,6 +8,7 @@ public enum MembershipSuccessCode implements SuccessCode {
 	CREATED_MEMBERSHIP("멤버십이 성공적으로 생성되었습니다.", HttpStatus.CREATED),
 	FETCHED_MEMBERSHIP("멤버십이 성공적으로 조회되었습니다.", HttpStatus.OK),
 	FETCHED_MEMBERSHIPS("멤버십 정보들을 불러왔습니다", HttpStatus.OK),
+	UPDATED_STORE("멤버십이 성공적으로 수정되었습니다.", HttpStatus.OK),
 	;
 
 	private final String message;

@@ -6,9 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.membershipservice.application.dto.mapper.MembershipApplicationMapper;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUpdateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipCreateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipSearchAdminResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUpdateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipAdminHelper;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipValidator;
@@ -45,5 +47,12 @@ public class MembershipAdminService {
 		MembershipSearchAdminRequestServiceDto requestServiceDto) {
 		Page<Membership> memberships = membershipAdminHelper.search(requestServiceDto);
 		return memberships.map(mapper::toMembershipSearchAdminResponseServiceDto);
+	}
+
+	@Transactional
+	public MembershipUpdateResponseServiceDto updateMembership(Long id, MembershipUpdateRequestServiceDto requestDto) {
+		validator.validateHasUpdatableFields(requestDto);
+		Membership updated = membershipAdminHelper.updateMembershipInfo(id, requestDto);
+		return mapper.toMembershipUpdateResponseServiceDto(updated);
 	}
 }

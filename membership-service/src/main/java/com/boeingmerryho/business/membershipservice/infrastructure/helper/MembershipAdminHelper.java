@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import com.boeingmerryho.business.membershipservice.application.dto.mapper.MembershipApplicationMapper;
 import com.boeingmerryho.business.membershipservice.application.dto.query.MembershipSearchCondition;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUpdateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 import com.boeingmerryho.business.membershipservice.domain.repository.MembershipQueryRepository;
 import com.boeingmerryho.business.membershipservice.domain.repository.MembershipRepository;
@@ -42,5 +43,14 @@ public class MembershipAdminHelper {
 			requestServiceDto.isDeleted()
 		);
 		return membershipQueryRepository.search(condition, requestServiceDto.customPageable());
+	}
+
+	public Membership updateMembershipInfo(Long id, MembershipUpdateRequestServiceDto requestDto) {
+		Membership membership = membershipRepository.findByIdAndIsDeletedFalse(id)
+			.orElseThrow(() -> new GlobalException(MembershipErrorCode.NOT_FOUND));
+
+		membership.update(requestDto);
+
+		return membership;
 	}
 }
