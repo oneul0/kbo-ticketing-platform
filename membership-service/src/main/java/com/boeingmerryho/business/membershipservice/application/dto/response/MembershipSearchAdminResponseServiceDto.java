@@ -1,9 +1,10 @@
 package com.boeingmerryho.business.membershipservice.application.dto.response;
 
-public record MembershipCreateResponseServiceDto(
+public record MembershipSearchAdminResponseServiceDto(
 	Long id,
 	Integer season,
 	String name,
-	Double discount
+	Double discount,
+	Boolean isDeleted
 ) {
 }

@@ -1,6 +1,6 @@
 package com.boeingmerryho.business.membershipservice.infrastructure.repository;
 
-import java.time.Year;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,5 +10,7 @@ import com.boeingmerryho.business.membershipservice.domain.type.MembershipType;
 
 public interface MembershipJpaRepository extends JpaRepository<Membership, Long>, MembershipRepository {
 
-	boolean existsBySeasonAndName(Year season, MembershipType membershipType);
+	boolean existsBySeasonAndName(Integer season, MembershipType membershipType);
+
+	Optional<Membership> findByIdAndIsDeletedFalse(Long id);
 }
