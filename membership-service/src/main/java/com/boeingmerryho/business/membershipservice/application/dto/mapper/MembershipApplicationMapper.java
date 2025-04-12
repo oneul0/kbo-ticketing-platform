@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Primary;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipCreateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailAdminResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 
 @Primary
@@ -28,4 +29,6 @@ public interface MembershipApplicationMapper {
 	MembershipCreateResponseServiceDto toMembershipCreateResponseServiceDto(Membership saved);
 
 	MembershipDetailAdminResponseServiceDto toMembershipDetailAdminResponseServiceDto(Membership membershipDetail);
+
+	MembershipDetailResponseServiceDto toMembershipDetailResponseServiceDto(Membership membership);
 }

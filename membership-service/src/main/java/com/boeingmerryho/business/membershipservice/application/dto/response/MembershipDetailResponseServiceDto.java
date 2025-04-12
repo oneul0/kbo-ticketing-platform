@@ -1,6 +1,6 @@
 package com.boeingmerryho.business.membershipservice.application.dto.response;
 
-public record MembershipCreateResponseServiceDto(
+public record MembershipDetailResponseServiceDto(
 	Long id,
 	Integer season,
 	String name,

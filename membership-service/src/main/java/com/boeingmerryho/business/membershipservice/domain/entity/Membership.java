@@ -1,7 +1,5 @@
 package com.boeingmerryho.business.membershipservice.domain.entity;
 
-import java.time.Year;
-
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -35,7 +33,7 @@ public class Membership extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false)
-	private Year season;
+	private Integer season;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)

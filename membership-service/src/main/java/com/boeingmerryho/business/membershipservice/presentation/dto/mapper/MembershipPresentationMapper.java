@@ -1,5 +1,7 @@
 package com.boeingmerryho.business.membershipservice.presentation.dto.mapper;
 
+import java.util.List;
+
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.springframework.context.annotation.Primary;
@@ -7,9 +9,11 @@ import org.springframework.context.annotation.Primary;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipCreateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailAdminResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipCreateRequestDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipCreateResponseDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipDetailAdminResponseDto;
+import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipDetailResponseDto;
 
 import jakarta.validation.Valid;
 
@@ -24,4 +28,7 @@ public interface MembershipPresentationMapper {
 
 	MembershipDetailAdminResponseDto toMembershipDetailAdminResponseDto(
 		MembershipDetailAdminResponseServiceDto responseServiceDto);
+
+	List<MembershipDetailResponseDto> toMembershipDetailResponseDto(
+		List<MembershipDetailResponseServiceDto> responseServiceDto);
 }

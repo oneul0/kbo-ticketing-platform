@@ -34,7 +34,7 @@ public class MembershipUser extends BaseEntity {
 	private Long userId;
 
 	@Column(nullable = false)
-	private Long season;
+	private Integer season;
 
 	@Column(nullable = false)
 	private Boolean isActive;
