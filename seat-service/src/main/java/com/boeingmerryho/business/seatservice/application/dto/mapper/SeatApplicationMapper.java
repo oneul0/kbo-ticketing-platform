@@ -1,9 +1,13 @@
 package com.boeingmerryho.business.seatservice.application.dto.mapper;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatServiceUpdateDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatUpdateServiceRequestDto;
+import com.boeingmerryho.business.seatservice.application.dto.response.CacheBlockServiceResponseDto;
+import com.boeingmerryho.business.seatservice.application.dto.response.CacheSeatServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatActiveServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatCreateServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatInActiveServiceResponseDto;
@@ -21,4 +25,8 @@ public interface SeatApplicationMapper {
 	SeatServiceUpdateDto toSeatServiceUpdateDto(SeatUpdateServiceRequestDto seatUpdateServiceRequestDto);
 
 	SeatUpdateServiceResponseDto toSeatUpdateServiceResponseDto(Seat seat);
+
+	CacheSeatServiceResponseDto toCacheSeatServiceResponseDto(String seat, String status);
+
+	CacheBlockServiceResponseDto toCacheBlockServiceResponseDto(Integer block, List<CacheSeatServiceResponseDto> seats);
 }
