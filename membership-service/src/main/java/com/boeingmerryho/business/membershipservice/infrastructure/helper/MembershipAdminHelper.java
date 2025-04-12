@@ -53,4 +53,11 @@ public class MembershipAdminHelper {
 
 		return membership;
 	}
+
+	public void deleteStore(Long id) {
+		Membership membership = membershipRepository.findByIdAndIsDeletedFalse(id)
+			.orElseThrow(() -> new GlobalException(MembershipErrorCode.NOT_FOUND));
+		// TODO: 사용자 받아올 시 변경 필요
+		membership.softDelete(1L);
+	}
 }

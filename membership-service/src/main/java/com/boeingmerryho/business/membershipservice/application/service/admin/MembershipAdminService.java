@@ -55,4 +55,9 @@ public class MembershipAdminService {
 		Membership updated = membershipAdminHelper.updateMembershipInfo(id, requestDto);
 		return mapper.toMembershipUpdateResponseServiceDto(updated);
 	}
+
+	@Transactional
+	public void deleteStore(Long id) {
+		membershipAdminHelper.deleteStore(id);
+	}
 }
