@@ -80,5 +80,7 @@ public interface UserHelper {
 	void checkDuplicatedVerificationRequest(String email);
 
 	String getNotifyLoginResponse(Long id);
+
+	void removeUserMembershipInfoFromRedis(Long id);
 }
 

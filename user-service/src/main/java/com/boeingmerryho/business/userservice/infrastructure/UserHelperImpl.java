@@ -40,6 +40,7 @@ public class UserHelperImpl implements UserHelper {
 	private static final String USER_TOKEN_PREFIX = "user:token:";
 	private static final String BLACKLIST_PREFIX = "blacklist:";
 	private static final String VERIFICATION_PREFIX = "verification:email:";
+	private static final String MEMBERSHIP_INFO_PREFIX = "user:membership:info:";
 
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final JwtTokenProvider jwtTokenProvider;
@@ -246,6 +247,11 @@ public class UserHelperImpl implements UserHelper {
 		} catch (Exception e) {
 			throw new GlobalException(ErrorCode.MEMBERSHIP_FEIGN_REQUEST_FAIL);
 		}
+	}
+
+	public void removeUserMembershipInfoFromRedis(Long id) {
+		String membershipKey = MEMBERSHIP_INFO_PREFIX+id;
+		redisTemplate.delete(membershipKey);
 	}
 
 }
