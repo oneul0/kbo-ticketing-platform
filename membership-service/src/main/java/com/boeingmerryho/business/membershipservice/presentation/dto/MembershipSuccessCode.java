@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.membershipservice.presentation;
+package com.boeingmerryho.business.membershipservice.presentation.dto;
 
 import org.springframework.http.HttpStatus;
 
