@@ -7,5 +7,4 @@ public record MembershipSearchCondition(
 	Double maxDiscount,
 	Boolean isDeleted
 ) {
-
 }

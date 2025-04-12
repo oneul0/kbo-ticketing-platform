@@ -50,7 +50,6 @@ public class Membership extends BaseEntity {
 			this.name = update.name();
 		if (update.discount() != null)
 			this.discount = update.discount();
-
 	}
 
 	// @OneToMany(mappedBy = "membership")
