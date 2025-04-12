@@ -1,10 +1,9 @@
-package com.boeingmerryho.business.membershipservice.domain.entity;
+package com.boeingmerryho.business.queueservice.domain;
+
+import java.io.Serializable;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-
-import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUpdateRequestServiceDto;
-import com.boeingmerryho.business.membershipservice.domain.type.MembershipType;
 
 import io.github.boeingmerryho.commonlibrary.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -16,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -25,33 +25,35 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "p_membership")
+@Table(name = "p_queue")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Membership extends BaseEntity {
+public class Queue extends BaseEntity implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
-	private Integer season;
+	@Column(name = "store_id", nullable = false)
+	private Long storeId;
+
+	@Column(name = "user_id", nullable = false)
+	private Long userId;
 
 	@Column(nullable = false)
+	private Integer sequence;
+
 	@Enumerated(EnumType.STRING)
-	private MembershipType name;
-
 	@Column(nullable = false)
-	private Double discount;
+	@Builder.Default
+	private QueueStatus status = QueueStatus.PENDING;
 
-	public void update(MembershipUpdateRequestServiceDto update) {
-		if (update.season() != null)
-			this.season = update.season();
-		if (update.name() != null)
-			this.name = update.name();
-		if (update.discount() != null)
-			this.discount = update.discount();
+	public static Queue withDefaultStatus(Long storeId, Long userId, Integer sequence) {
+		return Queue.builder()
+			.storeId(storeId)
+			.userId(userId)
+			.sequence(sequence)
+			.status(QueueStatus.PENDING)
+			.build();
 	}
 
-	// @OneToMany(mappedBy = "membership")
-	// private List<MembershipUser> users = new ArrayList<>();
 }
