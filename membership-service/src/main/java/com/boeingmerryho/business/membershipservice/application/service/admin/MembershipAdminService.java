@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.boeingmerryho.business.membershipservice.application.dto.mapper.MembershipApplicationMapper;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipCreateResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipAdminHelper;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipValidator;
@@ -28,4 +29,11 @@ public class MembershipAdminService {
 		return mapper.toMembershipCreateResponseServiceDto(saved);
 	}
 
+	@Transactional(readOnly = true)
+	public MembershipDetailAdminResponseServiceDto getMembershipDetail(Long id) {
+		Membership membershipDetail = membershipAdminHelper.getAnyMembershipById(id);
+
+		return mapper.toMembershipDetailAdminResponseServiceDto(membershipDetail);
+
+	}
 }

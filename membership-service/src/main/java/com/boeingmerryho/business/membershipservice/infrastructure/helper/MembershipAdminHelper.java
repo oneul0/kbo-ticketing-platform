@@ -6,7 +6,9 @@ import com.boeingmerryho.business.membershipservice.application.dto.mapper.Membe
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 import com.boeingmerryho.business.membershipservice.domain.repository.MembershipRepository;
+import com.boeingmerryho.business.membershipservice.exception.MembershipErrorCode;
 
+import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -19,5 +21,10 @@ public class MembershipAdminHelper {
 	public Membership save(MembershipCreateRequestServiceDto requestDto) {
 		Membership membership = mapper.toEntity(requestDto);
 		return membershipRepository.save(membership);
+	}
+
+	public Membership getAnyMembershipById(Long id) {
+		return membershipRepository.findById(id)
+			.orElseThrow(() -> new GlobalException(MembershipErrorCode.NOT_FOUND));
 	}
 }

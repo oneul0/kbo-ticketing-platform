@@ -6,8 +6,10 @@ import org.springframework.context.annotation.Primary;
 
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipCreateResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipCreateRequestDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipCreateResponseDto;
+import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipDetailAdminResponseDto;
 
 import jakarta.validation.Valid;
 
@@ -19,4 +21,7 @@ public interface MembershipPresentationMapper {
 
 	@BeanMapping(ignoreByDefault = true)
 	MembershipCreateRequestServiceDto toMembershipCreateRequestServiceDto(@Valid MembershipCreateRequestDto requestDto);
+
+	MembershipDetailAdminResponseDto toMembershipDetailAdminResponseDto(
+		MembershipDetailAdminResponseServiceDto responseServiceDto);
 }
