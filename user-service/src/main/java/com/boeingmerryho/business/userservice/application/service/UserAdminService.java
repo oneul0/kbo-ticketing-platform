@@ -154,6 +154,8 @@ public class UserAdminService {
 		userHelper.blacklistToken(accessToken);
 
 		userHelper.deleteKeyFromRedis(result.tokenKey());
+
+		userHelper.removeUserMembershipInfoFromRedis(userId);
 	}
 
 	public UserLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto dto) {
@@ -165,6 +167,9 @@ public class UserAdminService {
 			tokenMap.get("accessToken"),
 			tokenMap.get("refreshToken")
 		);
+
+		userHelper.getNotifyLoginResponse(user.getId());
+
 		return userApplicationMapper.toUserLoginResponseDto(serviceDto);
 	}
 
