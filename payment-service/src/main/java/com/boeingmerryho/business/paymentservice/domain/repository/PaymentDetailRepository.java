@@ -8,4 +8,6 @@ public interface PaymentDetailRepository {
 	PaymentDetail save(PaymentDetail paymentDetail);
 
 	Optional<PaymentDetail> findById(Long id);
+
+	Optional<PaymentDetail> findPaymentDetailByPaymentId(Long id);
 }

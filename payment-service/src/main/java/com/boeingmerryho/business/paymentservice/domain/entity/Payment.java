@@ -53,6 +53,10 @@ public class Payment extends BaseEntity {
 	@Builder.Default
 	private DiscountType discountType = DiscountType.NONE;
 
+	public void refundPayment() {
+		this.status = PaymentStatus.REFUNDED;
+	}
+
 	public void confirmPayment() {
 		this.status = PaymentStatus.CONFIRMED;
 	}

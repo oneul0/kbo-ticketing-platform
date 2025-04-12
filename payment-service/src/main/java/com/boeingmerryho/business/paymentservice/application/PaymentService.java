@@ -61,7 +61,7 @@ public class PaymentService {
 	private final KakaoPaymentHelper kakaoPaymentHelper;
 
 	@Transactional(readOnly = true)
-	public PaymentReadyResponseServiceDto readyPayment(PaymentReadyRequestServiceDto requestServiceDto) {
+	public PaymentReadyResponseServiceDto pay(PaymentReadyRequestServiceDto requestServiceDto) {
 
 		Payment payment = paymentRepository.findById(requestServiceDto.paymentId())
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
@@ -108,7 +108,6 @@ public class PaymentService {
 				String.valueOf(requestServiceDto.paymentId()))
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
 
-		System.out.println(paymentSession.getPartnerOrderId());
 		KakaoPayApproveRequest request = KakaoPayApproveRequest.builder()
 			.cid(paymentSession.getCid())
 			.tid(paymentSession.getTid())

@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class Amount {
+public class ApprovedCancelAmount {
 	private Integer total;
 	@JsonProperty("tax_free")
 	private Integer taxFree;

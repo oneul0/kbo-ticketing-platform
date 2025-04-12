@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,10 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.boeingmerryho.business.paymentservice.application.PaymentAdminService;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailAdminResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentMembershipCancelResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentMembershipRefundResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentTicketCancelResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentTicketRefundResponseDto;
 import com.boeingmerryho.business.paymentservice.utils.PageableUtils;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
@@ -28,6 +33,23 @@ import lombok.RequiredArgsConstructor;
 public class PaymentAdminController {
 	private final PaymentAdminService paymentAdminService;
 	private final PaymentPresentationMapper mapper;
+
+	@PostMapping("/refund/tickets/{id}")
+	public ResponseEntity<SuccessResponse<PaymentTicketRefundResponseDto>> refundTicketPayment(@PathVariable Long id) {
+		PaymentTicketRefundResponseServiceDto responseServiceDto = paymentAdminService.refundTicketPayment(
+			mapper.toPaymentTicketRefundRequestServiceDto(id));
+		return SuccessResponse.of(PaymentSuccessCode.TICKET_REFUNDED,
+			mapper.toPaymentTicketRefundResponseDto(responseServiceDto));
+	}
+
+	@PostMapping("/refund/memberships/{id}")
+	public ResponseEntity<SuccessResponse<PaymentMembershipRefundResponseDto>> refundMembershipPayment(
+		@PathVariable Long id) {
+		PaymentMembershipRefundResponseServiceDto responseServiceDto = paymentAdminService.refundMembershipPayment(
+			mapper.toPaymentMembershipRefundRequestServiceDto(id));
+		return SuccessResponse.of(PaymentSuccessCode.MEMBERSHIP_REFUNDED,
+			mapper.toPaymentMembershipRefundResponseDto(responseServiceDto));
+	}
 
 	@PutMapping("/{id}/cancel/tickets")
 	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(@PathVariable Long id) {
@@ -47,7 +69,8 @@ public class PaymentAdminController {
 	}
 
 	@GetMapping("/details/{id}")
-	public ResponseEntity<SuccessResponse<PaymentDetailAdminResponseDto>> getPaymentDetail(@PathVariable Long id) {
+	public ResponseEntity<SuccessResponse<PaymentDetailAdminResponseDto>> getPaymentDetail(
+		@PathVariable Long id) {
 
 		PaymentDetailAdminResponseServiceDto responseServiceDto = paymentAdminService.getPaymentDetail(
 			mapper.toPaymentDetailRequestServiceDto(id));

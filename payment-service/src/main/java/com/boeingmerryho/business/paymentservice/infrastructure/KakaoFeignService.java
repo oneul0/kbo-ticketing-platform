@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayApproveRequest;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayApproveResponse;
+import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayCancelRequest;
+import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayCancelResponse;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayReadyRequest;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayReadyResponse;
 
@@ -35,4 +37,15 @@ public interface KakaoFeignService {
 		@RequestHeader("Content-Type") String contentType,
 		@RequestBody KakaoPayApproveRequest request
 	);
+
+	@PostMapping(
+		value = "/online/v1/payment/cancel",
+		consumes = MediaType.APPLICATION_JSON_VALUE
+	)
+	KakaoPayCancelResponse cancel(
+		@RequestHeader("Authorization") String authorization,
+		@RequestHeader("Content-Type") String contentType,
+		@RequestBody KakaoPayCancelRequest request
+	);
+
 }

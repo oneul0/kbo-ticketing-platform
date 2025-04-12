@@ -11,6 +11,8 @@ public enum PaymentSuccessCode implements SuccessCode {
 	PAYMENT_READY_REQUESTED("결제 준비 요청이 완료되었습니다.", HttpStatus.ACCEPTED),
 	PAYMENT_APPROVED("결제가 승인되었습니다.", HttpStatus.OK),
 	PAYMENT_CANCELED("해당 결제가 취소되었습니다", HttpStatus.OK),
+	MEMBERSHIP_REFUNDED("멤버십 결제 환불이 성공적으로 처리되었습니다.", HttpStatus.OK),
+	TICKET_REFUNDED("티켓 결제 환불이 성공적으로 처리되었습니다.", HttpStatus.OK),
 	;
 
 	private final String message;

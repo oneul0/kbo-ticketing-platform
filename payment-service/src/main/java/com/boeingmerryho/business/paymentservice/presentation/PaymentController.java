@@ -40,10 +40,10 @@ public class PaymentController {
 	/**
 	 * 결제 요청 (결제 정보를 바탕으로 서버에 결제를 요청한다.)
 	 */
-	@PostMapping("/ready")
-	public ResponseEntity<SuccessResponse<PaymentReadyResponseDto>> readyPayment(
+	@PostMapping("/pay")
+	public ResponseEntity<SuccessResponse<PaymentReadyResponseDto>> pay(
 		@RequestBody @Valid PaymentReadyRequestDto requestDto) {
-		PaymentReadyResponseServiceDto responseServiceDto = paymentService.readyPayment(
+		PaymentReadyResponseServiceDto responseServiceDto = paymentService.pay(
 			paymentPresentationMapper.toPaymentReadyRequestServiceDto(1L, requestDto));    // TODO userId
 
 		return SuccessResponse.of(PaymentSuccessCode.PAYMENT_READY_REQUESTED,
