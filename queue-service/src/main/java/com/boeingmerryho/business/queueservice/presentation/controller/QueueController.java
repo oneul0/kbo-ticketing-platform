@@ -61,7 +61,7 @@ public class QueueController {
 	}
 
 	@Description(
-		"대기열에서 본인 순서 조회 api"
+		"대기열 취소 api"
 	)
 	@DeleteMapping("/stores/{id}")
 	public ResponseEntity<?> cancelQueue(
