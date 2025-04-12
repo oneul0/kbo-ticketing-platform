@@ -24,6 +24,7 @@ import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
 
+import feign.FeignException;
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -235,14 +236,16 @@ public class UserHelperImpl implements UserHelper {
 		}
 	}
 
-	public String getNotifyLoginResponse(Long id){
+	public String getNotifyLoginResponse(Long id) {
 		LoginSuccessRequest request = new LoginSuccessRequest(id);
 		try {
 			ResponseEntity<String> response = membershipClient.notifyLogin(request);
-			if (response.getStatusCode().is2xxSuccessful()) {
-				return response.getBody();
-			} else {
+			return response.getBody();
+		} catch (FeignException e) {
+			if (e.status() >= 400 && e.status() < 500) {
 				throw new GlobalException(ErrorCode.MEMBERSHIP_INFO_SETTING_FAIL);
+			} else {
+				throw new GlobalException(ErrorCode.MEMBERSHIP_FEIGN_REQUEST_FAIL);
 			}
 		} catch (Exception e) {
 			throw new GlobalException(ErrorCode.MEMBERSHIP_FEIGN_REQUEST_FAIL);
