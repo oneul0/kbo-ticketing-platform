@@ -7,13 +7,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.boeingmerryho.business.userservice.application.UserHelper;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminRegisterRequestServiceDto;
+import com.boeingmerryho.business.userservice.application.dto.request.feign.LoginSuccessRequest;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
+import com.boeingmerryho.business.userservice.application.feign.MembershipClient;
 import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
 import com.boeingmerryho.business.userservice.application.utils.jwt.JwtTokenProvider;
 import com.boeingmerryho.business.userservice.domain.User;
@@ -37,11 +40,13 @@ public class UserHelperImpl implements UserHelper {
 	private static final String USER_TOKEN_PREFIX = "user:token:";
 	private static final String BLACKLIST_PREFIX = "blacklist:";
 	private static final String VERIFICATION_PREFIX = "verification:email:";
+	private static final String MEMBERSHIP_INFO_PREFIX = "user:membership:info:";
 
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final RedisUtil redisUtil;
 	private final UserRepository userRepository;
+	private final MembershipClient membershipClient;
 
 	public User findUserById(Long id, UserRepository userRepository) {
 		return userRepository.findById(id)
@@ -228,6 +233,25 @@ public class UserHelperImpl implements UserHelper {
 		if (redisTemplate.hasKey(key)) {
 			throw new GlobalException(ErrorCode.VERIFICATION_ALREADY_SENT);
 		}
+	}
+
+	public String getNotifyLoginResponse(Long id){
+		LoginSuccessRequest request = new LoginSuccessRequest(id);
+		try {
+			ResponseEntity<String> response = membershipClient.notifyLogin(request);
+			if (response.getStatusCode().is2xxSuccessful()) {
+				return response.getBody();
+			} else {
+				throw new GlobalException(ErrorCode.MEMBERSHIP_INFO_SETTING_FAIL);
+			}
+		} catch (Exception e) {
+			throw new GlobalException(ErrorCode.MEMBERSHIP_FEIGN_REQUEST_FAIL);
+		}
+	}
+
+	public void removeUserMembershipInfoFromRedis(Long id) {
+		String membershipKey = MEMBERSHIP_INFO_PREFIX+id;
+		redisTemplate.delete(membershipKey);
 	}
 
 }
