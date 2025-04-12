@@ -1,5 +1,6 @@
 package com.boeingmerryho.business.membershipservice.application.service.admin;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -7,9 +8,11 @@ import com.boeingmerryho.business.membershipservice.application.dto.mapper.Membe
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipCreateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailAdminResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipSearchAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipAdminHelper;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipValidator;
+import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipSearchAdminRequestServiceDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,5 +38,12 @@ public class MembershipAdminService {
 
 		return mapper.toMembershipDetailAdminResponseServiceDto(membershipDetail);
 
+	}
+
+	@Transactional(readOnly = true)
+	public Page<MembershipSearchAdminResponseServiceDto> searchMembership(
+		MembershipSearchAdminRequestServiceDto requestServiceDto) {
+		Page<Membership> memberships = membershipAdminHelper.search(requestServiceDto);
+		return memberships.map(mapper::toMembershipSearchAdminResponseServiceDto);
 	}
 }

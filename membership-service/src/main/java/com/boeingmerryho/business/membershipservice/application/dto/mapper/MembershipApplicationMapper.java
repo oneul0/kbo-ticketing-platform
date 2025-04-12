@@ -9,6 +9,7 @@ import com.boeingmerryho.business.membershipservice.application.dto.request.Memb
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipCreateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipSearchAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 
 @Primary
@@ -31,4 +32,6 @@ public interface MembershipApplicationMapper {
 	MembershipDetailAdminResponseServiceDto toMembershipDetailAdminResponseServiceDto(Membership membershipDetail);
 
 	MembershipDetailResponseServiceDto toMembershipDetailResponseServiceDto(Membership membership);
+
+	MembershipSearchAdminResponseServiceDto toMembershipSearchAdminResponseServiceDto(Membership membership);
 }
