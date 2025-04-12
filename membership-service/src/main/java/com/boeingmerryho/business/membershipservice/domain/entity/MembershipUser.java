@@ -31,9 +31,6 @@ public class MembershipUser extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false)
-	private Long membershipId;
-
-	@Column(nullable = false)
 	private Long userId;
 
 	@Column(nullable = false)
