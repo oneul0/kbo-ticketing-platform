@@ -19,7 +19,7 @@ import com.boeingmerryho.business.queueservice.application.service.QueueService;
 import com.boeingmerryho.business.queueservice.presentation.QueueSuccessCode;
 import com.boeingmerryho.business.queueservice.presentation.dto.mapper.QueuePresentationMapper;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.other.QueueJoinRequestDto;
-import com.boeingmerryho.business.queueservice.presentation.dto.request.other.QueueJoinResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueCancelResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserSequenceResponseDto;
 
@@ -43,7 +43,7 @@ public class QueueController {
 	public ResponseEntity<?> joinQueue(
 		@RequestAttribute Long userId,
 		@RequestBody QueueJoinRequestDto requestDto) {
-		QueueJoinServiceDto serviceDto = queuePresentationMapper.toQueueJoinRequestServiceDto(requestDto, userId);
+		QueueJoinServiceDto serviceDto = queuePresentationMapper.toQueueJoinServiceDto(requestDto, userId);
 		QueueJoinResponseDto sequence = queueService.joinQueue(serviceDto);
 		return SuccessResponse.of(QueueSuccessCode.QUEUE_JOIN_SUCCESS, sequence);
 	}

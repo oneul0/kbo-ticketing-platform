@@ -7,7 +7,7 @@ import com.boeingmerryho.business.queueservice.application.dto.mapper.QueueAppli
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueCancelServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueJoinServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueUserSequenceServiceDto;
-import com.boeingmerryho.business.queueservice.presentation.dto.request.other.QueueJoinResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueCancelResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserSequenceResponseDto;
 
