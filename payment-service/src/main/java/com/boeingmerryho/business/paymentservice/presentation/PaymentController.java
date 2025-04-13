@@ -18,6 +18,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.PaymentPresentationMapper;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.PaymentReadyRequestDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentApproveResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailResponseDto;

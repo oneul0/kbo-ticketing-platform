@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.exception;
+package com.boeingmerryho.business.paymentservice.infrastructure.exception;
 
 import org.springframework.http.HttpStatus;
 

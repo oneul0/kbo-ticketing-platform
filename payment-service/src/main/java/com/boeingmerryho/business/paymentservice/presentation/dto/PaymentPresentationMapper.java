@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.presentation;
+package com.boeingmerryho.business.paymentservice.presentation.dto;
 
 import org.mapstruct.Mapper;
 import org.springframework.data.domain.Pageable;

@@ -30,9 +30,9 @@ import com.boeingmerryho.business.paymentservice.domain.repository.PaymentDetail
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
-import com.boeingmerryho.business.paymentservice.exception.ErrorCode;
-import com.boeingmerryho.business.paymentservice.exception.PaymentException;
 import com.boeingmerryho.business.paymentservice.infrastructure.KakaoApiClient;
+import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
+import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
 
 import lombok.RequiredArgsConstructor;
 
