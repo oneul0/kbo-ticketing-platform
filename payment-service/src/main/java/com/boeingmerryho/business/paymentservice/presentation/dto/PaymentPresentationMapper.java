@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.presentation;
+package com.boeingmerryho.business.paymentservice.presentation.dto;
 
 import org.mapstruct.Mapper;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +19,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketRefundResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.request.PaymentApproveRequestDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.PaymentReadyRequestDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentApproveResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailAdminResponseDto;
@@ -61,7 +62,10 @@ public interface PaymentPresentationMapper {
 
 	PaymentReadyResponseDto toPaymentReadyResponseDto(PaymentReadyResponseServiceDto responseServiceDto);
 
-	PaymentApproveRequestServiceDto toPaymentApproveRequestServiceDto(Long userId, String pgToken, Long paymentId);
+	PaymentApproveRequestServiceDto toPaymentApproveRequestServiceDto(
+		Long userId,
+		String pgToken,
+		PaymentApproveRequestDto requestDto);
 
 	PaymentApproveResponseDto toPaymentApproveResponseDto(PaymentApproveResponseServiceDto responseServiceDto);
 

@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.exception;
+package com.boeingmerryho.business.paymentservice.infrastructure.exception;
 
 import org.springframework.http.HttpStatus;
 
@@ -16,7 +16,10 @@ public enum ErrorCode implements BaseErrorCode {
 	PAYMENT_ALREADY_REFUNDED("이미 환불된 결제 건입니다.", HttpStatus.BAD_REQUEST),
 	PAYMENT_REFUND_UNAVAILABLE("환불 요청이 접수되지 않은 결제 건입니다.", HttpStatus.BAD_REQUEST),
 	PAYMENT_TICKET_NOT_FOUND("결제된 티켓 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-	PAYMENT_MEMBERSHIP_NOT_FOUND("결제된 멤버십 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+	PAYMENT_MEMBERSHIP_NOT_FOUND("결제된 멤버십 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+	PAYMENT_UNSUPPORTED("지원하지 않는 결제 방식입니다.", HttpStatus.BAD_REQUEST),
+	PAYMENT_INFO_NOT_FOUND("결제 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+	;
 
 	private final String message;
 	private final HttpStatus status;

@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPaymentSession;
+import com.boeingmerryho.business.paymentservice.application.dto.kakao.PaymentSession;
 
 @Configuration
 public class RedisConfig {
@@ -32,12 +32,12 @@ public class RedisConfig {
 	}
 
 	@Bean
-	public RedisTemplate<String, KakaoPaymentSession> redisTemplateForKakaoPaymentSession(
+	public RedisTemplate<String, PaymentSession> redisTemplateForKakaoPaymentSession(
 		RedisConnectionFactory factory) {
-		RedisTemplate<String, KakaoPaymentSession> template = new RedisTemplate<>();
+		RedisTemplate<String, PaymentSession> template = new RedisTemplate<>();
 		template.setConnectionFactory(factory);
 		template.setKeySerializer(new StringRedisSerializer());
-		template.setValueSerializer(new Jackson2JsonRedisSerializer<>(KakaoPaymentSession.class));
+		template.setValueSerializer(new Jackson2JsonRedisSerializer<>(PaymentSession.class));
 		return template;
 	}
 
