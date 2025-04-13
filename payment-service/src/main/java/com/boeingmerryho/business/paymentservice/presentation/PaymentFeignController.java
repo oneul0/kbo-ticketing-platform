@@ -26,7 +26,6 @@ public class PaymentFeignController {
 	) {
 		return paymentPresentationMapper.toPaymentCreationResponseDto(paymentFeignService.createPayment(
 			paymentPresentationMapper.toPaymentCreationRequestServiceDto(
-				1L,    // TODO userId
 				requestDto
 			))
 		);

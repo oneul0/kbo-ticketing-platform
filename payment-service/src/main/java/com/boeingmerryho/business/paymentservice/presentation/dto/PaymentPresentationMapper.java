@@ -83,8 +83,7 @@ public interface PaymentPresentationMapper {
 
 	PaymentMembershipRefundRequestServiceDto toPaymentMembershipRefundRequestServiceDto(Long id);
 
-	PaymentCreationRequestServiceDto toPaymentCreationRequestServiceDto(Long userId,
-		PaymentCreationRequestDto requestDto);
+	PaymentCreationRequestServiceDto toPaymentCreationRequestServiceDto(PaymentCreationRequestDto requestDto);
 
 	PaymentCreationResponseDto toPaymentCreationResponseDto(PaymentCreationResponseServiceDto responseServiceDto);
 }
