@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.infrastructure.feignClient;
+package com.boeingmerryho.business.paymentservice.infrastructure.feignclient;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;

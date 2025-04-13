@@ -36,7 +36,9 @@ public class PaymentAdminController {
 	private final PaymentPresentationMapper paymentPresentationMapper;
 
 	@PostMapping("/refund/tickets/{id}")
-	public ResponseEntity<SuccessResponse<PaymentTicketRefundResponseDto>> refundTicketPayment(@PathVariable Long id) {
+	public ResponseEntity<SuccessResponse<PaymentTicketRefundResponseDto>> refundTicketPayment(
+		@PathVariable Long id
+	) {
 		PaymentTicketRefundResponseServiceDto responseServiceDto = paymentAdminService.refundTicketPayment(
 			paymentPresentationMapper.toPaymentTicketRefundRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.TICKET_REFUNDED,
@@ -45,7 +47,8 @@ public class PaymentAdminController {
 
 	@PostMapping("/refund/memberships/{id}")
 	public ResponseEntity<SuccessResponse<PaymentMembershipRefundResponseDto>> refundMembershipPayment(
-		@PathVariable Long id) {
+		@PathVariable Long id
+	) {
 		PaymentMembershipRefundResponseServiceDto responseServiceDto = paymentAdminService.refundMembershipPayment(
 			paymentPresentationMapper.toPaymentMembershipRefundRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.MEMBERSHIP_REFUNDED,
@@ -53,7 +56,9 @@ public class PaymentAdminController {
 	}
 
 	@PutMapping("/{id}/cancel/tickets")
-	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(@PathVariable Long id) {
+	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(
+		@PathVariable Long id
+	) {
 		PaymentTicketCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelTicketPayment(
 			paymentPresentationMapper.toPaymentTicketCancelRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.TICKET_REFUND_REQUESTED,
@@ -62,7 +67,8 @@ public class PaymentAdminController {
 
 	@PutMapping("/{id}/cancel/memberships")
 	public ResponseEntity<SuccessResponse<PaymentMembershipCancelResponseDto>> cancelMembershipPayment(
-		@PathVariable Long id) {
+		@PathVariable Long id
+	) {
 		PaymentMembershipCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelMembershipPayment(
 			paymentPresentationMapper.toPaymentMembershipCancelRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.MEMBERSHIP_REFUND_REQUESTED,
@@ -71,8 +77,8 @@ public class PaymentAdminController {
 
 	@GetMapping("/details/{id}")
 	public ResponseEntity<SuccessResponse<PaymentDetailAdminResponseDto>> getPaymentDetail(
-		@PathVariable Long id) {
-
+		@PathVariable Long id
+	) {
 		PaymentDetailAdminResponseServiceDto responseServiceDto = paymentAdminService.getPaymentDetail(
 			paymentPresentationMapper.toPaymentDetailRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
@@ -91,12 +97,11 @@ public class PaymentAdminController {
 		@RequestParam(value = "paymentId", required = false) Long paymentId,
 		@RequestParam(value = "isDeleted", required = false) Boolean isDeleted
 	) {
-
 		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
 
 		Page<PaymentDetailAdminResponseServiceDto> responseServiceDto = paymentAdminService.searchPaymentDetail(
-			paymentPresentationMapper.toPaymentDetailSearchRequestServiceDto(pageable, id, userId, paymentId,
-				isDeleted));
+			paymentPresentationMapper.toPaymentDetailSearchRequestServiceDto(pageable, id, userId, paymentId, isDeleted)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
 			responseServiceDto.map(paymentPresentationMapper::toPaymentDetailAdminResponseDto));
 

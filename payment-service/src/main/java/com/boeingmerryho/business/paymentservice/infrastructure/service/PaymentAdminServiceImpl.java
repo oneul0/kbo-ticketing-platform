@@ -2,7 +2,6 @@ package com.boeingmerryho.business.paymentservice.infrastructure.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,17 +39,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentAdminServiceImpl implements PaymentAdminService {
 
-	@Value("${kakaopay.cid}")
-	String cid;
-
 	@Value("${kakaopay.secret-key}")
 	String secretKey;
 
 	@Value("${kakaopay.auth-prefix}")
 	String authPrefix;
-
-	@Value("${kakaopay.redirect-url}")
-	String redirectUrl;
 
 	private final KakaoApiClient kakaoApiClient;
 	private final PaymentRepository paymentRepository;
@@ -59,7 +52,8 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 
 	@Transactional
 	public PaymentTicketCancelResponseServiceDto cancelTicketPayment(
-		PaymentTicketCancelRequestServiceDto requestServiceDto) {
+		PaymentTicketCancelRequestServiceDto requestServiceDto
+	) {
 		Payment payment = paymentRepository.findById(requestServiceDto.id())
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
 		assertCancellablePayment(payment);
@@ -67,7 +61,9 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 		return paymentApplicationMapper.toPaymentTicketCancelResponseServiceDto(payment.getId());
 	}
 
-	private void assertCancellablePayment(Payment payment) {
+	private void assertCancellablePayment(
+		Payment payment
+	) {
 		if (!payment.validateStatus(PaymentStatus.CONFIRMED)) {
 			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
 		}
@@ -78,7 +74,8 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 
 	@Transactional
 	public PaymentMembershipCancelResponseServiceDto cancelMembershipPayment(
-		PaymentMembershipCancelRequestServiceDto requestServiceDto) {
+		PaymentMembershipCancelRequestServiceDto requestServiceDto
+	) {
 		Payment payment = paymentRepository.findById(requestServiceDto.id())
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
 		assertCancellablePayment(payment);
@@ -87,7 +84,9 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 	}
 
 	@Transactional(readOnly = true)
-	public PaymentDetailAdminResponseServiceDto getPaymentDetail(PaymentDetailRequestServiceDto requestServiceDto) {
+	public PaymentDetailAdminResponseServiceDto getPaymentDetail(
+		PaymentDetailRequestServiceDto requestServiceDto
+	) {
 		PaymentDetail paymentDetail = paymentDetailRepository.findById(requestServiceDto.id())
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
 
@@ -96,29 +95,22 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 
 	@Transactional(readOnly = true)
 	public Page<PaymentDetailAdminResponseServiceDto> searchPaymentDetail(
-		PaymentDetailSearchRequestServiceDto requestServiceDto) {
+		PaymentDetailSearchRequestServiceDto requestServiceDto
+	) {
 		Page<PaymentDetail> paymentDetails = paymentRepository.searchPaymentDetail(
-			createSearchContext(
-				requestServiceDto.id(),
-				requestServiceDto.paymentId(),
-				requestServiceDto.customPageable(),
-				requestServiceDto.isDeleted()
-			)
+			createSearchContext(requestServiceDto)
 		);
 		return paymentDetails.map(paymentApplicationMapper::toPaymentDetailAdminResponseServiceDto);
 	}
 
 	private PaymentDetailSearchContext createSearchContext(
-		Long id,
-		Long paymentId,
-		Pageable customPageable,
-		Boolean isDeleted
+		PaymentDetailSearchRequestServiceDto requestServiceDto
 	) {
 		return PaymentDetailSearchContext.builder()
-			.id(id)
-			.paymentId(paymentId)
-			.customPageable(customPageable)
-			.isDeleted(isDeleted)
+			.id(requestServiceDto.id())
+			.paymentId(requestServiceDto.paymentId())
+			.customPageable(requestServiceDto.customPageable())
+			.isDeleted(requestServiceDto.isDeleted())
 			.build();
 	}
 

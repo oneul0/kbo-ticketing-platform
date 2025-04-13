@@ -9,7 +9,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayC
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayCancelResponse;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayReadyRequest;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayReadyResponse;
-import com.boeingmerryho.business.paymentservice.infrastructure.feignClient.KakaoFeignClient;
+import com.boeingmerryho.business.paymentservice.infrastructure.feignclient.KakaoFeignClient;
 
 import lombok.RequiredArgsConstructor;
 
