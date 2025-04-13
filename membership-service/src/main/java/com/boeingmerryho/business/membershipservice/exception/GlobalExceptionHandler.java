@@ -5,10 +5,14 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.boeingmerryho.business.membershipservice.domain.type.MembershipType;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import io.github.boeingmerryho.commonlibrary.exception.BaseErrorCode;
 import io.github.boeingmerryho.commonlibrary.exception.ErrorResponse;
@@ -40,4 +44,25 @@ public class GlobalExceptionHandler {
 			.status(HttpStatus.BAD_REQUEST)
 			.body(ErrorResponse.of("VALIDATION_ERROR", message));
 	}
+
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ErrorResponse> handleInvalidEnumValue(HttpMessageNotReadableException ex) {
+		if (ex.getCause() instanceof InvalidFormatException formatException) {
+			Class<?> targetType = formatException.getTargetType();
+			if (targetType.isEnum() && targetType.equals(MembershipType.class)) {
+				return ResponseEntity
+					.status(MembershipErrorCode.INVALID_MEMBERSHIP_TYPE.getStatus())
+					.body(ErrorResponse.of(
+						MembershipErrorCode.INVALID_MEMBERSHIP_TYPE.getErrorCode(),
+						MembershipErrorCode.INVALID_MEMBERSHIP_TYPE.getMessage()
+					));
+			}
+		}
+
+		return ResponseEntity
+			.status(HttpStatus.BAD_REQUEST)
+			.body(ErrorResponse.of(MembershipErrorCode.BAD_REQUEST.getErrorCode(),
+				MembershipErrorCode.BAD_REQUEST.getMessage()));
+	}
+
 }
