@@ -28,7 +28,7 @@ public class CreateCacheSeatsService {
 	public void createSeatBucket(List<Seat> seats, LocalDate date) {
 		for (Seat seat : seats) {
 			String cacheKey = makeCacheKey(seat, date);
-			Map<String, String> cacheValue = makeCacheValue();
+			Map<String, String> cacheValue = makeCacheValue(seat);
 
 			RBucket<Map<String, String>> bucket = redissonClient.getBucket(cacheKey);
 			// TODO: 테스트 기간까지만 5분으로 설정
@@ -57,9 +57,10 @@ public class CreateCacheSeatsService {
 		return builder.toString();
 	}
 
-	private Map<String, String> makeCacheValue() {
+	private Map<String, String> makeCacheValue(Seat seat) {
 		Map<String, String> values = new HashMap<>();
 
+		values.put("id", seat.getId().toString());
 		values.put("status", ReservationStatus.AVAILABLE.name());
 		values.put("userId", null);
 		values.put("createdAt", null);
