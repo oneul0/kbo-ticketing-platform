@@ -1,13 +1,11 @@
 package com.boeingmerryho.business.paymentservice.domain.entity;
 
-import com.boeingmerryho.business.paymentservice.domain.type.DiscountType;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
-import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
-import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
-import jakarta.persistence.*;
-import lombok.*;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -36,11 +34,12 @@ public class PaymentDetail {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
-	private String cid;
-
-	@Column(nullable = false)
-	private String tid;
+	@Embedded
+	@AttributeOverrides({
+		@AttributeOverride(name = "tid", column = @Column(name = "tid")),
+		@AttributeOverride(name = "cid", column = @Column(name = "cid"))
+	})
+	private KakaoPayInfo kakaoPayInfo;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "payment_id")
@@ -50,17 +49,19 @@ public class PaymentDetail {
 	private Integer discountPrice;
 
 	@Column(nullable = false)
-	private PaymentMethod method;
-
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	@Builder.Default
-	private DiscountType discountType = DiscountType.NONE;
+	private PaymentMethod method;
 
 	@Column(nullable = false)
 	private Integer discountAmount;
 
-	@Column(nullable = false)
-	private String accountNumber;
+	@Embedded
+	@AttributeOverrides({
+		@AttributeOverride(name = "accountNumber", column = @Column(name = "account_number")),
+		@AttributeOverride(name = "accountBank", column = @Column(name = "account_bank")),
+		@AttributeOverride(name = "dueDate", column = @Column(name = "due_date")),
+		@AttributeOverride(name = "accountHolder", column = @Column(name = "account_holder"))
+	})
+	private VirtualAccountInfo accountInfo;
 
 }
