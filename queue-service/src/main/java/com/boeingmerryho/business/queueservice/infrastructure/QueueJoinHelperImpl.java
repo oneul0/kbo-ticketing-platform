@@ -27,7 +27,6 @@ public class QueueJoinHelperImpl implements QueueJoinHelper {
 
 
 	private final RedisTemplate<String, Object> redisTemplate;
-	private final RedisUtil redisUtil;
 
 	@Override
 	public Boolean validateStoreIsActive(Long storeId) {
@@ -39,7 +38,7 @@ public class QueueJoinHelperImpl implements QueueJoinHelper {
 		String ticketKey = TICKET_INFO_PREFIX + matchDate.toString() + ":" + ticketId;
 		Optional<String> userIdValue = Optional.ofNullable(redisTemplate.opsForValue().get(ticketKey))
 			.map(Object::toString);
-		if (!userIdValue.isPresent()) {
+		if (userIdValue.isEmpty()) {
 			throw new GlobalException(ErrorCode.TICKET_IS_NOT_ACTIVATED);
 		}
 		return Long.parseLong(userIdValue.get());
