@@ -37,7 +37,6 @@ public class MembershipAdminService {
 	@Transactional(readOnly = true)
 	public MembershipDetailAdminResponseServiceDto getMembershipDetail(Long id) {
 		Membership membershipDetail = membershipAdminHelper.getAnyMembershipById(id);
-
 		return mapper.toMembershipDetailAdminResponseServiceDto(membershipDetail);
 
 	}

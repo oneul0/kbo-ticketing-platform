@@ -5,6 +5,7 @@ public record MembershipDetailAdminResponseServiceDto(
 	Integer season,
 	String name,
 	Double discount,
+	Integer availableQuantity,
 	Boolean isDeleted
 ) {
 }
