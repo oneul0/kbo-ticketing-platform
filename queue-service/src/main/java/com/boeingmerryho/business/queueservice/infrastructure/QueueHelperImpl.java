@@ -84,10 +84,21 @@ public class QueueHelperImpl implements QueueHelper {
 		return rank.intValue() + 1;
 	}
 
+	@Override
+	public Boolean removeUserFromQueue(Long storeId, Long userId) {
+		String today = LocalDate.now().toString();
+
+		String redisKey = String.format(WAITLIST_INFO_PREFIX + storeId + ":" + today);
+		Long removedCount = redisTemplate.opsForZSet().remove(redisKey, userId.toString());
+
+		return removedCount != null && removedCount > 0;
+	}
+
 	private void setExpireIfAbsent(String key, Duration ttl) {
 		Long expire = redisTemplate.getExpire(key);
 		if (expire == null || expire == -1) {
 			redisTemplate.expire(key, ttl);
 		}
 	}
+
 }

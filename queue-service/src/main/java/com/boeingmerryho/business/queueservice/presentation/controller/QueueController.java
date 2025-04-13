@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -75,8 +74,10 @@ public class QueueController {
 	)
 	@DeleteMapping("/stores/{id}")
 	public ResponseEntity<?> cancelQueue(
+		//todo: @RequestAttribute Long userId, 로 수정
 		@PathVariable(name = "id") Long storeId,
-		@RequestAttribute Long userId
+		// @RequestAttribute Long userId
+		@RequestParam Long userId
 	) {
 		QueueCancelServiceDto serviceDto = queuePresentationMapper.toQueueCancelServiceDto(storeId, userId);
 		QueueCancelResponseDto sequence = queueService.cancelQueue(serviceDto);

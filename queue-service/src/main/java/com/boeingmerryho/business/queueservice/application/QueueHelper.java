@@ -10,5 +10,7 @@ public interface QueueHelper {
 	public void joinUserInQueue(Long storeId, Long userId, Long ticketId);
 
 	public Integer getUserQueuePosition(Long storeId, Long userId);
+
+	public Boolean removeUserFromQueue(Long storeId, Long userId);
 }
 

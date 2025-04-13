@@ -69,8 +69,15 @@ public class QueueService {
 
 	@Description("본인을 가게 대기열에서 삭제하는 메서드")
 	public QueueCancelResponseDto cancelQueue(QueueCancelServiceDto serviceDto) {
-		Long storeId = 0L;
-		Long userId = 0L;
+		Long storeId = serviceDto.storeId();
+		Long userId = serviceDto.userId();
+
+		boolean removed = helper.removeUserFromQueue(storeId, userId);
+
+		if (!removed) {
+			throw new GlobalException(ErrorCode.WAITLIST_NOT_EXIST);
+		}
+
 		return queueApplicationMapper.toQueueCancelResponseDto(storeId, userId);
 	}
 }
