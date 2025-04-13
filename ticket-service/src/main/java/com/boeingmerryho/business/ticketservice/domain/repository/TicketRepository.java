@@ -9,6 +9,8 @@ import com.boeingmerryho.business.ticketservice.domain.Ticket;
 import com.boeingmerryho.business.ticketservice.domain.TicketSearchCriteria;
 
 public interface TicketRepository {
+	void save(Ticket ticket);
+
 	Optional<Ticket> findById(Long id);
 
 	Page<Ticket> findByCriteria(TicketSearchCriteria criteria, Pageable pageable);

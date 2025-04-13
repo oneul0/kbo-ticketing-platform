@@ -1,5 +1,7 @@
 package com.boeingmerryho.business.ticketservice.application.user;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,8 +14,10 @@ import com.boeingmerryho.business.ticketservice.application.user.dto.response.Ti
 import com.boeingmerryho.business.ticketservice.domain.Ticket;
 import com.boeingmerryho.business.ticketservice.domain.TicketSearchCriteria;
 import com.boeingmerryho.business.ticketservice.domain.repository.TicketRepository;
+import com.boeingmerryho.business.ticketservice.domain.service.CreateTicketService;
 import com.boeingmerryho.business.ticketservice.exception.ErrorCode;
 import com.boeingmerryho.business.ticketservice.exception.TicketException;
+import com.boeingmerryho.business.ticketservice.infrastructure.adapter.kafka.dto.response.SeatListenerDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class TicketService {
 
 	private final TicketRepository ticketRepository;
+	private final CreateTicketService createTicketService;
 	private final TicketApplicationMapper mapper;
 
 	@Transactional(readOnly = true)
@@ -37,6 +42,15 @@ public class TicketService {
 			.orElseThrow(() -> new TicketException(ErrorCode.TICKET_NOT_FOUND));
 
 		return mapper.toTicketResponseDto(ticket);
+	}
+
+	@Transactional
+	public void handleSeatEvent(SeatListenerDto requestDto) {
+		List<Ticket> tickets = createTicketService.createTickets(requestDto);
+		// TODO : Redis 에 저장하기
+		for (Ticket ticket : tickets) {
+			ticketRepository.save(ticket);
+		}
 	}
 
 	private TicketSearchCriteria createTicketSearchCriteria(TicketSearchRequestServiceDto requestDto) {
