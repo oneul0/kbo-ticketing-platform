@@ -1,5 +1,7 @@
 package com.boeingmerryho.business.ticketservice.infrastructure.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +50,15 @@ public class TicketQueryRepository {
 			.fetchOne();
 
 		return new PageImpl<>(query.fetch(), pageable, total == null ? 0 : total);
+	}
+
+	public Optional<Ticket> findActiveTicketById(Long id) {
+		return Optional.ofNullable(
+			queryFactory
+				.selectFrom(QTicket.ticket)
+				.where(eqId(id).and(eqIsDeleted(false)))
+				.fetchOne()
+		);
 	}
 
 	private BooleanExpression eqId(Long id) {
