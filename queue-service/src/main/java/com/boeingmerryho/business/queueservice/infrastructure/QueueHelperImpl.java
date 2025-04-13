@@ -11,7 +11,7 @@ import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.boeingmerryho.business.queueservice.application.QueueJoinHelper;
+import com.boeingmerryho.business.queueservice.application.QueueHelper;
 import com.boeingmerryho.business.queueservice.exception.ErrorCode;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class QueueJoinHelperImpl implements QueueJoinHelper {
+public class QueueHelperImpl implements QueueHelper {
 
 	//todo: value로 주입받기
 	private static final String MEMBERSHIP_INFO_PREFIX = "user:membership:info:";
@@ -71,7 +71,17 @@ public class QueueJoinHelperImpl implements QueueJoinHelper {
 
 	@Override
 	public Integer getUserQueuePosition(Long storeId, Long userId) {
-		return 0;
+		String today = LocalDate.now().toString();
+
+		String redisKey = String.format(WAITLIST_INFO_PREFIX + storeId + ":" + today);
+
+		Long rank = redisTemplate.opsForZSet().rank(redisKey, userId.toString());
+		log.info("rank : {}", rank);
+		if (rank == null) {
+			throw new GlobalException(ErrorCode.WAITLIST_NOT_EXIST);
+		}
+
+		return rank.intValue() + 1;
 	}
 
 	private void setExpireIfAbsent(String key, Duration ttl) {

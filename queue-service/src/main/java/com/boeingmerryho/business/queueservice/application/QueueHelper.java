@@ -2,7 +2,7 @@ package com.boeingmerryho.business.queueservice.application;
 
 import java.util.Date;
 
-public interface QueueJoinHelper {
+public interface QueueHelper {
 	public Boolean validateStoreIsActive(Long storeId);
 
 	public Long validateTicket(Date matchDate, Long ticketId);

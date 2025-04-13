@@ -63,7 +63,7 @@ public class QueueController {
 	@GetMapping("/me")
 	public ResponseEntity<?> getMySequence(
 		//todo: @RequestAttribute Long userId, 로 수정
-		@RequestAttribute Long userId,
+		@RequestParam Long userId,
 		@RequestParam Long storeId) {
 		QueueUserSequenceServiceDto serviceDto = queuePresentationMapper.toQueueUserSequenceServiceDto(storeId, userId);
 		QueueUserSequenceResponseDto sequence = queueService.getSequence(serviceDto);
