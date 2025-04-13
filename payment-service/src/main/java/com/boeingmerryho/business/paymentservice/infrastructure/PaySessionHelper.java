@@ -1,5 +1,6 @@
 package com.boeingmerryho.business.paymentservice.infrastructure;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -25,6 +26,18 @@ public class PaySessionHelper {
 
 	public void deletePaymentInfo(String paymentId) {
 		paySessionService.deleteSession(paymentId);
+	}
+
+	public void savePaymentExpiredTime(String paymentId, LocalDateTime expiredTime) {
+		paySessionService.savePaymentExpiredTime(paymentId, expiredTime);
+	}
+
+	public Optional<LocalDateTime> getPaymentExpiredTime(String paymentId) {
+		return paySessionService.getPaymentExpiredTime(paymentId);
+	}
+
+	public void deletePaymentExpiredTime(String paymentId) {
+		paySessionService.deletePaymentExpiredTime(paymentId);
 	}
 
 }

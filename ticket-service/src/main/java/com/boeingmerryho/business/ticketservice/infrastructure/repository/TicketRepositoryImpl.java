@@ -20,6 +20,11 @@ public class TicketRepositoryImpl implements TicketRepository {
 	private final TicketQueryRepository ticketQueryRepository;
 
 	@Override
+	public void save(Ticket ticket) {
+		ticketJpaRepository.save(ticket);
+	}
+
+	@Override
 	public Optional<Ticket> findById(Long id) {
 		return ticketJpaRepository.findById(id);
 	}
