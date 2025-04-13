@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class VirtualAccountInfo {
+public class AccountInfo {
 	private String accountNumber;
 	private String accountBank;
 	private LocalDateTime dueDate;

@@ -1,5 +1,7 @@
 package com.boeingmerryho.business.paymentservice.domain.entity;
 
+import java.time.LocalDateTime;
+
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 
 import jakarta.persistence.AttributeOverride;
@@ -56,12 +58,19 @@ public class PaymentDetail {
 	private Integer discountAmount;
 
 	@Embedded
-	@AttributeOverrides({
-		@AttributeOverride(name = "accountNumber", column = @Column(name = "account_number")),
-		@AttributeOverride(name = "accountBank", column = @Column(name = "account_bank")),
-		@AttributeOverride(name = "dueDate", column = @Column(name = "due_date")),
-		@AttributeOverride(name = "accountHolder", column = @Column(name = "account_holder"))
-	})
-	private VirtualAccountInfo accountInfo;
+	private AccountInfo accountInfo;
 
+	public void fillAccountInfo(
+		String accountNumber,
+		String accountBank,
+		LocalDateTime dueDate,
+		String accountHolder
+	) {
+		this.accountInfo = AccountInfo.builder()
+			.accountNumber(accountNumber)
+			.accountBank(accountBank)
+			.dueDate(dueDate)
+			.accountHolder(accountHolder)
+			.build();
+	}
 }

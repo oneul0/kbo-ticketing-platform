@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.infrastructure;
+package com.boeingmerryho.business.paymentservice.infrastructure.feignclient;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -16,7 +16,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayR
 
 @Component
 @FeignClient(name = "kakaopay-service", url = "${kakaopay.url}")
-public interface KakaoFeignService {
+public interface KakaoFeignClient {
 
 	@PostMapping(
 		value = "/online/v1/payment/ready",
