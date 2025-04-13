@@ -29,7 +29,8 @@ public class MembershipValidator {
 	}
 
 	public void validateHasUpdatableFields(MembershipUpdateRequestServiceDto requestDto) {
-		if (requestDto.season() == null && requestDto.discount() == null) {
+		if (requestDto.season() == null && requestDto.discount() == null && requestDto.availableQuantity() == null
+			&& requestDto.price() == null) {
 			throw new GlobalException(MembershipErrorCode.NO_UPDATE_FIELDS_PROVIDED);
 		}
 	}

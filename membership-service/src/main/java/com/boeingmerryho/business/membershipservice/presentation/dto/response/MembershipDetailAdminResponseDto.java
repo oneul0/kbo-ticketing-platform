@@ -6,6 +6,7 @@ public record MembershipDetailAdminResponseDto(
 	String name,
 	Double discount,
 	Integer availableQuantity,
+	Integer price,
 	Boolean isDeleted
 ) {
 }

@@ -19,7 +19,6 @@ import com.boeingmerryho.business.membershipservice.application.dto.response.Mem
 import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipCreateRequestDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipSearchAdminRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipUpdateRequestDto;
-import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipUserCreateRequestDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipCreateResponseDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipDetailAdminResponseDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipDetailResponseDto;
@@ -49,7 +48,11 @@ public interface MembershipPresentationMapper {
 		String name,
 		Integer season,
 		Double minDiscount,
-		Double maxDiscount);
+		Double maxDiscount,
+		Integer minAvailableQuantity,
+		Integer maxAvailableQuantity,
+		Integer minPrice,
+		Integer maxPrice);
 
 	MembershipSearchAdminResponseDto toMembershipSearchAdminResponseDto(
 		MembershipSearchAdminResponseServiceDto membershipSearchAdminResponseServiceDto);
@@ -59,7 +62,7 @@ public interface MembershipPresentationMapper {
 	MembershipUpdateRequestServiceDto toMembershipUpdateRequestServiceDto(MembershipUpdateRequestDto requestDto);
 
 	MembershipUserCreateRequestServiceDto toMembershipUserCreateRequestServiceDto(
-		@Valid MembershipUserCreateRequestDto requestDto,
+		Long membershipId,
 		Long userId);
 
 	MembershipUserCreateResponseDto toMembershipUserCreateResponseDto(

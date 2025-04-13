@@ -4,6 +4,7 @@ public record MembershipUserCreateResponseDto(
 	Long id,
 	Long membershipId,
 	Long userId,
-	Boolean isActive
+	Boolean isActive,
+	Long paymentId
 ) {
 }

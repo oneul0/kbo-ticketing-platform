@@ -69,12 +69,17 @@ public class MembershipAdminController {
 		@RequestParam(value = "name", required = false) String name,
 		@RequestParam(value = "season", required = false) Integer season,
 		@RequestParam(value = "minDiscount", required = false) Double minDiscount,
-		@RequestParam(value = "maxDiscount", required = false) Double maxDiscount
+		@RequestParam(value = "maxDiscount", required = false) Double maxDiscount,
+		@RequestParam(value = "minAvailableQuantity", required = false) Integer minAvailableQuantity,
+		@RequestParam(value = "maxAvailableQuantity", required = false) Integer maxAvailableQuantity,
+		@RequestParam(value = "minPrice", required = false) Integer minPrice,
+		@RequestParam(value = "maxPrice", required = false) Integer maxPrice
 	) {
 		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
 
 		Page<MembershipSearchAdminResponseServiceDto> responseServiceDto = membershipAdminService.searchMembership(
-			mapper.toMembershipSearchAdminRequestServiceDto(pageable, name, season, minDiscount, maxDiscount));
+			mapper.toMembershipSearchAdminRequestServiceDto(pageable, name, season, minDiscount, maxDiscount,
+				minAvailableQuantity, maxAvailableQuantity, minPrice, maxPrice));
 		return SuccessResponse.of(MembershipSuccessCode.FETCHED_MEMBERSHIPS,
 			responseServiceDto.map(mapper::toMembershipSearchAdminResponseDto));
 	}

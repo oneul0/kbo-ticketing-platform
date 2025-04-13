@@ -23,11 +23,7 @@ public class MembershipAdminHelper {
 	private final MembershipQueryRepository membershipQueryRepository;
 
 	public Membership save(MembershipCreateRequestServiceDto requestDto) {
-		Membership membership = Membership.create(
-			requestDto.season(),
-			requestDto.name(),
-			requestDto.discount()
-		);
+		Membership membership = Membership.create(requestDto);
 		return membershipRepository.save(membership);
 	}
 
@@ -42,6 +38,10 @@ public class MembershipAdminHelper {
 			requestServiceDto.name(),
 			requestServiceDto.minDiscount(),
 			requestServiceDto.maxDiscount(),
+			requestServiceDto.minAvailableQuantity(),
+			requestServiceDto.maxAvailableQuantity(),
+			requestServiceDto.minPrice(),
+			requestServiceDto.maxPrice(),
 			requestServiceDto.isDeleted()
 		);
 		return membershipQueryRepository.search(condition, requestServiceDto.customPageable());
