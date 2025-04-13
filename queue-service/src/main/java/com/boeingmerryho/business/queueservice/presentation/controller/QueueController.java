@@ -74,6 +74,7 @@ public class QueueController {
 	)
 	@DeleteMapping("/stores/{id}")
 	public ResponseEntity<?> cancelQueue(
+		//todo: @RequestAttribute Long userId, 로 수정
 		@PathVariable(name = "id") Long storeId,
 		// @RequestAttribute Long userId
 		@RequestParam Long userId
