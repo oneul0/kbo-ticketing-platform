@@ -1,5 +1,7 @@
 package com.boeingmerryho.business.paymentservice.infrastructure.config;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +40,16 @@ public class RedisConfig {
 		template.setConnectionFactory(factory);
 		template.setKeySerializer(new StringRedisSerializer());
 		template.setValueSerializer(new Jackson2JsonRedisSerializer<>(PaymentSession.class));
+		return template;
+	}
+
+	@Bean
+	public RedisTemplate<String, LocalDateTime> redisTemplateForPaymentExpiredTime(
+		RedisConnectionFactory factory) {
+		RedisTemplate<String, LocalDateTime> template = new RedisTemplate<>();
+		template.setConnectionFactory(factory);
+		template.setKeySerializer(new StringRedisSerializer());
+		template.setValueSerializer(new Jackson2JsonRedisSerializer<>(LocalDateTime.class));
 		return template;
 	}
 

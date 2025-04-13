@@ -9,6 +9,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
+import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentFeignServiceImpl implements PaymentFeignService {
 
+	private final PaySessionHelper paySessionHelper;
 	private final PaymentRepository paymentRepository;
 	private final PaymentApplicationMapper paymentApplicationMapper;
 
@@ -28,6 +30,7 @@ public class PaymentFeignServiceImpl implements PaymentFeignService {
 				.type(PaymentType.from(requestServiceDto.paymentType()))
 				.build()
 		);
+		paySessionHelper.savePaymentExpiredTime(payment.getId().toString(), requestServiceDto.expiredTime());
 		return paymentApplicationMapper.toPaymentCreationResponseServiceDto(payment);
 	}
 }
