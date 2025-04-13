@@ -13,4 +13,8 @@ public interface PaySessionService {
 	void deleteSession(String paymentId);
 
 	void savePaymentExpiredTime(String paymentId, LocalDateTime expiredTime);
+
+	Optional<LocalDateTime> getPaymentExpiredTime(String paymentId);
+
+	void deletePaymentExpiredTime(String paymentId);
 }

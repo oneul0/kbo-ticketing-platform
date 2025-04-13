@@ -35,6 +35,7 @@ import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
 import com.boeingmerryho.business.paymentservice.infrastructure.KakaoApiClient;
+import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
@@ -52,6 +53,7 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 	String authPrefix;
 
 	private final KakaoApiClient kakaoApiClient;
+	private final PaySessionHelper paySessionHelper;
 	private final PaymentRepository paymentRepository;
 	private final PaymentDetailRepository paymentDetailRepository;
 	private final PaymentApplicationMapper paymentApplicationMapper;
@@ -238,12 +240,12 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 			paymentRepository.saveMembership(
 				PaymentMembership.builder()
 					.price(payment.getTotalPrice())
-					.membershipUserId(1L)    // TODO 논의
+					.membershipUserId(requestServiceDto.userId())
 					.payment(payment)
 					.build()
 			);
 		}
-
+		paySessionHelper.deletePaymentExpiredTime(String.valueOf(payment.getId()));
 		return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
 	}
 }

@@ -32,4 +32,12 @@ public class PaySessionHelper {
 		paySessionService.savePaymentExpiredTime(paymentId, expiredTime);
 	}
 
+	public Optional<LocalDateTime> getPaymentExpiredTime(String paymentId) {
+		return paySessionService.getPaymentExpiredTime(paymentId);
+	}
+
+	public void deletePaymentExpiredTime(String paymentId) {
+		paySessionService.deletePaymentExpiredTime(paymentId);
+	}
+
 }
