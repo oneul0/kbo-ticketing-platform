@@ -13,6 +13,7 @@ import com.boeingmerryho.business.membershipservice.application.dto.response.Mem
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUpdateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipAdminHelper;
+import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipRedisHelper;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipValidator;
 import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipSearchAdminRequestServiceDto;
 
@@ -25,12 +26,16 @@ public class MembershipAdminService {
 	private final MembershipValidator validator;
 	private final MembershipApplicationMapper mapper;
 	private final MembershipAdminHelper membershipAdminHelper;
+	private final MembershipRedisHelper membershipRedisHelper;
 
 	@Transactional
 	public MembershipCreateResponseServiceDto createMembership(MembershipCreateRequestServiceDto requestServiceDto) {
 		validator.validateNotDuplicated(requestServiceDto.season(), requestServiceDto.name());
 
 		Membership saved = membershipAdminHelper.save(requestServiceDto);
+
+		membershipRedisHelper.preloadStock(saved.getId(), saved.getAvailableQuantity());
+		
 		return mapper.toMembershipCreateResponseServiceDto(saved);
 	}
 
@@ -38,7 +43,6 @@ public class MembershipAdminService {
 	public MembershipDetailAdminResponseServiceDto getMembershipDetail(Long id) {
 		Membership membershipDetail = membershipAdminHelper.getAnyMembershipById(id);
 		return mapper.toMembershipDetailAdminResponseServiceDto(membershipDetail);
-
 	}
 
 	@Transactional(readOnly = true)

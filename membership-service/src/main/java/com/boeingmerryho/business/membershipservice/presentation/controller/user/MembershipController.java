@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUserCreateResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.service.user.MembershipReserveService;
 import com.boeingmerryho.business.membershipservice.application.service.user.MembershipService;
 import com.boeingmerryho.business.membershipservice.presentation.dto.MembershipSuccessCode;
 import com.boeingmerryho.business.membershipservice.presentation.dto.mapper.MembershipPresentationMapper;
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class MembershipController {
 
 	private final MembershipService membershipService;
+	private final MembershipReserveService membershipReserveService;
 	private final MembershipPresentationMapper mapper;
 
 	@GetMapping("/season")
@@ -41,7 +43,7 @@ public class MembershipController {
 	) {
 		// TODO: userId 받아오기
 		Long userId = 1L;
-		MembershipUserCreateResponseServiceDto responseServiceDto = membershipService.reserveMembership(
+		MembershipUserCreateResponseServiceDto responseServiceDto = membershipReserveService.reserveMembership(
 			mapper.toMembershipUserCreateRequestServiceDto(membershipId, userId));
 		MembershipUserCreateResponseDto responseDto = mapper.toMembershipUserCreateResponseDto(responseServiceDto);
 		return SuccessResponse.of(MembershipSuccessCode.CREATED_MEMBERSHIP_USER, responseDto);

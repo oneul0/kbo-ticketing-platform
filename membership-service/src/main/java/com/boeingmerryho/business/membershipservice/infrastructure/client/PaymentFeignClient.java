@@ -8,6 +8,6 @@ import com.boeingmerryho.business.membershipservice.application.dto.request.Paym
 
 @FeignClient(name = "payment-service")
 public interface PaymentFeignClient {
-	@PostMapping("/internal/payments")
+	@PostMapping("/payments/create")
 	Long createPayment(@RequestBody PaymentRequestDto dto);
 }

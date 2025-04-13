@@ -57,4 +57,9 @@ public class MembershipRedisHelper {
 		}
 	}
 
+	public void preloadStock(Long membershipId, Integer availableQuantity) {
+		String stockKey = "membership:stock:" + membershipId;
+		redisTemplate.opsForValue().set(stockKey, String.valueOf(availableQuantity));
+	}
+
 }
