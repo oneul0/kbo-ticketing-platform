@@ -21,4 +21,8 @@ public interface PaymentRepository {
 
 	Optional<PaymentMembership> findByPaymentMembershipId(Long id);
 
+	PaymentTicket saveTicket(PaymentTicket paymentTicket);
+
+	PaymentMembership saveMembership(PaymentMembership paymentMembership);
+
 }

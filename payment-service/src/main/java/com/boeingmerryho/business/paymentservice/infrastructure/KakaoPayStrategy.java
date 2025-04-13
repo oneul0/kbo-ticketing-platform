@@ -1,5 +1,6 @@
 package com.boeingmerryho.business.paymentservice.infrastructure;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +20,13 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.domain.entity.KakaoPayInfo;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
+import com.boeingmerryho.business.paymentservice.domain.entity.PaymentMembership;
+import com.boeingmerryho.business.paymentservice.domain.entity.PaymentTicket;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentDetailRepository;
+import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
+import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
+import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +54,7 @@ public class KakaoPayStrategy implements PaymentStrategy {
 
 	private final KakaoApiClient kakaoApiClient;
 	private final PaySessionHelper paySessionHelper;
+	private final PaymentRepository paymentRepository;
 	private final PaymentDetailRepository paymentDetailRepository;
 	private final PaymentApplicationMapper paymentApplicationMapper;
 
@@ -129,6 +136,28 @@ public class KakaoPayStrategy implements PaymentStrategy {
 				.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice() - response.amount().discount())
 				.build()
 		);
+
+		if (payment.getType() == PaymentType.TICKET) {
+			List<Ticket> tickets = paymentSession.tickets();
+			for (int i = 0; i < tickets.size(); i++) {
+				paymentRepository.saveTicket(
+					PaymentTicket.builder()
+						.price(tickets.get(i).price())
+						.ticketNo(tickets.get(i).no())
+						.payment(payment)
+						.build()
+				);
+			}
+		}
+		if (payment.getType() == PaymentType.MEMBERSHIP) {
+			paymentRepository.saveMembership(
+				PaymentMembership.builder()
+					.price(paymentSession.totalAmount())
+					.membershipUserId(1L)    // TODO 논의
+					.payment(payment)
+					.build()
+			);
+		}
 
 		payment.confirmPayment();
 		return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
