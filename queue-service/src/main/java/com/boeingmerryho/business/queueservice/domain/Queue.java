@@ -56,4 +56,13 @@ public class Queue extends BaseEntity implements Serializable {
 			.build();
 	}
 
+	public Queue setStatus(QueueStatus status) {
+		return Queue.builder()
+			.storeId(this.storeId)
+			.userId(this.userId)
+			.sequence(this.sequence)
+			.status(status)
+			.build();
+	}
+
 }

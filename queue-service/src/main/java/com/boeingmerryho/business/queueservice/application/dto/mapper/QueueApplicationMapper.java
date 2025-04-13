@@ -11,7 +11,7 @@ import com.boeingmerryho.business.queueservice.presentation.dto.response.other.Q
 @Mapper(componentModel = "spring")
 public interface QueueApplicationMapper {
 
-	QueueJoinResponseDto toQueueJoinResponseDto(Long userId, Integer sequence);
+	QueueJoinResponseDto toQueueJoinResponseDto(Long storeId, Long userId, Integer sequence);
 
 	QueueUserSequenceResponseDto toQueueUserSequenceResponseDto(Long storeId, Long userId, Integer sequence);
 

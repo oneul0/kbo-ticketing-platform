@@ -1,0 +1,23 @@
+spring:
+  data:
+    redis:
+      password: ""
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterAccess=600s
+  cloud:
+    config:
+      enabled: false  # Config 서버 비활성화
+server:
+  port: 18087
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+logging:
+  level:
+    org.springframework.data.redis: DEBUG
+    io.lettuce.core: DEBUG
+    org.redisson: DEBUG
