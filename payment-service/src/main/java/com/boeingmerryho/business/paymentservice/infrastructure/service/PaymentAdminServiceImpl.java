@@ -1,5 +1,7 @@
 package com.boeingmerryho.business.paymentservice.infrastructure.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -9,12 +11,14 @@ import com.boeingmerryho.business.paymentservice.application.PaymentAdminService
 import com.boeingmerryho.business.paymentservice.application.dto.PaymentApplicationMapper;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayCancelRequest;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayCancelResponse;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentApproveAdminRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailSearchRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentMembershipCancelRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentMembershipRefundRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentTicketCancelRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentTicketRefundRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipRefundResponseServiceDto;
@@ -27,11 +31,14 @@ import com.boeingmerryho.business.paymentservice.domain.entity.PaymentMembership
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentTicket;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentDetailRepository;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
+import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
 import com.boeingmerryho.business.paymentservice.infrastructure.KakaoApiClient;
+import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
+import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,6 +53,7 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 	String authPrefix;
 
 	private final KakaoApiClient kakaoApiClient;
+	private final PaySessionHelper paySessionHelper;
 	private final PaymentRepository paymentRepository;
 	private final PaymentDetailRepository paymentDetailRepository;
 	private final PaymentApplicationMapper paymentApplicationMapper;
@@ -198,5 +206,46 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 			response
 		);
 
+	}
+
+	@Override
+	public PaymentApproveResponseServiceDto approvePayment(
+		PaymentApproveAdminRequestServiceDto requestServiceDto) {
+
+		Payment payment = paymentRepository.findById(requestServiceDto.paymentId())
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
+
+		PaymentDetail paymentDetail = paymentDetailRepository.save(
+			PaymentDetail.builder()
+				.payment(payment)
+				.discountPrice(payment.getDiscountPrice())
+				.method(PaymentMethod.BANK_TRANSFER)
+				.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice())
+				.build()
+		);
+
+		if (payment.getType() == PaymentType.TICKET) {
+			List<Ticket> tickets = requestServiceDto.tickets();
+			for (int i = 0; i < tickets.size(); i++) {
+				paymentRepository.saveTicket(
+					PaymentTicket.builder()
+						.price(tickets.get(i).price())
+						.ticketNo(tickets.get(i).no())
+						.payment(payment)
+						.build()
+				);
+			}
+		}
+		if (payment.getType() == PaymentType.MEMBERSHIP) {
+			paymentRepository.saveMembership(
+				PaymentMembership.builder()
+					.price(payment.getTotalPrice())
+					.membershipUserId(requestServiceDto.userId())
+					.payment(payment)
+					.build()
+			);
+		}
+		paySessionHelper.deletePaymentExpiredTime(String.valueOf(payment.getId()));
+		return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
 	}
 }

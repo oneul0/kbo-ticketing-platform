@@ -66,7 +66,6 @@ public class PaymentController {
 	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(
 		@PathVariable Long id
 	) {
-
 		PaymentTicketCancelResponseServiceDto responseServiceDto = paymentService.cancelTicketPayment(
 			paymentPresentationMapper.toPaymentTicketCancelRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.TICKET_REFUND_REQUESTED,
@@ -91,7 +90,6 @@ public class PaymentController {
 			paymentPresentationMapper.toPaymentDetailRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
 			paymentPresentationMapper.toPaymentDetailResponseDto(responseServiceDto));
-
 	}
 
 	@GetMapping("/details")
@@ -104,12 +102,14 @@ public class PaymentController {
 		@RequestParam(value = "paymentId", required = false) Long paymentId
 	) {
 		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
-
-		Long userId = 1L;
-
 		Page<PaymentDetailResponseServiceDto> responseServiceDto = paymentService.searchPaymentDetail(
-			paymentPresentationMapper.toPaymentDetailSearchRequestServiceDto(pageable, id, userId, paymentId,
-				Boolean.FALSE));    // TODO userId
+			paymentPresentationMapper.toPaymentDetailSearchRequestServiceDto(
+				pageable,
+				id,
+				1L,        // TODO userId
+				paymentId,
+				Boolean.FALSE)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
 			responseServiceDto.map(paymentPresentationMapper::toPaymentDetailResponseDto));
 	}
