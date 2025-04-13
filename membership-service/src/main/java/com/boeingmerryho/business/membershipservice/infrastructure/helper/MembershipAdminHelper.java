@@ -3,7 +3,6 @@ package com.boeingmerryho.business.membershipservice.infrastructure.helper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import com.boeingmerryho.business.membershipservice.application.dto.mapper.MembershipApplicationMapper;
 import com.boeingmerryho.business.membershipservice.application.dto.query.MembershipSearchCondition;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUpdateRequestServiceDto;
@@ -20,12 +19,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MembershipAdminHelper {
 
-	private final MembershipApplicationMapper mapper;
 	private final MembershipRepository membershipRepository;
 	private final MembershipQueryRepository membershipQueryRepository;
 
 	public Membership save(MembershipCreateRequestServiceDto requestDto) {
-		Membership membership = mapper.toEntity(requestDto);
+		Membership membership = Membership.create(
+			requestDto.season(),
+			requestDto.name(),
+			requestDto.discount()
+		);
 		return membershipRepository.save(membership);
 	}
 

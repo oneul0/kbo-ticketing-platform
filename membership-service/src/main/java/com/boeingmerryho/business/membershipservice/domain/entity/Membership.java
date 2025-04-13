@@ -43,6 +43,9 @@ public class Membership extends BaseEntity {
 	@Column(nullable = false)
 	private Double discount;
 
+	@Column(nullable = false)
+	private Integer availableQuantity;
+
 	public void update(MembershipUpdateRequestServiceDto update) {
 		if (update.season() != null)
 			this.season = update.season();
@@ -50,6 +53,17 @@ public class Membership extends BaseEntity {
 			this.name = update.name();
 		if (update.discount() != null)
 			this.discount = update.discount();
+	}
+
+	public static Membership create(Integer season, String name, Double discount) {
+		MembershipType type = MembershipType.valueOf(name);
+
+		return Membership.builder()
+			.season(season)
+			.name(type)
+			.discount(discount)
+			.availableQuantity(type.getInitialQuantity())
+			.build();
 	}
 
 	// @OneToMany(mappedBy = "membership")

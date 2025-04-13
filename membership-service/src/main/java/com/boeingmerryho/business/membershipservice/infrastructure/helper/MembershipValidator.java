@@ -17,9 +17,14 @@ public class MembershipValidator {
 	private final MembershipRepository membershipRepository;
 
 	public void validateNotDuplicated(Integer season, String name) {
-		boolean exists = membershipRepository.existsBySeasonAndName(season, MembershipType.valueOf(name));
-		if (exists) {
-			throw new GlobalException(MembershipErrorCode.ALREADY_REGISTERED);
+		try {
+			MembershipType type = MembershipType.valueOf(name);
+			boolean exists = membershipRepository.existsBySeasonAndName(season, type);
+			if (exists) {
+				throw new GlobalException(MembershipErrorCode.ALREADY_REGISTERED);
+			}
+		} catch (IllegalArgumentException ex) {
+			throw new GlobalException(MembershipErrorCode.INVALID_MEMBERSHIP_TYPE);
 		}
 	}
 
