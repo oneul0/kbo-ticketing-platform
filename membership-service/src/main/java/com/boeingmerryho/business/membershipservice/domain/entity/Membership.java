@@ -49,8 +49,6 @@ public class Membership extends BaseEntity {
 	public void update(MembershipUpdateRequestServiceDto update) {
 		if (update.season() != null)
 			this.season = update.season();
-		if (update.name() != null)
-			this.name = update.name();
 		if (update.discount() != null)
 			this.discount = update.discount();
 	}
