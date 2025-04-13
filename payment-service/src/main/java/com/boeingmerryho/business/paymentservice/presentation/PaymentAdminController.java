@@ -28,44 +28,44 @@ import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/admin/v1/payments")
 @RequiredArgsConstructor
+@RequestMapping("/admin/v1/payments")
 public class PaymentAdminController {
 	private final PaymentAdminService paymentAdminService;
-	private final PaymentPresentationMapper mapper;
+	private final PaymentPresentationMapper paymentPresentationMapper;
 
 	@PostMapping("/refund/tickets/{id}")
 	public ResponseEntity<SuccessResponse<PaymentTicketRefundResponseDto>> refundTicketPayment(@PathVariable Long id) {
 		PaymentTicketRefundResponseServiceDto responseServiceDto = paymentAdminService.refundTicketPayment(
-			mapper.toPaymentTicketRefundRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentTicketRefundRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.TICKET_REFUNDED,
-			mapper.toPaymentTicketRefundResponseDto(responseServiceDto));
+			paymentPresentationMapper.toPaymentTicketRefundResponseDto(responseServiceDto));
 	}
 
 	@PostMapping("/refund/memberships/{id}")
 	public ResponseEntity<SuccessResponse<PaymentMembershipRefundResponseDto>> refundMembershipPayment(
 		@PathVariable Long id) {
 		PaymentMembershipRefundResponseServiceDto responseServiceDto = paymentAdminService.refundMembershipPayment(
-			mapper.toPaymentMembershipRefundRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentMembershipRefundRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.MEMBERSHIP_REFUNDED,
-			mapper.toPaymentMembershipRefundResponseDto(responseServiceDto));
+			paymentPresentationMapper.toPaymentMembershipRefundResponseDto(responseServiceDto));
 	}
 
 	@PutMapping("/{id}/cancel/tickets")
 	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(@PathVariable Long id) {
 		PaymentTicketCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelTicketPayment(
-			mapper.toPaymentTicketCancelRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentTicketCancelRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.TICKET_REFUND_REQUESTED,
-			mapper.toPaymentTicketCancelResponseDto(responseServiceDto));
+			paymentPresentationMapper.toPaymentTicketCancelResponseDto(responseServiceDto));
 	}
 
 	@PutMapping("/{id}/cancel/memberships")
 	public ResponseEntity<SuccessResponse<PaymentMembershipCancelResponseDto>> cancelMembershipPayment(
 		@PathVariable Long id) {
 		PaymentMembershipCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelMembershipPayment(
-			mapper.toPaymentMembershipCancelRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentMembershipCancelRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.MEMBERSHIP_REFUND_REQUESTED,
-			mapper.toPaymentMembershipCancelResponseDto(responseServiceDto));
+			paymentPresentationMapper.toPaymentMembershipCancelResponseDto(responseServiceDto));
 	}
 
 	@GetMapping("/details/{id}")
@@ -73,9 +73,9 @@ public class PaymentAdminController {
 		@PathVariable Long id) {
 
 		PaymentDetailAdminResponseServiceDto responseServiceDto = paymentAdminService.getPaymentDetail(
-			mapper.toPaymentDetailRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentDetailRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
-			mapper.toPaymentDetailAdminResponseDto(responseServiceDto));
+			paymentPresentationMapper.toPaymentDetailAdminResponseDto(responseServiceDto));
 
 	}
 
@@ -94,9 +94,10 @@ public class PaymentAdminController {
 		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
 
 		Page<PaymentDetailAdminResponseServiceDto> responseServiceDto = paymentAdminService.searchPaymentDetail(
-			mapper.toPaymentDetailSearchRequestServiceDto(pageable, id, userId, paymentId, isDeleted));
+			paymentPresentationMapper.toPaymentDetailSearchRequestServiceDto(pageable, id, userId, paymentId,
+				isDeleted));
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
-			responseServiceDto.map(mapper::toPaymentDetailAdminResponseDto));
+			responseServiceDto.map(paymentPresentationMapper::toPaymentDetailAdminResponseDto));
 
 	}
 }

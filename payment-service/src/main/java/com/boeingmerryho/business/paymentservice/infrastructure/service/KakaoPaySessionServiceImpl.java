@@ -6,14 +6,14 @@ import java.util.Optional;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.boeingmerryho.business.paymentservice.application.KakaoPaymentSessionService;
+import com.boeingmerryho.business.paymentservice.application.KakaoPaySessionService;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPaymentSession;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class KakaoPaymentSessionServiceImpl implements KakaoPaymentSessionService {
+public class KakaoPaySessionServiceImpl implements KakaoPaySessionService {
 
 	private final RedisTemplate<String, KakaoPaymentSession> redisTemplateForKakaoPaymentSession;
 

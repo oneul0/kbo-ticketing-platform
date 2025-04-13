@@ -2,6 +2,9 @@ package com.boeingmerryho.business.paymentservice.application.dto.kakao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Builder;
+
+@Builder
 public record KakaoPayReadyRequest(
 	@JsonProperty("cid") String cid,
 	@JsonProperty("partner_order_id") String partnerOrderId,

@@ -31,15 +31,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/payments")
 public class PaymentController {
 	private final PaymentService paymentService;
 	private final PaymentPresentationMapper paymentPresentationMapper;
 
-	/**
-	 * 결제 요청 (결제 정보를 바탕으로 서버에 결제를 요청한다.)
-	 */
 	@PostMapping("/pay")
 	public ResponseEntity<SuccessResponse<PaymentReadyResponseDto>> pay(
 		@RequestBody @Valid PaymentReadyRequestDto requestDto) {
@@ -50,9 +47,6 @@ public class PaymentController {
 			paymentPresentationMapper.toPaymentReadyResponseDto(responseServiceDto));
 	}
 
-	/**
-	 * 결제 승인 요청 (pg_token 값을 기반으로 결제 승인을 요청한다.)
-	 */
 	@GetMapping("/approve")
 	public ResponseEntity<SuccessResponse<PaymentApproveResponseDto>> approvePayment(
 		@RequestParam("pg_token") String pgToken,

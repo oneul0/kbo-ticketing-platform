@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPaymentSession;
 
-public interface KakaoPaymentSessionService {
+public interface KakaoPaySessionService {
 	void saveSession(String orderId, KakaoPaymentSession session);
 
 	Optional<KakaoPaymentSession> getSession(String orderId);

@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.application;
+package com.boeingmerryho.business.paymentservice.application.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
