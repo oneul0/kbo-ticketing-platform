@@ -47,4 +47,14 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 		return paymentMembershipJpaRepository.findById(id);
 	}
 
+	@Override
+	public PaymentTicket saveTicket(PaymentTicket paymentTicket) {
+		return paymentTicketJpaRepository.save(paymentTicket);
+	}
+
+	@Override
+	public PaymentMembership saveMembership(PaymentMembership paymentMembership) {
+		return paymentMembershipJpaRepository.save(paymentMembership);
+	}
+
 }
