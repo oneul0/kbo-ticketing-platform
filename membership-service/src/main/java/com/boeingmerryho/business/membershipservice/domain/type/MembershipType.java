@@ -7,8 +7,7 @@ public enum MembershipType {
 	SENIOR("Senior - Level0"),
 	GOLD("Gold - Level1"),
 	VIP("VIP - Level2"),
-	SVIP("SVIP - Level3"),
-	;
+	SVIP("SVIP - Level3");
 
 	private final String description;
 

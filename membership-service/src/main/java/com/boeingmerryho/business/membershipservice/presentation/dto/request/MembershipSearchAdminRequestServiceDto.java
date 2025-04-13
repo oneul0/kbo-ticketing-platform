@@ -8,6 +8,10 @@ public record MembershipSearchAdminRequestServiceDto(
 	String name,
 	Double minDiscount,
 	Double maxDiscount,
+	Integer minAvailableQuantity,
+	Integer maxAvailableQuantity,
+	Integer minPrice,
+	Integer maxPrice,
 	Boolean isDeleted
 ) {
 }

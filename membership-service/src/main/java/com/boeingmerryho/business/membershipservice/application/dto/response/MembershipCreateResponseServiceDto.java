@@ -4,6 +4,8 @@ public record MembershipCreateResponseServiceDto(
 	Long id,
 	Integer season,
 	String name,
-	Double discount
+	Double discount,
+	Integer availableQuantity,
+	Integer price
 ) {
 }
