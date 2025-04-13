@@ -2,18 +2,12 @@ package com.boeingmerryho.business.paymentservice.application.dto.kakao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
-public class CanceledAmount {
-	private Integer total;
-	@JsonProperty("tax_free")
-	private Integer taxFree;
-	private Integer vat;
-	private Integer point;
-	private Integer discount;
-	@JsonProperty("green_deposit")
-	private Integer greenDeposit;
+public record CanceledAmount(
+	@JsonProperty("total") Integer total,
+	@JsonProperty("tax_free") Integer taxFree,
+	@JsonProperty("vat") Integer vat,
+	@JsonProperty("point") Integer point,
+	@JsonProperty("discount") Integer discount,
+	@JsonProperty("green_deposit") Integer greenDeposit
+) {
 }
