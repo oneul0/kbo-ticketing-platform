@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.membershipservice.application.dto.mapper.MembershipApplicationMapper;
+import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUserCreateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUserCreateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipHelper;
 
@@ -26,5 +28,11 @@ public class MembershipService {
 		return memberships.stream()
 			.map(mapper::toMembershipDetailResponseServiceDto)
 			.toList();
+	}
+
+	public MembershipUserCreateResponseServiceDto createMembershipUser(
+		MembershipUserCreateRequestServiceDto requestServiceDto) {
+		// TODO: 멤버십 등록 시 멤버십 table 내 재고 차감
+		return null;
 	}
 }
