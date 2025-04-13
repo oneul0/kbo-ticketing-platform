@@ -1,0 +1,81 @@
+package com.boeingmerryho.business.paymentservice.presentation.dto;
+
+import org.mapstruct.Mapper;
+import org.springframework.data.domain.Pageable;
+
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentApproveRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailSearchRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentMembershipCancelRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentMembershipRefundRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentReadyRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentTicketCancelRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentTicketRefundRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailAdminResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipRefundResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketRefundResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.request.PaymentApproveRequestDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.request.PaymentReadyRequestDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentApproveResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailAdminResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentMembershipCancelResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentMembershipRefundResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentReadyResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentTicketCancelResponseDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentTicketRefundResponseDto;
+
+@Mapper(componentModel = "spring")
+public interface PaymentPresentationMapper {
+
+	PaymentTicketCancelRequestServiceDto toPaymentTicketCancelRequestServiceDto(Long id);
+
+	PaymentTicketCancelResponseDto toPaymentTicketCancelResponseDto(
+		PaymentTicketCancelResponseServiceDto responseServiceDto);
+
+	PaymentDetailRequestServiceDto toPaymentDetailRequestServiceDto(Long id);
+
+	PaymentDetailResponseDto toPaymentDetailResponseDto(PaymentDetailResponseServiceDto responseServiceDto);
+
+	PaymentDetailSearchRequestServiceDto toPaymentDetailSearchRequestServiceDto(
+		Pageable customPageable,
+		Long id,
+		Long userId,
+		Long paymentId,
+		Boolean isDeleted
+	);
+
+	PaymentDetailAdminResponseDto toPaymentDetailAdminResponseDto(
+		PaymentDetailAdminResponseServiceDto responseServiceDto);
+
+	PaymentMembershipCancelRequestServiceDto toPaymentMembershipCancelRequestServiceDto(Long id);
+
+	PaymentMembershipCancelResponseDto toPaymentMembershipCancelResponseDto(
+		PaymentMembershipCancelResponseServiceDto responseServiceDto);
+
+	PaymentReadyRequestServiceDto toPaymentReadyRequestServiceDto(Long userId, PaymentReadyRequestDto requestDto);
+
+	PaymentReadyResponseDto toPaymentReadyResponseDto(PaymentReadyResponseServiceDto responseServiceDto);
+
+	PaymentApproveRequestServiceDto toPaymentApproveRequestServiceDto(
+		Long userId,
+		String pgToken,
+		PaymentApproveRequestDto requestDto);
+
+	PaymentApproveResponseDto toPaymentApproveResponseDto(PaymentApproveResponseServiceDto responseServiceDto);
+
+	PaymentMembershipRefundResponseDto toPaymentMembershipRefundResponseDto(
+		PaymentMembershipRefundResponseServiceDto responseServiceDto);
+
+	PaymentTicketRefundResponseDto toPaymentTicketRefundResponseDto(
+		PaymentTicketRefundResponseServiceDto responseServiceDto);
+
+	PaymentTicketRefundRequestServiceDto toPaymentTicketRefundRequestServiceDto(Long id);
+
+	PaymentMembershipRefundRequestServiceDto toPaymentMembershipRefundRequestServiceDto(Long id);
+}

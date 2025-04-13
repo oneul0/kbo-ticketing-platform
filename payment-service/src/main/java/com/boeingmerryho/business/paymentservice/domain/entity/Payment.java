@@ -1,5 +1,6 @@
 package com.boeingmerryho.business.paymentservice.domain.entity;
 
+import com.boeingmerryho.business.paymentservice.domain.type.DiscountType;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
 
@@ -47,4 +48,28 @@ public class Payment extends BaseEntity {
 	@Column(nullable = false)
 	private PaymentType type;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	@Builder.Default
+	private DiscountType discountType = DiscountType.NONE;
+
+	public void refundPayment() {
+		this.status = PaymentStatus.REFUNDED;
+	}
+
+	public void confirmPayment() {
+		this.status = PaymentStatus.CONFIRMED;
+	}
+
+	public void requestCancel() {
+		this.status = PaymentStatus.REFUND_REQUESTED;
+	}
+
+	public boolean validateStatus(PaymentStatus status) {
+		return this.status == status;
+	}
+
+	public boolean validateType(PaymentType type) {
+		return this.type == type;
+	}
 }
