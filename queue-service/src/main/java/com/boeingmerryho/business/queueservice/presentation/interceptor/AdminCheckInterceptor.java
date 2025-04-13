@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import com.boeingmerryho.business.userservice.domain.UserRoleType;
+// import com.boeingmerryho.business.userservice.domain.UserRoleType;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -47,10 +47,10 @@ public class AdminCheckInterceptor implements HandlerInterceptor {
 				return false;
 			}
 
-			if (!UserRoleType.ADMIN.name().equals(userInfo.get("role"))) {
-				log.info("user is not admin");
-				return false;
-			}
+			// if (!UserRoleType.ADMIN.name().equals(userInfo.get("role"))) {
+			// 	log.info("user is not admin");
+			// 	return false;
+			// }
 
 			// 사용자 정보를 request 에 주입
 			request.setAttribute("userId", userId);

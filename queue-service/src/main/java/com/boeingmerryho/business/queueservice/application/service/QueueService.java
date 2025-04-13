@@ -50,7 +50,7 @@ public class QueueService {
 
 		Integer sequence = joinHelper.getUserQueuePosition(storeId, userId);
 
-		return queueApplicationMapper.toQueueJoinResponseDto(storeId, sequence);
+		return queueApplicationMapper.toQueueJoinResponseDto(storeId, userId, sequence);
 	}
 
 	@Description("가게 대기열에서 본인 순서를 조회하는 메서드")
