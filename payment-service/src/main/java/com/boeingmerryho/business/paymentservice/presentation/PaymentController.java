@@ -18,6 +18,8 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.PaymentPresentationMapper;
+import com.boeingmerryho.business.paymentservice.presentation.dto.request.PaymentApproveRequestDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.PaymentReadyRequestDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentApproveResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailResponseDto;
@@ -31,18 +33,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/payments")
 public class PaymentController {
 	private final PaymentService paymentService;
 	private final PaymentPresentationMapper paymentPresentationMapper;
 
-	/**
-	 * 결제 요청 (결제 정보를 바탕으로 서버에 결제를 요청한다.)
-	 */
 	@PostMapping("/pay")
 	public ResponseEntity<SuccessResponse<PaymentReadyResponseDto>> pay(
-		@RequestBody @Valid PaymentReadyRequestDto requestDto) {
+		@RequestBody @Valid PaymentReadyRequestDto requestDto
+	) {
 		PaymentReadyResponseServiceDto responseServiceDto = paymentService.pay(
 			paymentPresentationMapper.toPaymentReadyRequestServiceDto(1L, requestDto));    // TODO userId
 
@@ -50,23 +50,23 @@ public class PaymentController {
 			paymentPresentationMapper.toPaymentReadyResponseDto(responseServiceDto));
 	}
 
-	/**
-	 * 결제 승인 요청 (pg_token 값을 기반으로 결제 승인을 요청한다.)
-	 */
-	@GetMapping("/approve")
+	@PostMapping("/approve")
 	public ResponseEntity<SuccessResponse<PaymentApproveResponseDto>> approvePayment(
 		@RequestParam("pg_token") String pgToken,
-		@RequestParam("paymentId") Long paymentId
+		@RequestBody PaymentApproveRequestDto requestDto
 	) {
 		PaymentApproveResponseServiceDto responseServiceDto = paymentService.approvePayment(
-			paymentPresentationMapper.toPaymentApproveRequestServiceDto(1L, pgToken, paymentId));    // TODO userId
+			paymentPresentationMapper.toPaymentApproveRequestServiceDto(1L, pgToken, requestDto));    // TODO userId
 
 		return SuccessResponse.of(PaymentSuccessCode.PAYMENT_APPROVED,
 			paymentPresentationMapper.toPaymentApproveResponseDto(responseServiceDto));
 	}
 
 	@PutMapping("/{id}/cancel/tickets")
-	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(@PathVariable Long id) {
+	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(
+		@PathVariable Long id
+	) {
+
 		PaymentTicketCancelResponseServiceDto responseServiceDto = paymentService.cancelTicketPayment(
 			paymentPresentationMapper.toPaymentTicketCancelRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.TICKET_REFUND_REQUESTED,
@@ -75,7 +75,8 @@ public class PaymentController {
 
 	@PutMapping("/{id}/cancel/memberships")
 	public ResponseEntity<SuccessResponse<PaymentMembershipCancelResponseDto>> cancelMembershipPayment(
-		@PathVariable Long id) {
+		@PathVariable Long id
+	) {
 		PaymentMembershipCancelResponseServiceDto responseServiceDto = paymentService.cancelMembershipPayment(
 			paymentPresentationMapper.toPaymentMembershipCancelRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.MEMBERSHIP_REFUND_REQUESTED,
@@ -83,8 +84,9 @@ public class PaymentController {
 	}
 
 	@GetMapping("/details/{id}")
-	public ResponseEntity<SuccessResponse<PaymentDetailResponseDto>> getPaymentDetail(@PathVariable Long id) {
-
+	public ResponseEntity<SuccessResponse<PaymentDetailResponseDto>> getPaymentDetail(
+		@PathVariable Long id
+	) {
 		PaymentDetailResponseServiceDto responseServiceDto = paymentService.getPaymentDetail(
 			paymentPresentationMapper.toPaymentDetailRequestServiceDto(id));
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
@@ -101,7 +103,6 @@ public class PaymentController {
 		@RequestParam(value = "id", required = false) Long id,
 		@RequestParam(value = "paymentId", required = false) Long paymentId
 	) {
-
 		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
 
 		Long userId = 1L;
@@ -111,7 +112,6 @@ public class PaymentController {
 				Boolean.FALSE));    // TODO userId
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
 			responseServiceDto.map(paymentPresentationMapper::toPaymentDetailResponseDto));
-
 	}
 
 }

@@ -1,11 +1,11 @@
-package com.boeingmerryho.business.paymentservice.application;
+package com.boeingmerryho.business.paymentservice.application.dto;
+
+import java.time.LocalDateTime;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayApproveResponse;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayCancelResponse;
-import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayReadyResponse;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailResponseServiceDto;
@@ -35,13 +35,25 @@ public interface PaymentApplicationMapper {
 
 	PaymentMembershipCancelResponseServiceDto toPaymentMembershipCancelResponseServiceDto(Long id);
 
-	PaymentReadyResponseServiceDto toPaymentReadyResponseServiceDto(KakaoPayReadyResponse response);
+	PaymentReadyResponseServiceDto toPaymentReadyResponseServiceDto(
+		Long paymentId,
+		String accountNumber,
+		String accountBank,
+		LocalDateTime dueDate,
+		String accountHolder
+	);
 
-	PaymentApproveResponseServiceDto toPaymentApproveResponseServiceDto(KakaoPayApproveResponse response);
+	@Mapping(target = "userId", source = "paymentDetail.payment.userId")
+	@Mapping(target = "paymentId", source = "paymentDetail.payment.id")
+	@Mapping(target = "price", source = "paymentDetail.payment.totalPrice")
+	@Mapping(target = "discountType", source = "paymentDetail.payment.discountType")
+	PaymentApproveResponseServiceDto toPaymentApproveResponseServiceDto(PaymentDetail paymentDetail);
 
-	PaymentTicketRefundResponseServiceDto toPaymentTicketRefundResponseServiceDto(Long paymentId,
+	PaymentTicketRefundResponseServiceDto toPaymentTicketRefundResponseServiceDto(
+		Long paymentId,
 		KakaoPayCancelResponse response);
 
-	PaymentMembershipRefundResponseServiceDto toPaymentMembershipRefundResponseServiceDto(Long paymentId,
+	PaymentMembershipRefundResponseServiceDto toPaymentMembershipRefundResponseServiceDto(
+		Long paymentId,
 		KakaoPayCancelResponse response);
 }
