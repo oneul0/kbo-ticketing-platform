@@ -1,5 +1,6 @@
 package com.boeingmerryho.business.queueservice.infrastructure;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Date;
@@ -29,7 +30,6 @@ public class QueueJoinHelperImpl implements QueueJoinHelper {
 	private static final String WAITLIST_INFO_PREFIX = "queue:waitlist:store:";
 	private static final Long WAITLIST_INFO_EXPIRE_DAY = 1L;
 
-
 	private final RedisTemplate<String, Object> redisTemplate;
 
 	@Override
@@ -39,7 +39,9 @@ public class QueueJoinHelperImpl implements QueueJoinHelper {
 
 	@Override
 	public Long validateTicket(Date matchDate, Long ticketId) {
-		String ticketKey = TICKET_INFO_PREFIX + matchDate.toString() + ":" + ticketId;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String formattedDate = sdf.format(matchDate);
+		String ticketKey = TICKET_INFO_PREFIX + formattedDate + ":" + ticketId;
 		Optional<String> userIdValue = Optional.ofNullable(redisTemplate.opsForValue().get(ticketKey))
 			.map(Object::toString);
 		if (userIdValue.isEmpty()) {

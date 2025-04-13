@@ -50,44 +50,36 @@ public class QueueJoinServiceConcurrencyTest {
 
 	@Test
 	@Timeout(10)
-		// 테스트에 제한 시간 설정
 	void testJoinQueueConcurrency() throws InterruptedException {
-		int threadCount = 100;  // 동시 요청을 보낼 스레드 수
-		ExecutorService executorService = Executors.newFixedThreadPool(threadCount); // 스레드 풀
-		CountDownLatch latch = new CountDownLatch(threadCount); // 모든 스레드가 끝날 때까지 대기
+		int threadCount = 100;
+		ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+		CountDownLatch latch = new CountDownLatch(threadCount);
 
-		// 유저가 중복으로 등록되지 않도록 Set을 사용하여 유일성 체크
 		Set<Long> registeredUserIds = Collections.synchronizedSet(new HashSet<>());
 
-		// 여러 스레드에서 joinQueue 메서드를 호출하는 시나리오
 		for (int i = 0; i < threadCount; i++) {
 			executorService.submit(() -> {
 				try {
-					// 분산 락 설정 (storeId + userId를 키로 사용하여 중복을 방지)
 					RLock lock = redissonClient.getLock("queue:join:" + STORE_ID + ":" + USER_ID);
-					lock.lock();  // 락을 획득
+					lock.lock();
 					try {
-						// joinQueue 메서드 호출
 						QueueJoinServiceDto dto = new QueueJoinServiceDto(STORE_ID, USER_ID, TICKET_ID);
 						queueJoinService.joinQueue(dto);
 
-						// 등록된 userId 추적
-						registeredUserIds.add(USER_ID);  // 유저 등록 상태를 추적
+						registeredUserIds.add(USER_ID);
 					} finally {
-						lock.unlock();  // 락 해제
+						lock.unlock();
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {
-					latch.countDown(); // 작업 완료 후 countDown
+					latch.countDown();
 				}
 			});
 		}
 
-		// 모든 스레드가 작업을 마칠 때까지 기다림
 		latch.await();
 
-		// 중복 등록이 없으면 registeredUserIds의 크기는 1이어야 한다
 		Assertions.assertEquals(1, registeredUserIds.size(), "유저는 중복 등록되지 않아야 합니다.");
 	}
 }

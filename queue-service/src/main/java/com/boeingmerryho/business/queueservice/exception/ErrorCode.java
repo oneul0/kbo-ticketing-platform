@@ -16,6 +16,8 @@ public enum ErrorCode implements BaseErrorCode {
 	QUEUE_JOIN_FAIL("Q-004", "알 수 없는 오류로 대기열 등록에 실패했습니다.", HttpStatus.BAD_REQUEST),
 	LOCK_ACQUISITION_FAIL("Q-005", "잠금 획득에 실패했습니다.", HttpStatus.CONFLICT),
 
+
+
 	;
 
 	private final String errorCode;

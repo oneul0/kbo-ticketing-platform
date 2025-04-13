@@ -20,8 +20,8 @@ import com.boeingmerryho.business.queueservice.exception.ErrorCode;
 import com.boeingmerryho.business.queueservice.presentation.QueueSuccessCode;
 import com.boeingmerryho.business.queueservice.presentation.dto.mapper.QueuePresentationMapper;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.other.QueueJoinRequestDto;
-import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueCancelResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserSequenceResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
@@ -43,9 +43,11 @@ public class QueueController {
 	)
 	@PostMapping("/join")
 	public ResponseEntity<?> joinQueue(
-		@RequestAttribute Long userId,
+		//todo: @RequestAttribute Long userId, 로 수정
+
 		@RequestBody QueueJoinRequestDto requestDto) {
-		QueueJoinServiceDto serviceDto = queuePresentationMapper.toQueueJoinServiceDto(requestDto, userId);
+		// QueueJoinServiceDto serviceDto = queuePresentationMapper.toQueueJoinServiceDto(requestDto, userId);
+		QueueJoinServiceDto serviceDto = queuePresentationMapper.toQueueJoinServiceDto(requestDto);
 		QueueJoinResponseDto sequence = null;
 		try {
 			sequence = queueService.joinQueue(serviceDto);
@@ -60,6 +62,7 @@ public class QueueController {
 	)
 	@GetMapping("/me")
 	public ResponseEntity<?> getMySequence(
+		//todo: @RequestAttribute Long userId, 로 수정
 		@RequestAttribute Long userId,
 		@RequestParam Long storeId) {
 		QueueUserSequenceServiceDto serviceDto = queuePresentationMapper.toQueueUserSequenceServiceDto(storeId, userId);
