@@ -16,6 +16,7 @@ import com.boeingmerryho.business.queueservice.application.dto.request.other.Que
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueJoinServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueUserSequenceServiceDto;
 import com.boeingmerryho.business.queueservice.application.service.QueueService;
+import com.boeingmerryho.business.queueservice.exception.ErrorCode;
 import com.boeingmerryho.business.queueservice.presentation.QueueSuccessCode;
 import com.boeingmerryho.business.queueservice.presentation.dto.mapper.QueuePresentationMapper;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.other.QueueJoinRequestDto;
@@ -23,6 +24,7 @@ import com.boeingmerryho.business.queueservice.presentation.dto.response.other.Q
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueCancelResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserSequenceResponseDto;
 
+import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +46,12 @@ public class QueueController {
 		@RequestAttribute Long userId,
 		@RequestBody QueueJoinRequestDto requestDto) {
 		QueueJoinServiceDto serviceDto = queuePresentationMapper.toQueueJoinServiceDto(requestDto, userId);
-		QueueJoinResponseDto sequence = queueService.joinQueue(serviceDto);
+		QueueJoinResponseDto sequence = null;
+		try {
+			sequence = queueService.joinQueue(serviceDto);
+		} catch (InterruptedException e) {
+			throw new GlobalException(ErrorCode.LOCK_ACQUISITION_FAIL);
+		}
 		return SuccessResponse.of(QueueSuccessCode.QUEUE_JOIN_SUCCESS, sequence);
 	}
 

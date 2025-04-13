@@ -11,6 +11,7 @@ import com.boeingmerryho.business.queueservice.application.dto.mapper.QueueAppli
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueCancelServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueJoinServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueUserSequenceServiceDto;
+import com.boeingmerryho.business.queueservice.config.aop.DistributedLock;
 import com.boeingmerryho.business.queueservice.exception.ErrorCode;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueCancelResponseDto;
@@ -29,18 +30,19 @@ public class QueueService {
 	private final QueueJoinHelper joinHelper;
 
 	@Description("대기열에 등록하는 메서드")
-	public QueueJoinResponseDto joinQueue(QueueJoinServiceDto dto) {
+	@DistributedLock(key = "#dto.storeId")
+	public QueueJoinResponseDto joinQueue(QueueJoinServiceDto dto) throws InterruptedException {
 		Long storeId = dto.storeId();
 		Long userId = dto.userId();
 		Long ticketId = dto.ticketId();
 		Date matchDate = new Date();
 
 		Long ticketUserId = joinHelper.validateTicket(matchDate, ticketId);
-		if(!Objects.equals(userId, ticketUserId)) {
+		if (!Objects.equals(userId, ticketUserId)) {
 			throw new GlobalException(ErrorCode.USER_IS_NOT_MATCHED);
 		}
 
-		if(!joinHelper.validateStoreIsActive(storeId)){
+		if (!joinHelper.validateStoreIsActive(storeId)) {
 			throw new GlobalException(ErrorCode.STORE_IS_NOT_ACTIVATED);
 		}
 

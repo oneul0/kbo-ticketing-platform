@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+// @Sl4j
 public class DistributedLockAop {
 	private static final String REDISSON_LOCK_PREFIX = "LOCK:";
 
@@ -33,10 +34,10 @@ public class DistributedLockAop {
 		DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
 
 		String key = REDISSON_LOCK_PREFIX + CustomSpringELParser.getDynamicValue(signature.getParameterNames(), joinPoint.getArgs(), distributedLock.key());
-		RLock rLock = redissonClient.getLock(key);  // (1)
+		RLock rLock = redissonClient.getLock(key);
 
 		try {
-			boolean available = rLock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(), distributedLock.timeUnit());  // (2)
+			boolean available = rLock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(), distributedLock.timeUnit());
 			if (!available) {
 				return false;
 			}
@@ -48,10 +49,11 @@ public class DistributedLockAop {
 			try {
 				rLock.unlock();   // (4)
 			} catch (IllegalMonitorStateException e) {
-				log.info("Redisson Lock Already UnLock {} {}",
-					kv("serviceName", method.getName()),
-					kv("key", key)
-				);
+				// log.info("Redisson Lock Already UnLock {} {}",
+				// 	kv("serviceName", method.getName()),
+				// 	kv("key", key)
+				// );
+
 			}
 		}
 	}
