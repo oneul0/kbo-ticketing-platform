@@ -6,11 +6,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.ticketservice.application.user.dto.mapper.TicketApplicationMapper;
+import com.boeingmerryho.business.ticketservice.application.user.dto.request.TicketByIdRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.user.dto.request.TicketSearchRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.domain.Ticket;
 import com.boeingmerryho.business.ticketservice.domain.TicketSearchCriteria;
 import com.boeingmerryho.business.ticketservice.domain.repository.TicketRepository;
+import com.boeingmerryho.business.ticketservice.exception.ErrorCode;
+import com.boeingmerryho.business.ticketservice.exception.TicketException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +29,14 @@ public class TicketService {
 		Page<Ticket> tickets = ticketRepository.findByCriteria(createTicketSearchCriteria(requestDto), pageable);
 
 		return tickets.map(mapper::toTicketResponseDto);
+	}
+
+	@Transactional(readOnly = true)
+	public TicketResponseServiceDto getTicketById(TicketByIdRequestServiceDto requestDto) {
+		Ticket ticket = ticketRepository.findActiveTicketById(requestDto.id())
+			.orElseThrow(() -> new TicketException(ErrorCode.TICKET_NOT_FOUND));
+
+		return mapper.toTicketResponseDto(ticket);
 	}
 
 	private TicketSearchCriteria createTicketSearchCriteria(TicketSearchRequestServiceDto requestDto) {

@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,6 +52,19 @@ public class TicketController {
 		return SuccessResponse.of(
 			TicketSuccessCode.TICKET_SEARCH,
 			responseDto.map(mapper::toTicketResponseDto)
+		);
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getTicketById(@PathVariable Long id) {
+		// TODO : Request Header 의 userId 와 비교하기
+		TicketResponseServiceDto responseDto = ticketService.getTicketById(
+			mapper.toTicketByIdRequestServiceDto(id)
+		);
+
+		return SuccessResponse.of(
+			TicketSuccessCode.TICKET_FOUND,
+			mapper.toTicketResponseDto(responseDto)
 		);
 	}
 }
