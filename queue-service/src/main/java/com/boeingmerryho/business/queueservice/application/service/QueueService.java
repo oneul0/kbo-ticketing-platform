@@ -12,6 +12,8 @@ import com.boeingmerryho.business.queueservice.application.dto.request.other.Que
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueJoinServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueUserSequenceServiceDto;
 import com.boeingmerryho.business.queueservice.config.aop.DistributedLock;
+import com.boeingmerryho.business.queueservice.domain.entity.Queue;
+import com.boeingmerryho.business.queueservice.domain.model.CancelReason;
 import com.boeingmerryho.business.queueservice.exception.ErrorCode;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueCancelResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
@@ -72,12 +74,18 @@ public class QueueService {
 		Long storeId = serviceDto.storeId();
 		Long userId = serviceDto.userId();
 
+		Integer sequence = helper.getUserQueuePosition(storeId, userId);
+
 		boolean removed = helper.removeUserFromQueue(storeId, userId);
 
 		if (!removed) {
-			throw new GlobalException(ErrorCode.WAITLIST_NOT_EXIST);
+			throw new GlobalException(ErrorCode.CAN_NOT_REMOVE_QUEUE);
 		}
 
-		return queueApplicationMapper.toQueueCancelResponseDto(storeId, userId);
+		Queue canceledQueue = Queue.cancelQueue(storeId, userId, sequence, CancelReason.USER_CANCEL);
+
+		Queue cancelledUser = helper.saveQueueInfo(canceledQueue);
+
+		return queueApplicationMapper.toQueueCancelResponseDto(cancelledUser.getStoreId(), cancelledUser.getUserId());
 	}
 }

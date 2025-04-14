@@ -12,6 +12,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.boeingmerryho.business.queueservice.application.QueueHelper;
+import com.boeingmerryho.business.queueservice.domain.entity.Queue;
+import com.boeingmerryho.business.queueservice.domain.repository.QueueRepository;
 import com.boeingmerryho.business.queueservice.exception.ErrorCode;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
@@ -31,6 +33,8 @@ public class QueueHelperImpl implements QueueHelper {
 	private static final Long WAITLIST_INFO_EXPIRE_DAY = 1L;
 
 	private final RedisTemplate<String, Object> redisTemplate;
+
+	private final QueueRepository queueRepository;
 
 	@Override
 	public Boolean validateStoreIsActive(Long storeId) {
@@ -92,6 +96,11 @@ public class QueueHelperImpl implements QueueHelper {
 		Long removedCount = redisTemplate.opsForZSet().remove(redisKey, userId.toString());
 
 		return removedCount != null && removedCount > 0;
+	}
+
+	@Override
+	public Queue saveQueueInfo(Queue queue) {
+		return queueRepository.save(queue);
 	}
 
 	private void setExpireIfAbsent(String key, Duration ttl) {

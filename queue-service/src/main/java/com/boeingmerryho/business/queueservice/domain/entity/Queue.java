@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import com.boeingmerryho.business.queueservice.domain.model.CancelReason;
 import com.boeingmerryho.business.queueservice.domain.model.QueueStatus;
 
 import io.github.boeingmerryho.commonlibrary.entity.BaseEntity;
@@ -49,6 +50,10 @@ public class Queue extends BaseEntity implements Serializable {
 	@Builder.Default
 	private QueueStatus status = QueueStatus.PENDING;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = true)
+	private CancelReason cancelReason;
+
 	public static Queue withDefaultStatus(Long storeId, Long userId, Integer sequence) {
 		return Queue.builder()
 			.storeId(storeId)
@@ -64,6 +69,16 @@ public class Queue extends BaseEntity implements Serializable {
 			.userId(this.userId)
 			.sequence(this.sequence)
 			.status(status)
+			.build();
+	}
+
+	public static Queue cancelQueue(Long storeId, Long userId, Integer sequence, CancelReason cancelReason) {
+		return Queue.builder()
+			.storeId(storeId)
+			.userId(userId)
+			.sequence(sequence)
+			.status(QueueStatus.CANCELLED)
+			.cancelReason(cancelReason)
 			.build();
 	}
 
