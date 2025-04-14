@@ -1,5 +1,10 @@
 package com.boeingmerryho.business.paymentservice.domain.type;
 
+import java.util.Arrays;
+
+import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
+import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
+
 import lombok.Getter;
 
 @Getter
@@ -13,5 +18,12 @@ public enum DiscountType {
 
 	DiscountType(String description) {
 		this.description = description;
+	}
+
+	public static DiscountType from(String name) {
+		return Arrays.stream(values())
+			.filter(v -> v.name().equalsIgnoreCase(name))
+			.findFirst()
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_UNSUPPORTED));
 	}
 }

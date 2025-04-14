@@ -20,7 +20,8 @@ public enum ErrorCode implements BaseErrorCode {
 	PAYMENT_UNSUPPORTED("지원하지 않는 결제 방식입니다.", HttpStatus.BAD_REQUEST),
 	PAYMENT_INFO_NOT_FOUND("결제 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
 	PAYMENT_EXPIRED("결제가 만료되었습니다.", HttpStatus.BAD_REQUEST),
-	;
+	PAYMENT_PRICE_INVALID("결제 금액이 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+	MEMBERSHIP_SERVICE_UNAVAILABLE("멤버십 서비스 이용이 불가합니다.", HttpStatus.SERVICE_UNAVAILABLE);
 
 	private final String message;
 	private final HttpStatus status;

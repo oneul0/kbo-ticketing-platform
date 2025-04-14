@@ -27,8 +27,10 @@ import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentDetailRepository;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
+import com.boeingmerryho.business.paymentservice.domain.type.DiscountType;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
+import com.boeingmerryho.business.paymentservice.infrastructure.MembershipApiClient;
 import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
@@ -42,6 +44,7 @@ public class PaymentServiceImpl implements PaymentService {
 	private final PaySessionHelper paySessionHelper;
 	private final PaymentRepository paymentRepository;
 	private final PaymentStrategyFactory strategyFactory;
+	private final MembershipApiClient membershipApiClient;
 	private final PaymentDetailRepository paymentDetailRepository;
 	private final PaymentApplicationMapper paymentApplicationMapper;
 
@@ -49,11 +52,18 @@ public class PaymentServiceImpl implements PaymentService {
 	public PaymentReadyResponseServiceDto pay(
 		PaymentReadyRequestServiceDto requestServiceDto
 	) {
-		assertInExpiredTimePayment(requestServiceDto.paymentId());
+		// assertInExpiredTimePayment(requestServiceDto.paymentId());
 		Payment payment = paymentRepository.findById(requestServiceDto.paymentId())
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
 
-		// TODO Membership 조회 및 payment discount update (할인가 적용)
+		Double discount = membershipApiClient.getDiscount(requestServiceDto.userId())
+			.orElseThrow(() -> new PaymentException(ErrorCode.MEMBERSHIP_SERVICE_UNAVAILABLE));
+		payment.updateDiscountInfo(
+			discount,
+			DiscountType.from(
+				requestServiceDto.discountType()
+			)
+		);
 		PaymentStrategy strategy = strategyFactory.getStrategy(requestServiceDto.method());
 		return strategy.pay(payment, requestServiceDto);
 	}
