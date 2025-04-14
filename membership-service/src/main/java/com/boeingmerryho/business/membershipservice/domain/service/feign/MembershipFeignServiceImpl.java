@@ -29,7 +29,7 @@ public class MembershipFeignServiceImpl implements MembershipFeignService {
 		int currentYear = Year.now().getValue();
 
 		Membership membership = membershipRepository
-			.findActiveMembershipByUserIdAndSeason(request.userId(), currentYear)
+			.findActiveMembershipByUserIdAndSeasonAndIsDeletedFalse(request.userId(), currentYear)
 			.orElseThrow(() -> new GlobalException(MembershipErrorCode.NOT_FOUND));
 
 		String key = MEMBERSHIP_INFO_PREFIX + request.userId();
@@ -37,5 +37,14 @@ public class MembershipFeignServiceImpl implements MembershipFeignService {
 			"name", membership.getName().name()
 		);
 		redisTemplate.opsForHash().putAll(key, membershipInfo);
+	}
+
+	@Override
+	public Double getDiscountById(Long userId) {
+		int currentYear = Year.now().getValue();
+
+		return membershipRepository.findActiveMembershipByUserIdAndSeasonAndIsDeletedFalse(userId, currentYear)
+			.map(Membership::getDiscount)
+			.orElse(0.0);
 	}
 }

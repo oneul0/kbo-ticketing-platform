@@ -11,13 +11,13 @@ public interface MembershipRepository {
 
 	Membership save(Membership membership);
 
-	List<Membership> findAllBySeason(Integer currentYear);
+	List<Membership> findAllBySeasonAndIsDeletedFalse(Integer currentYear);
 
 	Optional<Membership> findByIdAndIsDeletedFalse(Long id);
 
-	boolean existsBySeasonAndName(Integer season, MembershipType membershipType);
+	boolean existsBySeasonAndNameAndIsDeletedFalse(Integer season, MembershipType membershipType);
 
-	Optional<Membership> findActiveMembershipByUserIdAndSeason(Long userId, int season);
+	Optional<Membership> findActiveMembershipByUserIdAndSeasonAndIsDeletedFalse(Long userId, int season);
 
 	List<Membership> findAll();
 }

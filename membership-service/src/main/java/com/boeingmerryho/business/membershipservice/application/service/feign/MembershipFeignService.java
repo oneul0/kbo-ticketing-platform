@@ -4,4 +4,6 @@ import com.boeingmerryho.business.membershipservice.application.dto.request.Logi
 
 public interface MembershipFeignService {
 	void handleLoginSuccess(LoginSuccessRequest request);
+
+	Double getDiscountById(Long userId);
 }
