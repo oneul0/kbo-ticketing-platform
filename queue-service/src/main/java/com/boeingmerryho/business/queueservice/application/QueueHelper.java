@@ -38,5 +38,9 @@ public interface QueueHelper {
 	QueueSearchCriteria getQueueSearchCriteria(QueueAdminSearchHistoryServiceDto requestDto);
 
 	Page<Queue> searchHistoryByDynamicQuery(QueueSearchCriteria criteria, Pageable pageable);
+
+	Queue findQueueHistoryById(Long id);
+
+	void deleteQueueHistoryById(Long id, Long userId);
 }
 

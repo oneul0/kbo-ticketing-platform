@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.springframework.data.domain.Pageable;
 
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminCallUserServiceDto;
+import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteUserServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminSearchHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminStatusServiceDto;
@@ -44,4 +45,6 @@ public interface QueuePresentationMapper {
 	@Mapping(target = "pageable", source = "customPageable")
 	QueueAdminSearchHistoryServiceDto toQueueAdminSearchHistoryServiceDto(QueueAdminSearchHistoryRequestDto requestDto,
 		Pageable customPageable);
+
+	QueueAdminDeleteHistoryServiceDto toQueueAdminDeleteHistoryServiceDto(Long id, Long userId);
 }

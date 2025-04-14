@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.boeingmerryho.business.queueservice.application.QueueHelper;
 import com.boeingmerryho.business.queueservice.application.dto.mapper.QueueApplicationMapper;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminCallUserServiceDto;
+import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteUserServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminSearchHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.domain.entity.Queue;
@@ -124,5 +125,11 @@ public class QueueAdminService {
 
 		return new PageImpl<>(content, requestDto.pageable(), queuePage.getTotalElements());
 
+	}
+
+	@Description("가게의 대기열 정보 기록을 삭제하는 메서드")
+	public Long deleteQueueHistory(QueueAdminDeleteHistoryServiceDto serviceDto) {
+		helper.deleteQueueHistoryById(serviceDto.id(), serviceDto.userId());
+		return serviceDto.id();
 	}
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminCallUserServiceDto;
+import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteUserServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminSearchHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.service.QueueAdminService;
@@ -103,5 +104,21 @@ public class QueueAdminController {
 			customPageable);
 		Page<QueueAdminSearchHistoryResponseDto> responseDto = queueAdminService.getQueueHistory(serviceDto);
 		return SuccessResponse.of(QueueSuccessCode.QUEUE_HISTORY_SEARCH_SUCCESS, responseDto);
+	}
+
+	@Description(
+		"가게의 대기열 기록을 조회하는 api. manager, admin 사용 가능"
+	)
+	@DeleteMapping("/stores/history/{id}")
+	public ResponseEntity<SuccessResponse<Long>> getQueueHistory(
+		@PathVariable(name = "id") Long id,
+		@RequestParam Long userId
+		//todo : @RequestAttribute Long userId 로 수정
+	) {
+
+		QueueAdminDeleteHistoryServiceDto serviceDto = queuePresentationMapper.toQueueAdminDeleteHistoryServiceDto(id,
+			userId);
+		Long deletedId = queueAdminService.deleteQueueHistory(serviceDto);
+		return SuccessResponse.of(QueueSuccessCode.QUEUE_HISTORY_DELETE_SUCCESS, deletedId);
 	}
 }

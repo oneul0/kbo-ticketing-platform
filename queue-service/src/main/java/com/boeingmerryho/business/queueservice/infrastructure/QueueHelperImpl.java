@@ -191,4 +191,16 @@ public class QueueHelperImpl implements QueueHelper {
 	public Page<Queue> searchHistoryByDynamicQuery(QueueSearchCriteria criteria, Pageable pageable) {
 		return customQueueRepository.findDynamicQuery(criteria, pageable);
 	}
+
+	@Override
+	public Queue findQueueHistoryById(Long id) {
+		return queueRepository.findAllById(id)
+			.orElseThrow(() -> new GlobalException(ErrorCode.QUEUE_HISTORY_NOT_FOUND));
+	}
+
+	@Override
+	public void deleteQueueHistoryById(Long id, Long userId) {
+		Queue queue = findQueueHistoryById(id);
+		queue.softDelete(userId);
+	}
 }
