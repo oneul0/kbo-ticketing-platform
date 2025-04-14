@@ -1,4 +1,6 @@
-package com.boeingmerryho.business.queueservice.domain;
+package com.boeingmerryho.business.queueservice.domain.entity;
+
+import com.boeingmerryho.business.queueservice.domain.model.QueueStatus;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -1,9 +1,11 @@
-package com.boeingmerryho.business.queueservice.domain;
+package com.boeingmerryho.business.queueservice.domain.entity;
 
 import java.io.Serializable;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+
+import com.boeingmerryho.business.queueservice.domain.model.QueueStatus;
 
 import io.github.boeingmerryho.commonlibrary.entity.BaseEntity;
 import jakarta.persistence.Column;
