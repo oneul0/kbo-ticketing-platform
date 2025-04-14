@@ -11,6 +11,12 @@ public record MembershipCreateRequestDto(
 	String name,
 
 	@NotNull(message = "discount는 필수입니다.")
-	Double discount
+	Double discount,
+
+	@NotNull(message = "availableQuantity는 필수입니다.")
+	Double availableQuantity,
+
+	@NotNull(message = "price는 필수입니다.")
+	Double price
 ) {
 }
