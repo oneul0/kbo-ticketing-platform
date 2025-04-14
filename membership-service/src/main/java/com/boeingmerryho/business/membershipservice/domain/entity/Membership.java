@@ -3,6 +3,7 @@ package com.boeingmerryho.business.membershipservice.domain.entity;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUpdateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.type.MembershipType;
 
@@ -43,13 +44,33 @@ public class Membership extends BaseEntity {
 	@Column(nullable = false)
 	private Double discount;
 
+	@Column(nullable = false)
+	private Integer availableQuantity;
+
+	@Column(nullable = false)
+	private Integer price;
+
 	public void update(MembershipUpdateRequestServiceDto update) {
 		if (update.season() != null)
 			this.season = update.season();
-		if (update.name() != null)
-			this.name = update.name();
 		if (update.discount() != null)
 			this.discount = update.discount();
+		if (update.availableQuantity() != null)
+			this.availableQuantity = update.availableQuantity();
+		if (update.price() != null)
+			this.price = update.price();
+	}
+
+	public static Membership create(MembershipCreateRequestServiceDto requestDto) {
+		MembershipType type = MembershipType.valueOf(requestDto.name());
+
+		return Membership.builder()
+			.season(requestDto.season())
+			.name(type)
+			.discount(requestDto.discount())
+			.availableQuantity(requestDto.availableQuantity())
+			.price(requestDto.price())
+			.build();
 	}
 
 	// @OneToMany(mappedBy = "membership")
