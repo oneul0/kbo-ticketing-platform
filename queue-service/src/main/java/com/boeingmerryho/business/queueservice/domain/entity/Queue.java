@@ -73,4 +73,11 @@ public class Queue extends BaseEntity implements Serializable {
 			.build();
 	}
 
+	public void updateStatus(QueueStatus status) {
+		this.status = status;
+	}
+
+	public void updateCancelReason(CancelReason cancelReason) {
+		this.cancelReason = cancelReason;
+	}
 }

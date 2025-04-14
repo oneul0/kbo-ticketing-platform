@@ -5,16 +5,20 @@ import org.mapstruct.Mapping;
 import org.springframework.data.domain.Pageable;
 
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminCallUserServiceDto;
+import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteUserServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminSearchHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminStatusServiceDto;
+import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminUpdateHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueCancelServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueJoinServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueUserSequenceServiceDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminCallUserRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminQueueListRequestDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminSearchHistoryRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminStatusRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.other.QueueJoinRequestDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminUpdateHistoryRequestDto;
 
 @Mapper(componentModel = "spring")
 public interface QueuePresentationMapper {
@@ -40,5 +44,12 @@ public interface QueuePresentationMapper {
 	@Mapping(target = "pageable", source = "customPageable")
 	QueueAdminQueueListRequestDto toQueueAdminQueueListRequestDto(Long storeId, Pageable customPageable);
 
-	QueueAdminSearchHistoryServiceDto toQueueAdminSearchHistoryServiceDto(Long storeId, Pageable customPageable);
+	@Mapping(target = "pageable", source = "customPageable")
+	QueueAdminSearchHistoryServiceDto toQueueAdminSearchHistoryServiceDto(QueueAdminSearchHistoryRequestDto requestDto,
+		Pageable customPageable);
+
+	QueueAdminDeleteHistoryServiceDto toQueueAdminDeleteHistoryServiceDto(Long id, Long userId);
+
+	QueueAdminUpdateHistoryServiceDto toQueueAdminUpdateHistoryServiceDto(QueueAdminUpdateHistoryRequestDto requestDto,
+		Long id, Long userId);
 }
