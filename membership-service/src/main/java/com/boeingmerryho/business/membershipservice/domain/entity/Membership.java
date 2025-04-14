@@ -54,6 +54,9 @@ public class Membership extends BaseEntity {
 	@Column(nullable = false)
 	private Integer price;
 
+	@OneToMany(mappedBy = "membership")
+	private List<MembershipUser> users = new ArrayList<>();
+
 	public void update(MembershipUpdateRequestServiceDto update) {
 		if (update.season() != null)
 			this.season = update.season();
@@ -76,7 +79,4 @@ public class Membership extends BaseEntity {
 			.price(requestDto.price())
 			.build();
 	}
-
-	@OneToMany(mappedBy = "membership")
-	private List<MembershipUser> users = new ArrayList<>();
 }

@@ -26,9 +26,9 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/memberships")
 public class MembershipController {
 
+	private final MembershipPresentationMapper mapper;
 	private final MembershipService membershipService;
 	private final MembershipReserveService membershipReserveService;
-	private final MembershipPresentationMapper mapper;
 
 	@GetMapping("/season")
 	public ResponseEntity<SuccessResponse<List<MembershipDetailResponseDto>>> getMembershipsByCurrentSeason() {

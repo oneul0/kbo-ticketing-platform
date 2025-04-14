@@ -21,6 +21,7 @@ public class MembershipFeignServiceImpl implements MembershipFeignService {
 
 	private final MembershipRepository membershipRepository;
 	private final RedisTemplate<String, String> redisTemplate;
+
 	private static final String MEMBERSHIP_INFO_PREFIX = "user:membership:info:";
 
 	@Override

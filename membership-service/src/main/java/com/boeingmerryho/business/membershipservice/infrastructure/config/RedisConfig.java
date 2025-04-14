@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,16 +19,15 @@ public class RedisConfig {
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(connectionFactory);
 
-		// ✅ Jackson 3 대응: 안전한 타입 활성화 설정
 		PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
 			.allowIfBaseType(Object.class)
 			.build();
 
 		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL); // 👈 새 방식
+		objectMapper.activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL);
 
-		Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
-		serializer.setObjectMapper(objectMapper);
+		GenericJackson2JsonRedisSerializer serializer =
+			new GenericJackson2JsonRedisSerializer(objectMapper);
 
 		template.setKeySerializer(new StringRedisSerializer());
 		template.setValueSerializer(serializer);
