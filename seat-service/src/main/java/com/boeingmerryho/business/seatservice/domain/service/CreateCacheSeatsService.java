@@ -61,8 +61,9 @@ public class CreateCacheSeatsService {
 		Map<String, String> values = new HashMap<>();
 
 		values.put("id", seat.getId().toString());
-		values.put("status", ReservationStatus.AVAILABLE.name());
 		values.put("userId", null);
+		values.put("status", ReservationStatus.AVAILABLE.name());
+		values.put("price", seat.getPrice().toString());
 		values.put("createdAt", null);
 		values.put("expiredAt", null);
 
