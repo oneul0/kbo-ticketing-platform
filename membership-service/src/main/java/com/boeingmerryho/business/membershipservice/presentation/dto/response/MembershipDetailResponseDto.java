@@ -4,6 +4,8 @@ public record MembershipDetailResponseDto(
 	Long id,
 	Integer season,
 	String name,
-	Double discount
+	Double discount,
+	Integer availableQuantity,
+	Integer price
 ) {
 }
