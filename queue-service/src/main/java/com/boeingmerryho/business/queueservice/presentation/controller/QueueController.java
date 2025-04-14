@@ -21,7 +21,7 @@ import com.boeingmerryho.business.queueservice.presentation.dto.mapper.QueuePres
 import com.boeingmerryho.business.queueservice.presentation.dto.request.other.QueueJoinRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueCancelResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
-import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserSequenceResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserRankResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
@@ -47,13 +47,13 @@ public class QueueController {
 		@RequestBody QueueJoinRequestDto requestDto) {
 		// QueueJoinServiceDto serviceDto = queuePresentationMapper.toQueueJoinServiceDto(requestDto, userId);
 		QueueJoinServiceDto serviceDto = queuePresentationMapper.toQueueJoinServiceDto(requestDto);
-		QueueJoinResponseDto sequence = null;
+		QueueJoinResponseDto rank = null;
 		try {
-			sequence = queueService.joinQueue(serviceDto);
+			rank = queueService.joinQueue(serviceDto);
 		} catch (InterruptedException e) {
 			throw new GlobalException(ErrorCode.LOCK_ACQUISITION_FAIL);
 		}
-		return SuccessResponse.of(QueueSuccessCode.QUEUE_JOIN_SUCCESS, sequence);
+		return SuccessResponse.of(QueueSuccessCode.QUEUE_JOIN_SUCCESS, rank);
 	}
 
 	@Description(
@@ -65,8 +65,8 @@ public class QueueController {
 		@RequestParam Long userId,
 		@RequestParam Long storeId) {
 		QueueUserSequenceServiceDto serviceDto = queuePresentationMapper.toQueueUserSequenceServiceDto(storeId, userId);
-		QueueUserSequenceResponseDto sequence = queueService.getSequence(serviceDto);
-		return SuccessResponse.of(QueueSuccessCode.QUEUE_GET_SEQUENCE_SUCCESS, sequence);
+		QueueUserRankResponseDto rank = queueService.getRank(serviceDto);
+		return SuccessResponse.of(QueueSuccessCode.QUEUE_GET_SEQUENCE_SUCCESS, rank);
 	}
 
 	@Description(
