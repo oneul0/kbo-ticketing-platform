@@ -64,4 +64,13 @@ public class Queue extends BaseEntity implements Serializable {
 			.build();
 	}
 
+	public static Queue confirmQueue(Long storeId, Long userId, Integer sequence) {
+		return Queue.builder()
+			.storeId(storeId)
+			.userId(userId)
+			.sequence(sequence)
+			.status(QueueStatus.CONFIRMED)
+			.build();
+	}
+
 }
