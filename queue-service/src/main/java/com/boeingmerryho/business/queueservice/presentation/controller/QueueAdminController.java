@@ -71,15 +71,12 @@ public class QueueAdminController {
 	public ResponseEntity<QueueAdminSearchResponseDto> getQueueList(
 		@PathVariable(name = "id") Long storeId,
 		@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
-		@RequestParam(value = "size", required = false) Integer size,
-		@RequestParam(value = "sortDirection", required = false) String sortDirection,
-		@RequestParam(value = "by", required = false) String by
+		@RequestParam(value = "size", required = false) Integer size
 	) {
-		Pageable customPageable = pageableConfig.customPageable(page, size, sortDirection, by);
+		Pageable customPageable = pageableConfig.customPageable(page, size, null, null);
 		QueueAdminQueueListRequestDto requestDto = queuePresentationMapper.toQueueAdminQueueListRequestDto(storeId,
 			customPageable);
 		Page<QueueAdminItemListResponseDto> queuePageDto = queueAdminService.getQueueList(requestDto);
 		return ResponseEntity.ok(new QueueAdminSearchResponseDto(storeId, queuePageDto));
 	}
-
 }
