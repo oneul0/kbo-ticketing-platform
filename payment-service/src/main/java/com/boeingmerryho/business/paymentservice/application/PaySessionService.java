@@ -1,13 +1,20 @@
 package com.boeingmerryho.business.paymentservice.application;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.PaymentSession;
 
 public interface PaySessionService {
-	void saveSession(String orderId, PaymentSession session);
+	void saveSession(String paymentId, PaymentSession session);
 
-	Optional<PaymentSession> getSession(String orderId);
+	Optional<PaymentSession> getSession(String paymentId);
 
-	void deleteSession(String orderId);
+	void deleteSession(String paymentId);
+
+	void savePaymentExpiredTime(String paymentId, LocalDateTime expiredTime);
+
+	Optional<LocalDateTime> getPaymentExpiredTime(String paymentId);
+
+	void deletePaymentExpiredTime(String paymentId);
 }

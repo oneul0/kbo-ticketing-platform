@@ -1,5 +1,7 @@
 package com.boeingmerryho.business.paymentservice.infrastructure.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +49,7 @@ public class PaymentServiceImpl implements PaymentService {
 	public PaymentReadyResponseServiceDto pay(
 		PaymentReadyRequestServiceDto requestServiceDto
 	) {
+		assertInExpiredTimePayment(requestServiceDto.paymentId());
 		Payment payment = paymentRepository.findById(requestServiceDto.paymentId())
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
 
@@ -65,7 +68,10 @@ public class PaymentServiceImpl implements PaymentService {
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
 
 		PaymentStrategy strategy = strategyFactory.getStrategy(paymentSession.method());
-		return strategy.approve(paymentSession, payment, requestServiceDto);
+		PaymentApproveResponseServiceDto responseServiceDto = strategy.approve(paymentSession, payment,
+			requestServiceDto);
+		paySessionHelper.deletePaymentExpiredTime(String.valueOf(payment.getId()));
+		return responseServiceDto;
 	}
 
 	@Transactional
@@ -103,6 +109,17 @@ public class PaymentServiceImpl implements PaymentService {
 			createSearchContext(requestServiceDto)
 		);
 		return paymentDetails.map(paymentApplicationMapper::toPaymentDetailResponseServiceDto);
+	}
+
+	private void assertInExpiredTimePayment(Long paymentId) {
+		LocalDateTime expiredTime = paySessionHelper.getPaymentExpiredTime(paymentId.toString())
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
+
+		if (!LocalDateTime.now().isBefore(expiredTime)) {
+			paySessionHelper.deletePaymentExpiredTime(paymentId.toString());
+			throw new PaymentException(ErrorCode.PAYMENT_EXPIRED);
+		}
+
 	}
 
 	private void assertCancellablePayment(Payment payment) {

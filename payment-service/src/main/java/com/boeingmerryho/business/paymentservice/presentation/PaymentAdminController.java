@@ -7,17 +7,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.paymentservice.application.PaymentAdminService;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.PaymentPresentationMapper;
+import com.boeingmerryho.business.paymentservice.presentation.dto.request.PaymentApproveRequestDto;
+import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentApproveResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentDetailAdminResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentMembershipCancelResponseDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentMembershipRefundResponseDto;
@@ -34,6 +38,17 @@ import lombok.RequiredArgsConstructor;
 public class PaymentAdminController {
 	private final PaymentAdminService paymentAdminService;
 	private final PaymentPresentationMapper paymentPresentationMapper;
+
+	@PostMapping("/approve")
+	public ResponseEntity<SuccessResponse<PaymentApproveResponseDto>> approvePayment(
+		@RequestBody PaymentApproveRequestDto requestDto
+	) {
+		PaymentApproveResponseServiceDto responseServiceDto = paymentAdminService.approvePayment(
+			paymentPresentationMapper.toPaymentApproveAdminRequestServiceDto(1L, requestDto));    // TODO userId
+
+		return SuccessResponse.of(PaymentSuccessCode.PAYMENT_APPROVED,
+			paymentPresentationMapper.toPaymentApproveResponseDto(responseServiceDto));
+	}
 
 	@PostMapping("/refund/tickets/{id}")
 	public ResponseEntity<SuccessResponse<PaymentTicketRefundResponseDto>> refundTicketPayment(
