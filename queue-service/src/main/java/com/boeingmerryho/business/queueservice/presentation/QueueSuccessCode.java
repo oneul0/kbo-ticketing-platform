@@ -15,6 +15,7 @@ public enum QueueSuccessCode implements SuccessCode {
 	QUEUE_HISTORY_SEARCH_SUCCESS("가게 대기열 기록 검색에 성공했습니다.", HttpStatus.OK),
 
 	QUEUE_HISTORY_DELETE_SUCCESS("가게 대기열 기록 삭제에 성공했습니다.", HttpStatus.OK),
+	QUEUE_HISTORY_UPDATE_SUCCESS("가게 대기열 기록 수정에 성공했습니다.", HttpStatus.OK),
 	;
 
 	private final String message;

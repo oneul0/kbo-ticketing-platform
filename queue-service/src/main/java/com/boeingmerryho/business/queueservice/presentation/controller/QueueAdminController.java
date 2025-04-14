@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +19,7 @@ import com.boeingmerryho.business.queueservice.application.dto.request.admin.Que
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteUserServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminSearchHistoryServiceDto;
+import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminUpdateHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.service.QueueAdminService;
 import com.boeingmerryho.business.queueservice.config.pageable.PageableConfig;
 import com.boeingmerryho.business.queueservice.presentation.QueueSuccessCode;
@@ -30,6 +32,7 @@ import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.Q
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminHistoryListResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminSearchHistoryResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminSearchResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminUpdateHistoryRequestDto;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -120,5 +123,23 @@ public class QueueAdminController {
 			userId);
 		Long deletedId = queueAdminService.deleteQueueHistory(serviceDto);
 		return SuccessResponse.of(QueueSuccessCode.QUEUE_HISTORY_DELETE_SUCCESS, deletedId);
+	}
+
+	@Description(
+		"가게의 대기열 기록을 수정하는 api. manager, admin 사용 가능"
+	)
+	@PutMapping("/stores/history/{id}")
+	public ResponseEntity<SuccessResponse<Long>> updateQueueHistory(
+		@PathVariable(name = "id") Long id,
+		@RequestParam Long userId,
+		//todo : @RequestAttribute Long userId 로 수정
+		@RequestBody QueueAdminUpdateHistoryRequestDto requestDto
+	) {
+
+		QueueAdminUpdateHistoryServiceDto serviceDto = queuePresentationMapper.toQueueAdminUpdateHistoryServiceDto(
+			requestDto, id,
+			userId);
+		Long updatedId = queueAdminService.updateQueueHistory(serviceDto);
+		return SuccessResponse.of(QueueSuccessCode.QUEUE_HISTORY_UPDATE_SUCCESS, updatedId);
 	}
 }

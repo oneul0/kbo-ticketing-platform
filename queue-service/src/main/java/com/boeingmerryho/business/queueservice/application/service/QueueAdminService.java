@@ -18,6 +18,7 @@ import com.boeingmerryho.business.queueservice.application.dto.request.admin.Que
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteUserServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminSearchHistoryServiceDto;
+import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminUpdateHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.domain.entity.Queue;
 import com.boeingmerryho.business.queueservice.domain.entity.QueueSearchCriteria;
 import com.boeingmerryho.business.queueservice.domain.model.CancelReason;
@@ -131,5 +132,22 @@ public class QueueAdminService {
 	public Long deleteQueueHistory(QueueAdminDeleteHistoryServiceDto serviceDto) {
 		helper.deleteQueueHistoryById(serviceDto.id(), serviceDto.userId());
 		return serviceDto.id();
+	}
+
+	@Description("가게의 대기열 정보 기록을 수정하는 메서드")
+	public Long updateQueueHistory(QueueAdminUpdateHistoryServiceDto serviceDto) {
+		Long queueId = serviceDto.id();
+
+		Queue queue = helper.findQueueHistoryById(queueId);
+
+		if (serviceDto.status() != null) {
+			queue.updateStatus(serviceDto.status());
+		}
+		if (serviceDto.cancelReason() != null) {
+			queue.updateCancelReason(serviceDto.cancelReason());
+		}
+
+		helper.saveQueueInfo(queue);
+		return queue.getId();
 	}
 }

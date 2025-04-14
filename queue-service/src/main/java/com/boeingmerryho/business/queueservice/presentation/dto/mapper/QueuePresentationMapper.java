@@ -9,6 +9,7 @@ import com.boeingmerryho.business.queueservice.application.dto.request.admin.Que
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteUserServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminSearchHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminStatusServiceDto;
+import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminUpdateHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueCancelServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueJoinServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueUserSequenceServiceDto;
@@ -17,6 +18,7 @@ import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.Qu
 import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminSearchHistoryRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminStatusRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.other.QueueJoinRequestDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminUpdateHistoryRequestDto;
 
 @Mapper(componentModel = "spring")
 public interface QueuePresentationMapper {
@@ -47,4 +49,7 @@ public interface QueuePresentationMapper {
 		Pageable customPageable);
 
 	QueueAdminDeleteHistoryServiceDto toQueueAdminDeleteHistoryServiceDto(Long id, Long userId);
+
+	QueueAdminUpdateHistoryServiceDto toQueueAdminUpdateHistoryServiceDto(QueueAdminUpdateHistoryRequestDto requestDto,
+		Long id, Long userId);
 }
