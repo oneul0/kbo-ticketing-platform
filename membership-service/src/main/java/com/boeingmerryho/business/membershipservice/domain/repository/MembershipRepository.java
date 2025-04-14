@@ -18,4 +18,6 @@ public interface MembershipRepository {
 	boolean existsBySeasonAndName(Integer season, MembershipType membershipType);
 
 	Optional<Membership> findActiveMembershipByUserIdAndSeason(Long userId, int season);
+
+	List<Membership> findAll();
 }
