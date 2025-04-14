@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminCallUserResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminDeleteUserResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminItemListResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueCancelResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserRankResponseDto;
@@ -20,4 +21,6 @@ public interface QueueApplicationMapper {
 	QueueAdminDeleteUserResponseDto toQueueAdminDeleteUserResponseDto(Long storeId, Long userId);
 
 	QueueAdminCallUserResponseDto toQueueAdminCallUserResponseDto(Long storeId, Long userId, Integer sequence);
+
+	QueueAdminItemListResponseDto toQueueAdminItemListResponseDto(Long userId, Integer sequence);
 }

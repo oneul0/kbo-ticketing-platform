@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminCallUserServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteUserServiceDto;
+import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminSearchHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminStatusServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueCancelServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueJoinServiceDto;
@@ -38,4 +39,6 @@ public interface QueuePresentationMapper {
 	@Mapping(target = "storeId", source = "storeId")
 	@Mapping(target = "pageable", source = "customPageable")
 	QueueAdminQueueListRequestDto toQueueAdminQueueListRequestDto(Long storeId, Pageable customPageable);
+
+	QueueAdminSearchHistoryServiceDto toQueueAdminSearchHistoryServiceDto(Long storeId, Pageable customPageable);
 }
