@@ -1,7 +1,6 @@
 package com.boeingmerryho.business.paymentservice.infrastructure;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,6 +25,8 @@ import com.boeingmerryho.business.paymentservice.domain.repository.PaymentDetail
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
+import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
+import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
@@ -63,12 +64,22 @@ public class KakaoPayStrategy implements PaymentStrategy {
 		Payment payment,
 		PaymentReadyRequestServiceDto requestServiceDto
 	) {
+
+		Integer price = paySessionHelper.getPaymentPrice(payment.getId().toString())
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_PRICE_INVALID));
+
+		int quantity = requestServiceDto.tickets() == null ? 1 : requestServiceDto.tickets().size();
+
+		if (requestServiceDto.price() != price * quantity) {    // 서비스에서 받은 가격 * 요청이 들어온 수량 == 결제 요청 금액 검증
+			throw new PaymentException(ErrorCode.PAYMENT_PRICE_INVALID);
+		}
+
 		KakaoPayReadyRequest request = KakaoPayReadyRequest.builder()
 			.cid(cid)
-			.partnerOrderId(requestServiceDto.paymentId() + UUID.randomUUID().toString())
+			.partnerOrderId(requestServiceDto.paymentId().toString())
 			.partnerUserId(requestServiceDto.userId().toString())
 			.itemName(requestServiceDto.type())
-			.quantity(requestServiceDto.tickets().size())
+			.quantity(requestServiceDto.tickets() == null ? 1 : requestServiceDto.tickets().size())
 			.totalAmount(payment.getDiscountPrice())
 			.vatAmount(0)
 			.taxFreeAmount(0)
@@ -78,20 +89,39 @@ public class KakaoPayStrategy implements PaymentStrategy {
 			.build();
 
 		KakaoPayReadyResponse response = kakaoApiClient.callReady(request, secretKey, authPrefix);
-		PaymentSession session = PaymentSession.builder()
-			.cid(cid)
-			.tid(response.tid())
-			.partnerOrderId(request.partnerOrderId())
-			.partnerUserId(request.partnerUserId())
-			.tickets(requestServiceDto.tickets())
-			.totalAmount(payment.getDiscountPrice())
-			.quantity(requestServiceDto.tickets().size())
-			.itemName(requestServiceDto.type())
-			.createdAt(response.createdAt().toString())
-			.method(requestServiceDto.method())
-			.build();
 
-		paySessionHelper.savePaymentInfo(String.valueOf(requestServiceDto.paymentId()), session);
+		if (payment.getType() == PaymentType.TICKET) {
+			PaymentSession session = PaymentSession.builder()
+				.cid(cid)
+				.tid(response.tid())
+				.partnerOrderId(request.partnerOrderId())
+				.partnerUserId(request.partnerUserId())
+				.tickets(requestServiceDto.tickets())
+				.totalAmount(payment.getDiscountPrice())
+				.quantity(requestServiceDto.tickets().size())
+				.itemName(requestServiceDto.type())
+				.createdAt(response.createdAt().toString())
+				.method(requestServiceDto.method())
+				.build();
+
+			paySessionHelper.savePaymentInfo(String.valueOf(requestServiceDto.paymentId()), session);
+		}
+		if (payment.getType() == PaymentType.MEMBERSHIP) {
+			PaymentSession session = PaymentSession.builder()
+				.cid(cid)
+				.tid(response.tid())
+				.partnerOrderId(request.partnerOrderId())
+				.partnerUserId(request.partnerUserId())
+				.membershipId(requestServiceDto.membershipId())
+				.totalAmount(payment.getDiscountPrice())
+				.quantity(1)
+				.itemName(requestServiceDto.type())
+				.createdAt(response.createdAt().toString())
+				.method(requestServiceDto.method())
+				.build();
+
+			paySessionHelper.savePaymentInfo(String.valueOf(requestServiceDto.paymentId()), session);
+		}
 
 		log.info("[Payment Ready] tid: {}, nextRedirectPcUrl: {}, createdAt: {}",
 			response.tid(),
@@ -133,7 +163,7 @@ public class KakaoPayStrategy implements PaymentStrategy {
 				.payment(payment)
 				.discountPrice(payment.getDiscountPrice() - response.amount().discount())
 				.method(PaymentMethod.KAKAOPAY)
-				.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice() - response.amount().discount())
+				.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice() + response.amount().discount())
 				.build()
 		);
 
@@ -153,7 +183,7 @@ public class KakaoPayStrategy implements PaymentStrategy {
 			paymentRepository.saveMembership(
 				PaymentMembership.builder()
 					.price(paymentSession.totalAmount())
-					.membershipUserId(1L)    // TODO 논의
+					.membershipUserId(1L)
 					.payment(payment)
 					.build()
 			);

@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 
 public record PaymentCreationRequestServiceDto(
 	Long userId,
-	Integer totalPrice,
+	Integer price,
+	Integer quantity,
 	String paymentType,
 	LocalDateTime expiredTime
 ) {

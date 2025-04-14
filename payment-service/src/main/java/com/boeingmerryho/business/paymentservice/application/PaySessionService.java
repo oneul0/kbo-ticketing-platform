@@ -17,4 +17,10 @@ public interface PaySessionService {
 	Optional<LocalDateTime> getPaymentExpiredTime(String paymentId);
 
 	void deletePaymentExpiredTime(String paymentId);
+
+	void savePaymentPrice(String paymentId, Integer price);
+
+	Optional<Integer> getPaymentPrice(String paymentId);
+
+	void deletePaymentPrice(String paymentId);
 }
