@@ -168,6 +168,7 @@ public class UserHelperImpl implements UserHelper {
 	public void clearRedisUserData(Long userId) {
 		redisTemplate.delete(USER_INFO_PREFIX + userId);
 		redisTemplate.delete(USER_TOKEN_PREFIX + userId);
+		redisTemplate.delete(MEMBERSHIP_INFO_PREFIX + userId);
 	}
 
 	public void deleteKeyFromRedis(String tokenKey) {
@@ -253,7 +254,7 @@ public class UserHelperImpl implements UserHelper {
 	}
 
 	public void removeUserMembershipInfoFromRedis(Long id) {
-		String membershipKey = MEMBERSHIP_INFO_PREFIX+id;
+		String membershipKey = MEMBERSHIP_INFO_PREFIX + id;
 		redisTemplate.delete(membershipKey);
 	}
 

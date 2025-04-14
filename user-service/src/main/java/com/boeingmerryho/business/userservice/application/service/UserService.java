@@ -87,8 +87,8 @@ public class UserService {
 		userHelper.blacklistToken(accessToken);
 
 		userHelper.deleteKeyFromRedis(result.tokenKey());
-		
-		userHelper.removeUserMembershipInfoFromRedis(userId);
+
+		userHelper.clearRedisUserData(userId);
 	}
 
 	@Transactional(readOnly = true)

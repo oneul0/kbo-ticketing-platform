@@ -155,7 +155,7 @@ public class UserAdminService {
 
 		userHelper.deleteKeyFromRedis(result.tokenKey());
 
-		userHelper.removeUserMembershipInfoFromRedis(userId);
+		userHelper.clearRedisUserData(userId);
 	}
 
 	public UserLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto dto) {
