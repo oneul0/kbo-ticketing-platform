@@ -37,6 +37,7 @@ dependencies {
     // Spring cloud
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
     // common
     implementation 'io.github.boeingmerryho:common-library:1.0.4'
@@ -59,6 +60,9 @@ dependencies {
     // Database
     runtimeOnly 'com.mysql:mysql-connector-j'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

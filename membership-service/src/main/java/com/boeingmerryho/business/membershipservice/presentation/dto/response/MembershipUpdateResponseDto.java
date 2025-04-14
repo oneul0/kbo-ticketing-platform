@@ -6,6 +6,8 @@ public record MembershipUpdateResponseDto(
 	Long id,
 	Integer season,
 	MembershipType name,
-	Double discount
+	Double discount,
+	Integer availableQuantity,
+	Integer price
 ) {
 }
