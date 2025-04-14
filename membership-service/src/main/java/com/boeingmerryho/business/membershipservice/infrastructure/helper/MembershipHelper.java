@@ -23,7 +23,7 @@ public class MembershipHelper {
 	public List<Membership> findAllBySeason() {
 		Integer currentYear = Year.now().getValue();
 
-		return membershipRepository.findAllBySeason(currentYear);
+		return membershipRepository.findAllBySeasonAndIsDeletedFalse(currentYear);
 	}
 
 	public Membership readActiveMembership(Long membershipId) {

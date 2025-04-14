@@ -15,12 +15,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentApiClient {
 
-	private final static String PaymentType = "MEMBERSHIP";
 	private final PaymentFeignClient paymentFeignClient;
 
+	private final static Integer QUANTITY = 1;
+	private final static String PAYMENT_TYPE = "MEMBERSHIP";
+
 	public Long getPaymentId(MembershipUserCreateRequestServiceDto requestDto, Membership membership) {
-		PaymentRequestDto paymentInfo = new PaymentRequestDto(requestDto.userId(), membership.getPrice(),
-			PaymentType, LocalDateTime.now());
+		PaymentRequestDto paymentInfo = new PaymentRequestDto(
+			requestDto.userId(),
+			membership.getPrice(),
+			QUANTITY,
+			PAYMENT_TYPE,
+			LocalDateTime.now());
 		return paymentFeignClient.createPayment(paymentInfo);
 	}
 

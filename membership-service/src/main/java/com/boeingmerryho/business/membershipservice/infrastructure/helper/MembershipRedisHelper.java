@@ -18,6 +18,8 @@ public class MembershipRedisHelper {
 
 	private final RedisTemplate<String, String> redisTemplate;
 
+	private static final String MEMBERSHIP_STOCK_PREFIX = "membership:stock:";
+	private static final String MEMBERSHIP_USER_PREFIX = "membership:user:";
 	private static final String LUA_SCRIPT = """
 			local stock = tonumber(redis.call("GET", KEYS[1]))
 			if not stock or stock <= 0 then
@@ -34,8 +36,8 @@ public class MembershipRedisHelper {
 		""";
 
 	public void reserve(Long membershipId, Long userId, Duration ttl) {
-		String stockKey = "membership:stock:" + membershipId;
-		String userKey = "membership:user:" + userId;
+		String stockKey = MEMBERSHIP_STOCK_PREFIX + membershipId;
+		String userKey = MEMBERSHIP_USER_PREFIX + userId;
 
 		DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>(LUA_SCRIPT, Long.class);
 
@@ -58,7 +60,7 @@ public class MembershipRedisHelper {
 	}
 
 	public void preloadStock(Long membershipId, Integer availableQuantity) {
-		String stockKey = "membership:stock:" + membershipId;
+		String stockKey = MEMBERSHIP_STOCK_PREFIX + membershipId;
 		redisTemplate.opsForValue().set(stockKey, String.valueOf(availableQuantity));
 	}
 

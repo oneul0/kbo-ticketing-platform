@@ -1,5 +1,8 @@
 package com.boeingmerryho.business.membershipservice.domain.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -15,6 +18,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -50,6 +54,9 @@ public class Membership extends BaseEntity {
 	@Column(nullable = false)
 	private Integer price;
 
+	@OneToMany(mappedBy = "membership")
+	private List<MembershipUser> users = new ArrayList<>();
+
 	public void update(MembershipUpdateRequestServiceDto update) {
 		if (update.season() != null)
 			this.season = update.season();
@@ -72,7 +79,4 @@ public class Membership extends BaseEntity {
 			.price(requestDto.price())
 			.build();
 	}
-
-	// @OneToMany(mappedBy = "membership")
-	// private List<MembershipUser> users = new ArrayList<>();
 }
