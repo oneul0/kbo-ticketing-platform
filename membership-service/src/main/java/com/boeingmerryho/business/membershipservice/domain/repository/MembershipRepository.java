@@ -20,4 +20,6 @@ public interface MembershipRepository {
 	Optional<Membership> findActiveMembershipByUserIdAndSeasonAndIsDeletedFalse(Long userId, int season);
 
 	List<Membership> findAll();
+
+	Optional<Membership> findMembershipByMembershipUserId(Long membershipUserId);
 }

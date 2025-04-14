@@ -16,6 +16,7 @@ import com.boeingmerryho.business.membershipservice.application.dto.response.Mem
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipSearchAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUpdateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUserCreateResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUserDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipCreateRequestDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipSearchAdminRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipUpdateRequestDto;
@@ -25,6 +26,7 @@ import com.boeingmerryho.business.membershipservice.presentation.dto.response.Me
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipSearchAdminResponseDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipUpdateResponseDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipUserCreateResponseDto;
+import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipUserDetailAdminResponseDto;
 
 import jakarta.validation.Valid;
 
@@ -67,4 +69,7 @@ public interface MembershipPresentationMapper {
 
 	MembershipUserCreateResponseDto toMembershipUserCreateResponseDto(
 		MembershipUserCreateResponseServiceDto responseServiceDto);
+
+	MembershipUserDetailAdminResponseDto toMembershipUserDetailAdminResponseDto(
+		MembershipUserDetailAdminResponseServiceDto responseServiceDto);
 }

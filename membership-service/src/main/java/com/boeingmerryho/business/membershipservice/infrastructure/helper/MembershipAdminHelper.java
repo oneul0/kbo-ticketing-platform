@@ -6,7 +6,9 @@ import org.springframework.stereotype.Component;
 import com.boeingmerryho.business.membershipservice.application.dto.query.MembershipSearchCondition;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUpdateRequestServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUserDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
+import com.boeingmerryho.business.membershipservice.domain.entity.MembershipUser;
 import com.boeingmerryho.business.membershipservice.domain.repository.MembershipQueryRepository;
 import com.boeingmerryho.business.membershipservice.domain.repository.MembershipRepository;
 import com.boeingmerryho.business.membershipservice.exception.MembershipErrorCode;
@@ -61,5 +63,26 @@ public class MembershipAdminHelper {
 			.orElseThrow(() -> new GlobalException(MembershipErrorCode.NOT_FOUND));
 		// TODO: 사용자 받아올 시 변경 필요
 		membership.softDelete(1L);
+	}
+
+	public MembershipUserDetailAdminResponseServiceDto getMembershipUserDetailInfo(Long membershipUserId) {
+		Membership membership = membershipRepository.findMembershipByMembershipUserId(membershipUserId)
+			.orElseThrow(() -> new GlobalException(MembershipErrorCode.NOT_FOUND));
+
+		MembershipUser targetUser = membership.getUsers().stream()
+			.filter(mu -> mu.getId().equals(membershipUserId))
+			.findFirst()
+			.orElseThrow(() -> new GlobalException(MembershipErrorCode.NOT_FOUND));
+
+		return new MembershipUserDetailAdminResponseServiceDto(
+			targetUser.getId(),
+			membership.getId(),
+			targetUser.getUserId(),
+			targetUser.getIsActive(),
+			targetUser.getIsDeleted(),
+			membership.getSeason(),
+			membership.getName().name(),
+			membership.getDiscount()
+		);
 	}
 }

@@ -30,4 +30,10 @@ public interface MembershipJpaRepository extends JpaRepository<Membership, Long>
 		@Param("userId") Long userId,
 		@Param("season") int season
 	);
+
+	@Query("SELECT M " +
+		"FROM Membership M " +
+		"JOIN M.users MU " +
+		"WHERE MU.id = :membershipUserId ")
+	Optional<Membership> findMembershipByMembershipUserId(@Param("membershipUserId") Long membershipUserId);
 }
