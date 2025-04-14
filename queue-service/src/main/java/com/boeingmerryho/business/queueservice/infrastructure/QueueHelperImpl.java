@@ -80,12 +80,27 @@ public class QueueHelperImpl implements QueueHelper {
 		String redisKey = String.format(WAITLIST_INFO_PREFIX + storeId + ":" + today);
 
 		Long rank = redisTemplate.opsForZSet().rank(redisKey, userId.toString());
-		log.info("rank : {}", rank);
+		log.debug("rank : {}", rank);
 		if (rank == null) {
 			throw new GlobalException(ErrorCode.WAITLIST_NOT_EXIST);
 		}
 
 		return rank.intValue() + 1;
+	}
+
+	@Override
+	public Integer getUserSequencePosition(Long storeId, Long userId) {
+		String today = LocalDate.now().toString();
+
+		String redisKey = String.format(WAITLIST_INFO_PREFIX + storeId + ":" + today);
+
+		Double score = redisTemplate.opsForZSet().score(redisKey, userId.toString());
+		log.debug("score : {}", score);
+		if (score == null) {
+			throw new GlobalException(ErrorCode.WAITLIST_NOT_EXIST);
+		}
+
+		return score.intValue();
 	}
 
 	@Override

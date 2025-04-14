@@ -54,24 +54,6 @@ public class Queue extends BaseEntity implements Serializable {
 	@Column(nullable = true)
 	private CancelReason cancelReason;
 
-	public static Queue withDefaultStatus(Long storeId, Long userId, Integer sequence) {
-		return Queue.builder()
-			.storeId(storeId)
-			.userId(userId)
-			.sequence(sequence)
-			.status(QueueStatus.PENDING)
-			.build();
-	}
-
-	public Queue setStatus(QueueStatus status) {
-		return Queue.builder()
-			.storeId(this.storeId)
-			.userId(this.userId)
-			.sequence(this.sequence)
-			.status(status)
-			.build();
-	}
-
 	public static Queue cancelQueue(Long storeId, Long userId, Integer sequence, CancelReason cancelReason) {
 		return Queue.builder()
 			.storeId(storeId)

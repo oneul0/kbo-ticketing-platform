@@ -13,6 +13,8 @@ public interface QueueHelper {
 
 	public Integer getUserQueuePosition(Long storeId, Long userId);
 
+	public Integer getUserSequencePosition(Long storeId, Long userId);
+
 	public Boolean removeUserFromQueue(Long storeId, Long userId);
 
 	public Queue saveQueueInfo(Queue queue);

@@ -4,16 +4,16 @@ import org.mapstruct.Mapper;
 
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminCallUserResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminDeleteUserResponseDto;
-import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueCancelResponseDto;
-import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserSequenceResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserRankResponseDto;
 
 @Mapper(componentModel = "spring")
 public interface QueueApplicationMapper {
 
 	QueueJoinResponseDto toQueueJoinResponseDto(Long storeId, Long userId, Integer sequence);
 
-	QueueUserSequenceResponseDto toQueueUserSequenceResponseDto(Long storeId, Long userId, Integer sequence);
+	QueueUserRankResponseDto toQueueUserRankResponseDto(Long storeId, Long userId, Integer rank);
 
 	QueueCancelResponseDto toQueueCancelResponseDto(Long storeId, Long userId);
 

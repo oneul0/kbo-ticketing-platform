@@ -17,7 +17,7 @@ import com.boeingmerryho.business.queueservice.domain.model.CancelReason;
 import com.boeingmerryho.business.queueservice.exception.ErrorCode;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueCancelResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
-import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserSequenceResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserRankResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -50,23 +50,23 @@ public class QueueService {
 
 		helper.joinUserInQueue(storeId, userId, ticketId);
 
-		Integer sequence = helper.getUserQueuePosition(storeId, userId);
+		Integer rank = helper.getUserQueuePosition(storeId, userId);
 
-		return queueApplicationMapper.toQueueJoinResponseDto(storeId, userId, sequence);
+		return queueApplicationMapper.toQueueJoinResponseDto(storeId, userId, rank);
 	}
 
 	@Description("가게 대기열에서 본인 순서를 조회하는 메서드")
-	public QueueUserSequenceResponseDto getSequence(QueueUserSequenceServiceDto serviceDto) {
+	public QueueUserRankResponseDto getRank(QueueUserSequenceServiceDto serviceDto) {
 		Long storeId = serviceDto.storeId();
 		Long userId = serviceDto.userId();
 
-		Integer sequence = helper.getUserQueuePosition(storeId, userId);
+		Integer rank = helper.getUserQueuePosition(storeId, userId);
 
-		if (sequence == null) {
+		if (rank == null) {
 			throw new GlobalException(ErrorCode.WAITLIST_NOT_EXIST);
 		}
 
-		return queueApplicationMapper.toQueueUserSequenceResponseDto(storeId, userId, sequence);
+		return queueApplicationMapper.toQueueUserRankResponseDto(storeId, userId, rank);
 	}
 
 	@Description("본인을 가게 대기열에서 삭제하는 메서드")
@@ -74,7 +74,7 @@ public class QueueService {
 		Long storeId = serviceDto.storeId();
 		Long userId = serviceDto.userId();
 
-		Integer sequence = helper.getUserQueuePosition(storeId, userId);
+		Integer sequence = helper.getUserSequencePosition(storeId, userId);
 
 		boolean removed = helper.removeUserFromQueue(storeId, userId);
 
