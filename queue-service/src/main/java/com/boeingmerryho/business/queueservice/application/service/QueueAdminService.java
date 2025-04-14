@@ -33,7 +33,7 @@ public class QueueAdminService {
 		Long storeId = dto.storeId();
 		Long userId = dto.userId();
 
-		Integer sequence = helper.getUserQueuePosition(storeId, userId);
+		Integer sequence = helper.getUserSequencePosition(storeId, userId);
 
 		boolean removed = helper.removeUserFromQueue(storeId, userId);
 
