@@ -56,6 +56,10 @@ public class MembershipQueryRepositoryImpl implements MembershipQueryRepository 
 		builder.and(likeName(membership, condition.name()));
 		builder.and(greaterThanOrEqualDiscount(membership, condition.minDiscount()));
 		builder.and(lessThanOrEqualDiscount(membership, condition.maxDiscount()));
+		builder.and(greaterThanOrEqualAvailableQuantity(membership, condition.minAvailableQuantity()));
+		builder.and(lessThanOrEqualAvailableQuantity(membership, condition.maxAvailableQuantity()));
+		builder.and(greaterThanOrEqualPrice(membership, condition.minPrice()));
+		builder.and(lessThanOrEqualPrice(membership, condition.maxPrice()));
 		builder.and(eqIsDeleted(membership, condition.isDeleted()));
 		return builder;
 	}
@@ -87,4 +91,29 @@ public class MembershipQueryRepositoryImpl implements MembershipQueryRepository 
 			? new BooleanBuilder(membership.isDeleted.eq(isDeleted))
 			: new BooleanBuilder();
 	}
+
+	private BooleanBuilder greaterThanOrEqualAvailableQuantity(QMembership membership, Integer minQuantity) {
+		return minQuantity != null
+			? new BooleanBuilder(membership.availableQuantity.goe(minQuantity))
+			: new BooleanBuilder();
+	}
+
+	private BooleanBuilder lessThanOrEqualAvailableQuantity(QMembership membership, Integer maxQuantity) {
+		return maxQuantity != null
+			? new BooleanBuilder(membership.availableQuantity.loe(maxQuantity))
+			: new BooleanBuilder();
+	}
+
+	private BooleanBuilder greaterThanOrEqualPrice(QMembership membership, Integer minPrice) {
+		return minPrice != null
+			? new BooleanBuilder(membership.price.goe(minPrice))
+			: new BooleanBuilder();
+	}
+
+	private BooleanBuilder lessThanOrEqualPrice(QMembership membership, Integer maxPrice) {
+		return maxPrice != null
+			? new BooleanBuilder(membership.price.loe(maxPrice))
+			: new BooleanBuilder();
+	}
+
 }

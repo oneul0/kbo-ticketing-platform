@@ -17,14 +17,20 @@ public class MembershipValidator {
 	private final MembershipRepository membershipRepository;
 
 	public void validateNotDuplicated(Integer season, String name) {
-		boolean exists = membershipRepository.existsBySeasonAndName(season, MembershipType.valueOf(name));
-		if (exists) {
-			throw new GlobalException(MembershipErrorCode.ALREADY_REGISTERED);
+		try {
+			MembershipType type = MembershipType.valueOf(name);
+			boolean exists = membershipRepository.existsBySeasonAndName(season, type);
+			if (exists) {
+				throw new GlobalException(MembershipErrorCode.ALREADY_REGISTERED);
+			}
+		} catch (IllegalArgumentException ex) {
+			throw new GlobalException(MembershipErrorCode.INVALID_MEMBERSHIP_TYPE);
 		}
 	}
 
 	public void validateHasUpdatableFields(MembershipUpdateRequestServiceDto requestDto) {
-		if (requestDto.season() == null && requestDto.name() == null && requestDto.discount() == null) {
+		if (requestDto.season() == null && requestDto.discount() == null && requestDto.availableQuantity() == null
+			&& requestDto.price() == null) {
 			throw new GlobalException(MembershipErrorCode.NO_UPDATE_FIELDS_PROVIDED);
 		}
 	}

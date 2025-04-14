@@ -1,19 +1,26 @@
 package com.boeingmerryho.business.seatservice.presentation.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.context.annotation.Description;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.seatservice.application.dto.request.CacheBlockServiceRequestDto;
+import com.boeingmerryho.business.seatservice.application.dto.request.CacheSeatProcessServiceRequestDto;
+import com.boeingmerryho.business.seatservice.application.dto.request.CacheSeatsProcessServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.CacheBlockServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.service.SeatService;
-import com.boeingmerryho.business.seatservice.presentation.SeatSuccessCode;
+import com.boeingmerryho.business.seatservice.exception.SeatSuccessCode;
 import com.boeingmerryho.business.seatservice.presentation.dto.mapper.SeatPresentationMapper;
+import com.boeingmerryho.business.seatservice.presentation.dto.request.CacheSeatsProcessRequestDto;
 import com.boeingmerryho.business.seatservice.presentation.dto.response.CacheBlockResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
@@ -39,5 +46,28 @@ public class SeatController {
 		CacheBlockServiceResponseDto cacheBlockServiceResponseDto = seatService.getBlockSeats(serviceDto);
 		CacheBlockResponseDto response = seatPresentationMapper.toCacheBlockResponseDto(cacheBlockServiceResponseDto);
 		return SuccessResponse.of(SeatSuccessCode.OK_BLOCK, response).getBody();
+	}
+
+	@Description(
+		"좌석 선점하기"
+	)
+	@PostMapping("/blocks/{blockId}")
+	public ResponseEntity<SuccessResponse<Void>> processBlockSeats(
+		@PathVariable Integer blockId,
+		@RequestBody CacheSeatsProcessRequestDto request
+	) {
+		List<CacheSeatProcessServiceRequestDto> serviceRequestSeatInfos = request.requestSeatsInfo().stream().map(
+			seatPresentationMapper::toCacheSeatProcessServiceRequestDto
+		).toList();
+
+		CacheSeatsProcessServiceRequestDto serviceDto = seatPresentationMapper.toCacheSeatsProcessServiceRequestDto(
+			request.matchId(),
+			request.date(),
+			blockId,
+			serviceRequestSeatInfos
+		);
+
+		seatService.processBlockSeats(serviceDto);
+		return SuccessResponse.of(SeatSuccessCode.PROCESS_SEAT, null);
 	}
 }

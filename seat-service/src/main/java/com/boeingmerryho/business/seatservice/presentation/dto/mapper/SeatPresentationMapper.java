@@ -1,12 +1,15 @@
 package com.boeingmerryho.business.seatservice.presentation.dto.mapper;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.boeingmerryho.business.seatservice.application.dto.request.CacheBlockServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.CacheSeatCreateServiceRequestDto;
+import com.boeingmerryho.business.seatservice.application.dto.request.CacheSeatProcessServiceRequestDto;
+import com.boeingmerryho.business.seatservice.application.dto.request.CacheSeatsProcessServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatActiveServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatCreateServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.SeatDeleteServiceRequestDto;
@@ -17,6 +20,7 @@ import com.boeingmerryho.business.seatservice.application.dto.response.SeatActiv
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatCreateServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatInActiveServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatUpdateServiceResponseDto;
+import com.boeingmerryho.business.seatservice.presentation.dto.request.CacheSeatProcessRequestDto;
 import com.boeingmerryho.business.seatservice.presentation.dto.request.SeatCreateRequestDto;
 import com.boeingmerryho.business.seatservice.presentation.dto.request.SeatUpdateRequestDto;
 import com.boeingmerryho.business.seatservice.presentation.dto.response.CacheBlockResponseDto;
@@ -51,4 +55,15 @@ public interface SeatPresentationMapper {
 	@Mapping(target = "block", source = "cacheBlockServiceResponseDto.block")
 	@Mapping(target = "seats", source = "cacheBlockServiceResponseDto.seats")
 	CacheBlockResponseDto toCacheBlockResponseDto(CacheBlockServiceResponseDto cacheBlockServiceResponseDto);
+
+	CacheSeatProcessServiceRequestDto toCacheSeatProcessServiceRequestDto(
+		CacheSeatProcessRequestDto cacheSeatProcessRequestDto
+	);
+
+	CacheSeatsProcessServiceRequestDto toCacheSeatsProcessServiceRequestDto(
+		Long matchId,
+		LocalDate date,
+		Integer blockId,
+		List<CacheSeatProcessServiceRequestDto> serviceRequestSeatInfos
+	);
 }
