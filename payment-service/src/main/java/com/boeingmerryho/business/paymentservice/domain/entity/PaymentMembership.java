@@ -31,7 +31,7 @@ public class PaymentMembership {
 	private Payment payment;
 
 	@Column(nullable = false)
-	private Integer membershipUserId;
+	private Long membershipUserId;
 
 	@Column(nullable = false)
 	private Integer price;

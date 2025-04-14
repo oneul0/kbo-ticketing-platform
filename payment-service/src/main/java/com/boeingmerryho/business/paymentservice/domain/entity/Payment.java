@@ -36,7 +36,6 @@ public class Payment extends BaseEntity {
 	@Column(nullable = false)
 	private Integer totalPrice;
 
-	@Column(nullable = false)
 	private Integer discountPrice;
 
 	@Enumerated(EnumType.STRING)
@@ -51,7 +50,7 @@ public class Payment extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	@Builder.Default
-	private DiscountType discountType = DiscountType.NONE;
+	private DiscountType discountType = DiscountType.UNASSIGNED;
 
 	public void refundPayment() {
 		this.status = PaymentStatus.REFUNDED;
@@ -63,6 +62,11 @@ public class Payment extends BaseEntity {
 
 	public void requestCancel() {
 		this.status = PaymentStatus.REFUND_REQUESTED;
+	}
+
+	private void updateDiscountInfo(int discountPrice, DiscountType discountType) {
+		this.discountPrice = discountPrice;
+		this.discountType = discountType;
 	}
 
 	public boolean validateStatus(PaymentStatus status) {
