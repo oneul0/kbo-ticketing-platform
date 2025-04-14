@@ -1,4 +1,4 @@
 package com.boeingmerryho.business.queueservice.presentation.dto.response.other;
 
-public record QueueJoinResponseDto(Long storeId, Long userId, Integer sequence) {
+public record QueueUserRankResponseDto(Long storeId, Long userId, Integer rank) {
 }
