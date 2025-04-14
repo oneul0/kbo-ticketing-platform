@@ -9,7 +9,8 @@ public enum SeatErrorCode implements BaseErrorCode {
 	NOT_FOUND_BLOCK(HttpStatus.NOT_FOUND, "SEAT_002", "존재하지 않는 블록 정보입니다."),
 	NOT_EXCEED_4_SEAT(HttpStatus.BAD_REQUEST, "SEAT_003", "4개 이상의 좌석을 예약할 수 없습니다."),
 	FAILED_GET_LOCK(HttpStatus.BAD_REQUEST, "SEAT_004", "락 획득에 실패하였습니다."),
-	FAILED_PROCESS_SEAT(HttpStatus.BAD_REQUEST, "SEAT_005", "좌석 선점에 실패하였습니다.");
+	FAILED_PROCESS_SEAT(HttpStatus.BAD_REQUEST, "SEAT_005", "좌석 선점에 실패하였습니다."),
+	INVALID_ACCESS(HttpStatus.BAD_REQUEST, "SEAT_006", "잘못된 접근입니다.");
 
 	private final HttpStatus status;
 	private final String errorCode;
