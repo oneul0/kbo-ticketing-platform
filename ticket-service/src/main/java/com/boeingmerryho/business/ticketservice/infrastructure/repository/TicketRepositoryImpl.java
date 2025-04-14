@@ -20,6 +20,11 @@ public class TicketRepositoryImpl implements TicketRepository {
 	private final TicketQueryRepository ticketQueryRepository;
 
 	@Override
+	public void save(Ticket ticket) {
+		ticketJpaRepository.save(ticket);
+	}
+
+	@Override
 	public Optional<Ticket> findById(Long id) {
 		return ticketJpaRepository.findById(id);
 	}
@@ -27,5 +32,10 @@ public class TicketRepositoryImpl implements TicketRepository {
 	@Override
 	public Page<Ticket> findByCriteria(TicketSearchCriteria criteria, Pageable pageable) {
 		return ticketQueryRepository.findByCriteria(criteria, pageable);
+	}
+
+	@Override
+	public Optional<Ticket> findActiveTicketById(Long id) {
+		return ticketQueryRepository.findActiveTicketById(id);
 	}
 }

@@ -1,57 +1,30 @@
 package com.boeingmerryho.business.paymentservice.application;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentApproveRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailSearchRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentMembershipCancelRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentReadyRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentTicketCancelRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailResponseServiceDto;
-import com.boeingmerryho.business.paymentservice.domain.context.PaymentDetailSearchContext;
-import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
-import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
 
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
+public interface PaymentService {
+	PaymentReadyResponseServiceDto pay(PaymentReadyRequestServiceDto requestServiceDto);
 
-@Service
-@RequiredArgsConstructor
-public class PaymentService {
-	private final PaymentRepository paymentRepository;
-	private final PaymentApplicationMapper mapper;
+	PaymentApproveResponseServiceDto approvePayment(PaymentApproveRequestServiceDto requestServiceDto);
 
-	public PaymentDetailResponseServiceDto getPaymentDetail(
-		PaymentDetailRequestServiceDto requestServiceDto) {
-		PaymentDetail paymentDetail = paymentRepository.findPaymentDetailByIdAndIsDeleted(requestServiceDto.id())
-			.orElseThrow(() -> new EntityNotFoundException("Payment not found"));
+	PaymentTicketCancelResponseServiceDto cancelTicketPayment(PaymentTicketCancelRequestServiceDto requestServiceDto);
 
-		return mapper.toPaymentDetailResponseServiceDto(paymentDetail);
-	}
+	PaymentMembershipCancelResponseServiceDto cancelMembershipPayment(
+		PaymentMembershipCancelRequestServiceDto requestServiceDto);
 
-	public Page<PaymentDetailResponseServiceDto> searchPaymentDetail(
-		PaymentDetailSearchRequestServiceDto requestServiceDto) {
-		Page<PaymentDetail> paymentDetails = paymentRepository.searchPaymentDetail(
-			createSearchContext(
-				requestServiceDto.id(),
-				requestServiceDto.paymentId(),
-				requestServiceDto.customPageable(),
-				requestServiceDto.isDeleted()
-			)
-		);
-		return paymentDetails.map(mapper::toPaymentDetailResponseServiceDto);
-	}
+	PaymentDetailResponseServiceDto getPaymentDetail(PaymentDetailRequestServiceDto requestServiceDto);
 
-	private PaymentDetailSearchContext createSearchContext(
-		Long id,
-		Long paymentId,
-		Pageable customPageable,
-		Boolean isDeleted
-	) {
-		return PaymentDetailSearchContext.builder()
-			.id(id)
-			.paymentId(paymentId)
-			.customPageable(customPageable)
-			.isDeleted(isDeleted)
-			.build();
-	}
+	Page<PaymentDetailResponseServiceDto> searchPaymentDetail(PaymentDetailSearchRequestServiceDto requestServiceDto);
 }

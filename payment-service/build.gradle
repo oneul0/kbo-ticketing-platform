@@ -30,7 +30,7 @@ ext {
 
 dependencies {
     // common
-    implementation 'io.github.boeingmerryho:common-library:1.0.2'
+    implementation 'io.github.boeingmerryho:common-library:1.0.4'
 
     // eureka
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
@@ -46,6 +46,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    // validation
+    implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final'
+    implementation 'javax.validation:validation-api:2.0.1.Final'
 
     // querydsl
     implementation "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
