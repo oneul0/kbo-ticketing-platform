@@ -8,14 +8,19 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import com.boeingmerryho.business.queueservice.application.QueueHelper;
+import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminSearchHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.domain.entity.Queue;
+import com.boeingmerryho.business.queueservice.domain.entity.QueueSearchCriteria;
 import com.boeingmerryho.business.queueservice.domain.model.QueueUserInfo;
+import com.boeingmerryho.business.queueservice.domain.repository.CustomQueueRepository;
 import com.boeingmerryho.business.queueservice.domain.repository.QueueRepository;
 import com.boeingmerryho.business.queueservice.exception.ErrorCode;
 
@@ -38,6 +43,7 @@ public class QueueHelperImpl implements QueueHelper {
 	private final RedisTemplate<String, Object> redisTemplate;
 
 	private final QueueRepository queueRepository;
+	private final CustomQueueRepository customQueueRepository;
 
 	@Override
 	public Boolean validateStoreIsActive(Long storeId) {
@@ -167,4 +173,22 @@ public class QueueHelperImpl implements QueueHelper {
 		return redisTemplate.opsForZSet().size(redisKey);
 	}
 
+	@Override
+	public QueueSearchCriteria getQueueSearchCriteria(QueueAdminSearchHistoryServiceDto requestDto) {
+		QueueSearchCriteria criteria = QueueSearchCriteria.builder()
+			.storeId(requestDto.storeId())
+			.userId(requestDto.userId())
+			.status(requestDto.status())
+			.cancelReason(requestDto.cancelReason())
+			.startDate(requestDto.startDate())
+			.endDate(requestDto.endDate())
+			.build();
+
+		return criteria;
+	}
+
+	@Override
+	public Page<Queue> searchHistoryByDynamicQuery(QueueSearchCriteria criteria, Pageable pageable) {
+		return customQueueRepository.findDynamicQuery(criteria, pageable);
+	}
 }

@@ -13,6 +13,7 @@ import com.boeingmerryho.business.queueservice.application.dto.request.other.Que
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueUserSequenceServiceDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminCallUserRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminQueueListRequestDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminSearchHistoryRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminStatusRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.other.QueueJoinRequestDto;
 
@@ -40,5 +41,7 @@ public interface QueuePresentationMapper {
 	@Mapping(target = "pageable", source = "customPageable")
 	QueueAdminQueueListRequestDto toQueueAdminQueueListRequestDto(Long storeId, Pageable customPageable);
 
-	QueueAdminSearchHistoryServiceDto toQueueAdminSearchHistoryServiceDto(Long storeId, Pageable customPageable);
+	@Mapping(target = "pageable", source = "customPageable")
+	QueueAdminSearchHistoryServiceDto toQueueAdminSearchHistoryServiceDto(QueueAdminSearchHistoryRequestDto requestDto,
+		Pageable customPageable);
 }

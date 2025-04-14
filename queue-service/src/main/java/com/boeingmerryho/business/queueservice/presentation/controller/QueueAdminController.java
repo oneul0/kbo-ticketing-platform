@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,15 +16,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminCallUserServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteUserServiceDto;
+import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminSearchHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.service.QueueAdminService;
 import com.boeingmerryho.business.queueservice.config.pageable.PageableConfig;
 import com.boeingmerryho.business.queueservice.presentation.QueueSuccessCode;
 import com.boeingmerryho.business.queueservice.presentation.dto.mapper.QueuePresentationMapper;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminCallUserRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminQueueListRequestDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminSearchHistoryRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminCallUserResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminDeleteUserResponseDto;
-import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminItemListResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminHistoryListResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminSearchHistoryResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminSearchResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
@@ -68,7 +72,7 @@ public class QueueAdminController {
 		"가게의 대기열을 조회하는 api. manager, admin 사용 가능"
 	)
 	@GetMapping("/stores/{id}/queues")
-	public ResponseEntity<QueueAdminSearchResponseDto> getQueueList(
+	public ResponseEntity<SuccessResponse<QueueAdminSearchResponseDto>> getQueueList(
 		@PathVariable(name = "id") Long storeId,
 		@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
 		@RequestParam(value = "size", required = false) Integer size
@@ -76,7 +80,28 @@ public class QueueAdminController {
 		Pageable customPageable = pageableConfig.customPageable(page, size, null, null);
 		QueueAdminQueueListRequestDto requestDto = queuePresentationMapper.toQueueAdminQueueListRequestDto(storeId,
 			customPageable);
-		Page<QueueAdminItemListResponseDto> queuePageDto = queueAdminService.getQueueList(requestDto);
-		return ResponseEntity.ok(new QueueAdminSearchResponseDto(storeId, queuePageDto));
+		Page<QueueAdminHistoryListResponseDto> queuePageDto = queueAdminService.getQueueList(requestDto);
+		return SuccessResponse.of(QueueSuccessCode.QUEUE_SEARCH_STATUS_SUCCESS,
+			new QueueAdminSearchResponseDto(storeId, queuePageDto));
+	}
+
+	@Description(
+		"가게의 대기열 기록을 조회하는 api. manager, admin 사용 가능"
+	)
+	@GetMapping("/stores/history")
+	public ResponseEntity<SuccessResponse<Page<QueueAdminSearchHistoryResponseDto>>> getQueueHistory(
+		@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+		@RequestParam(value = "size", required = false) Integer size,
+		@RequestParam(value = "sortDirection", required = false) String sortDirection,
+		@RequestParam(value = "by", required = false) String by,
+		@ModelAttribute QueueAdminSearchHistoryRequestDto requestDto
+	) {
+		Pageable customPageable = pageableConfig.customPageable(page, size, sortDirection, by);
+
+		QueueAdminSearchHistoryServiceDto serviceDto = queuePresentationMapper.toQueueAdminSearchHistoryServiceDto(
+			requestDto,
+			customPageable);
+		Page<QueueAdminSearchHistoryResponseDto> responseDto = queueAdminService.getQueueHistory(serviceDto);
+		return SuccessResponse.of(QueueSuccessCode.QUEUE_HISTORY_SEARCH_SUCCESS, responseDto);
 	}
 }
