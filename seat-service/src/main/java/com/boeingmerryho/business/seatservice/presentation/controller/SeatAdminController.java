@@ -21,7 +21,7 @@ import com.boeingmerryho.business.seatservice.application.dto.response.SeatCreat
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatInActiveServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatUpdateServiceResponseDto;
 import com.boeingmerryho.business.seatservice.application.service.SeatAdminService;
-import com.boeingmerryho.business.seatservice.presentation.SeatSuccessCode;
+import com.boeingmerryho.business.seatservice.exception.SeatSuccessCode;
 import com.boeingmerryho.business.seatservice.presentation.dto.mapper.SeatPresentationMapper;
 import com.boeingmerryho.business.seatservice.presentation.dto.request.CacheSeatCreateRequestDto;
 import com.boeingmerryho.business.seatservice.presentation.dto.request.SeatCreateRequestDto;
