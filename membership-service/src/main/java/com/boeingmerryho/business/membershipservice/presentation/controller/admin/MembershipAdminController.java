@@ -37,8 +37,8 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/admin/v1/memberships")
 public class MembershipAdminController {
 
-	private final MembershipAdminService membershipAdminService;
 	private final MembershipPresentationMapper mapper;
+	private final MembershipAdminService membershipAdminService;
 
 	@PostMapping
 	public ResponseEntity<SuccessResponse<MembershipCreateResponseDto>> createMembership(
