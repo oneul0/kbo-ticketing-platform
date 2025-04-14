@@ -1,5 +1,8 @@
 package com.boeingmerryho.business.membershipservice.domain.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -15,6 +18,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -73,6 +77,6 @@ public class Membership extends BaseEntity {
 			.build();
 	}
 
-	// @OneToMany(mappedBy = "membership")
-	// private List<MembershipUser> users = new ArrayList<>();
+	@OneToMany(mappedBy = "membership")
+	private List<MembershipUser> users = new ArrayList<>();
 }
