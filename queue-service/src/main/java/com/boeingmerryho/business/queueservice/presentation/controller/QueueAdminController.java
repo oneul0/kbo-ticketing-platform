@@ -107,10 +107,10 @@ public class QueueAdminController {
 	}
 
 	@Description(
-		"가게의 대기열 기록을 조회하는 api. manager, admin 사용 가능"
+		"가게의 대기열 기록을 삭제하는 api. manager, admin 사용 가능"
 	)
 	@DeleteMapping("/stores/history/{id}")
-	public ResponseEntity<SuccessResponse<Long>> getQueueHistory(
+	public ResponseEntity<SuccessResponse<Long>> deleteQueueHistory(
 		@PathVariable(name = "id") Long id,
 		@RequestParam Long userId
 		//todo : @RequestAttribute Long userId 로 수정
