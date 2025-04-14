@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import com.boeingmerryho.business.queueservice.application.QueueHelper;
@@ -58,28 +59,24 @@ public class QueueHelperImpl implements QueueHelper {
 
 	@Override
 	public void joinUserInQueue(Long storeId, Long userId, Long ticketId) {
-		String today = LocalDate.now().toString();
-
-		String queueKey = WAITLIST_INFO_PREFIX + storeId + ":" + today;
-		String seqKey = queueKey + ":seq";
+		String redisKey = getWaitlistInfoPrefix(storeId);
+		String seqKey = redisKey + ":seq";
 
 		try {
 			Long order = redisTemplate.opsForValue().increment(seqKey);
 
-			redisTemplate.opsForZSet().add(queueKey, userId.toString(), Objects.requireNonNull(order).doubleValue());
+			redisTemplate.opsForZSet().add(redisKey, userId.toString(), Objects.requireNonNull(order).doubleValue());
 		} catch (RedisConnectionFailureException e) {
 			throw new GlobalException(ErrorCode.QUEUE_JOIN_FAIL);
 		}
 
-		setExpireIfAbsent(queueKey, Duration.ofDays(WAITLIST_INFO_EXPIRE_DAY));
+		setExpireIfAbsent(redisKey, Duration.ofDays(WAITLIST_INFO_EXPIRE_DAY));
 		setExpireIfAbsent(seqKey, Duration.ofDays(WAITLIST_INFO_EXPIRE_DAY));
 	}
 
 	@Override
 	public Integer getUserQueuePosition(Long storeId, Long userId) {
-		String today = LocalDate.now().toString();
-
-		String redisKey = String.format(WAITLIST_INFO_PREFIX + storeId + ":" + today);
+		String redisKey = getWaitlistInfoPrefix(storeId);
 
 		Long rank = redisTemplate.opsForZSet().rank(redisKey, userId.toString());
 		log.debug("rank : {}", rank);
@@ -92,9 +89,7 @@ public class QueueHelperImpl implements QueueHelper {
 
 	@Override
 	public Integer getUserSequencePosition(Long storeId, Long userId) {
-		String today = LocalDate.now().toString();
-
-		String redisKey = String.format(WAITLIST_INFO_PREFIX + storeId + ":" + today);
+		String redisKey = getWaitlistInfoPrefix(storeId);
 
 		Double score = redisTemplate.opsForZSet().score(redisKey, userId.toString());
 		log.debug("score : {}", score);
@@ -107,9 +102,7 @@ public class QueueHelperImpl implements QueueHelper {
 
 	@Override
 	public Boolean removeUserFromQueue(Long storeId, Long userId) {
-		String today = LocalDate.now().toString();
-
-		String redisKey = String.format(WAITLIST_INFO_PREFIX + storeId + ":" + today);
+		String redisKey = getWaitlistInfoPrefix(storeId);
 		Long removedCount = redisTemplate.opsForZSet().remove(redisKey, userId.toString());
 
 		return removedCount != null && removedCount > 0;
@@ -129,8 +122,8 @@ public class QueueHelperImpl implements QueueHelper {
 
 	@Override
 	public QueueUserInfo getNextUserInQueue(Long storeId) {
-		String today = LocalDate.now().toString();
-		String redisKey = String.format(WAITLIST_INFO_PREFIX + storeId + ":" + today);
+
+		String redisKey = getWaitlistInfoPrefix(storeId);
 
 		Set<Object> userIds = redisTemplate.opsForZSet().range(redisKey, 0, 0);
 		if (userIds == null || userIds.isEmpty()) {
@@ -146,6 +139,32 @@ public class QueueHelperImpl implements QueueHelper {
 		}
 
 		return new QueueUserInfo(userId, rank.intValue() + 1);
+	}
+
+	@Override
+	public String getWaitlistInfoPrefix(Long storeId) {
+		String today = LocalDate.now().toString();
+		String redisKey = String.format(WAITLIST_INFO_PREFIX + storeId + ":" + today);
+		return redisKey;
+	}
+
+	@Override
+	public Set<ZSetOperations.TypedTuple<String>> getUserQueueRange(Long storeId, int page, int size) {
+		String today = LocalDate.now().toString();
+		String redisKey = String.format(WAITLIST_INFO_PREFIX + storeId + ":" + today);
+
+		long start = (long)page * size;
+		long end = start + size - 1;
+
+		Set<ZSetOperations.TypedTuple<String>> result = (Set<ZSetOperations.TypedTuple<String>>)(Set<?>)redisTemplate.opsForZSet()
+			.rangeWithScores(redisKey, start, end);
+
+		return result;
+	}
+
+	@Override
+	public Long getTotalQueueSize(String redisKey) {
+		return redisTemplate.opsForZSet().size(redisKey);
 	}
 
 }
