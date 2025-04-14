@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.boeingmerryho.business.queueservice.application.QueueHelper;
 import com.boeingmerryho.business.queueservice.domain.entity.Queue;
+import com.boeingmerryho.business.queueservice.domain.model.QueueUserInfo;
 import com.boeingmerryho.business.queueservice.domain.repository.QueueRepository;
 import com.boeingmerryho.business.queueservice.exception.ErrorCode;
 
@@ -123,6 +125,27 @@ public class QueueHelperImpl implements QueueHelper {
 		if (expire == null || expire == -1) {
 			redisTemplate.expire(key, ttl);
 		}
+	}
+
+	@Override
+	public QueueUserInfo getNextUserInQueue(Long storeId) {
+		String today = LocalDate.now().toString();
+		String redisKey = String.format(WAITLIST_INFO_PREFIX + storeId + ":" + today);
+
+		Set<Object> userIds = redisTemplate.opsForZSet().range(redisKey, 0, 0);
+		if (userIds == null || userIds.isEmpty()) {
+			return null;
+		}
+
+		String userIdStr = (String)userIds.iterator().next();
+		Long userId = Long.parseLong(userIdStr);
+
+		Long rank = redisTemplate.opsForZSet().rank(redisKey, userIdStr);
+		if (rank == null) {
+			throw new GlobalException(ErrorCode.WAITLIST_NOT_EXIST);
+		}
+
+		return new QueueUserInfo(userId, rank.intValue() + 1);
 	}
 
 }

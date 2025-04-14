@@ -18,7 +18,7 @@ public enum ErrorCode implements BaseErrorCode {
 
 	WAITLIST_NOT_EXIST("Q-006", "대기열에 존재하지 않는 사용자입니다.", HttpStatus.BAD_REQUEST),
 	CAN_NOT_REMOVE_QUEUE("Q-007", "대기열에서 삭제하지 못했습니다.", HttpStatus.BAD_REQUEST),
-
+	WAITLIST_EMPTY("Q-008", "대기열이 없습니다.", HttpStatus.BAD_REQUEST),
 	;
 
 	private final String errorCode;

@@ -10,6 +10,7 @@ import com.boeingmerryho.business.queueservice.application.dto.request.admin.Que
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteUserServiceDto;
 import com.boeingmerryho.business.queueservice.domain.entity.Queue;
 import com.boeingmerryho.business.queueservice.domain.model.CancelReason;
+import com.boeingmerryho.business.queueservice.domain.model.QueueUserInfo;
 import com.boeingmerryho.business.queueservice.exception.ErrorCode;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminQueueListRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminCallUserResponseDto;
@@ -51,10 +52,26 @@ public class QueueAdminService {
 
 	@Description("대기열의 다음 사용자 호출 메서드")
 	public QueueAdminCallUserResponseDto callNextUserFromQueue(QueueAdminCallUserServiceDto dto) {
-		Long storeId = 0L;
-		Long userId = 0L;
-		Integer sequence = 0;
-		return queueApplicationMapper.toQueueAdminCallUserResponseDto(storeId, userId, sequence);
+		Long storeId = dto.storeId();
+		QueueUserInfo userInfo = helper.getNextUserInQueue(storeId);
+
+		if (userInfo == null) {
+			throw new GlobalException(ErrorCode.WAITLIST_EMPTY);
+		}
+
+		Integer sequence = helper.getUserSequencePosition(storeId, userInfo.userId());
+
+		helper.removeUserFromQueue(storeId, userInfo.userId());
+
+		Queue canceledQueue = Queue.confirmQueue(storeId, userInfo.userId(), sequence);
+
+		Queue cancelledUser = helper.saveQueueInfo(canceledQueue);
+
+		return queueApplicationMapper.toQueueAdminCallUserResponseDto(
+			storeId,
+			userInfo.userId(),
+			userInfo.rank()
+		);
 	}
 
 	@Description("가게의 대기열 정보를 가져오는 메서드")
