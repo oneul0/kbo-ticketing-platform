@@ -19,14 +19,13 @@ public interface MembershipJpaRepository extends JpaRepository<Membership, Long>
 
 	Optional<Membership> findByIdAndIsDeletedFalse(Long id);
 
-	@Query("""
-		SELECT m FROM Membership m
-		JOIN m.users mu
-		WHERE mu.userId = :userId
-		AND mu.season = :season
-		AND mu.isActive = true
-		AND mu.isDeleted = false
-		""")
+	@Query("SELECT M " +
+		"FROM Membership M " +
+		"JOIN M.users MU " +
+		"WHERE MU.userId = :userId " +
+		"AND MU.season = :season " +
+		"AND MU.isActive IS TRUE " +
+		"AND MU.isDeleted IS FALSE")
 	Optional<Membership> findActiveMembershipByUserIdAndSeasonAndIsDeletedFalse(
 		@Param("userId") Long userId,
 		@Param("season") int season
