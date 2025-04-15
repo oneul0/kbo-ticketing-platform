@@ -55,5 +55,5 @@ public interface MembershipJpaRepository extends JpaRepository<Membership, Long>
 		+ "SET MU.isActive = false "
 		+ "WHERE MU.season = :season "
 		+ "AND MU.isDeleted = false")
-	void bulkDeactivateBySeason(@Param("season") Integer season);
+	Integer bulkDeactivateBySeason(@Param("season") Integer season);
 }

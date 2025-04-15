@@ -26,4 +26,9 @@ public class MembershipUserAdminService {
 		MembershipUserSearchAdminRequestServiceDto requestServiceDto) {
 		return membershipAdminHelper.searchUserMembership(requestServiceDto);
 	}
+
+	@Transactional
+	public Integer deactivateUsersOfSeason(Integer season) {
+		return membershipAdminHelper.deactivateUsers(season);
+	}
 }

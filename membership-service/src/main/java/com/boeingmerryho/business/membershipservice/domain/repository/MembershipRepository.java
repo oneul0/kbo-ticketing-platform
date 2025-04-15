@@ -26,5 +26,5 @@ public interface MembershipRepository {
 
 	Optional<MembershipUser> findByUserIdAndMembershipSeason(Long userId, Integer season);
 
-	void bulkDeactivateBySeason(Integer season);
+	Integer bulkDeactivateBySeason(Integer season);
 }

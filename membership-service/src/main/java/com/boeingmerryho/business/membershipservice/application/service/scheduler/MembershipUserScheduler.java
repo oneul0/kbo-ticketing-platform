@@ -24,7 +24,7 @@ public class MembershipUserScheduler {
 		int currentYear = LocalDate.now().getYear();
 		int previousSeason = currentYear - 1;
 
-		membershipJpaRepository.bulkDeactivateBySeason(previousSeason);
-		log.info("전년도 멤버십 등록 고객 멤버십 비활성화");
+		int updatedCount = membershipJpaRepository.bulkDeactivateBySeason(previousSeason);
+		System.out.println("[스케줄러] 시즌 " + previousSeason + " 멤버십 사용자 " + updatedCount + "명 비활성화 완료");
 	}
 }

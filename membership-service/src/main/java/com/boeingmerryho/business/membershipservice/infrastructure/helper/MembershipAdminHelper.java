@@ -104,4 +104,8 @@ public class MembershipAdminHelper {
 		);
 		return membershipUserQueryRepository.searchMembershipUser(condition, requestServiceDto.customPageable());
 	}
+
+	public int deactivateUsers(Integer season) {
+		return membershipRepository.bulkDeactivateBySeason(season);
+	}
 }
