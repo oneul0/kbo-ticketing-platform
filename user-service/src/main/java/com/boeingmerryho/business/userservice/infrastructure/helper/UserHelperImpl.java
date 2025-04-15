@@ -3,7 +3,6 @@ package com.boeingmerryho.business.userservice.infrastructure.helper;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,7 +17,6 @@ import com.boeingmerryho.business.userservice.application.dto.request.other.User
 import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
 import com.boeingmerryho.business.userservice.application.feign.MembershipClient;
 import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
-import com.boeingmerryho.business.userservice.application.utils.jwt.JwtTokenProvider;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
@@ -26,7 +24,6 @@ import com.boeingmerryho.business.userservice.exception.ErrorCode;
 
 import feign.FeignException;
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -37,14 +34,13 @@ public class UserHelperImpl implements UserHelper {
 	private static final Pattern PASSWORD_PATTERN = Pattern.compile(
 		"^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,15}$");
 
-	private static final String USER_INFO_PREFIX = "user:info:";
 	private static final String USER_TOKEN_PREFIX = "user:token:";
-	private static final String BLACKLIST_PREFIX = "blacklist:";
 	private static final String VERIFICATION_PREFIX = "verification:email:";
 	private static final String MEMBERSHIP_INFO_PREFIX = "user:membership:info:";
+	private static final String USER_INFO_PREFIX = "user:info:";
+	private static final String BLACKLIST_PREFIX = "blacklist:";
 
 	private final RedisTemplate<String, Object> redisTemplate;
-	private final JwtTokenProvider jwtTokenProvider;
 	private final RedisUtil redisUtil;
 	private final UserRepository userRepository;
 	private final MembershipClient membershipClient;
@@ -126,17 +122,6 @@ public class UserHelperImpl implements UserHelper {
 		}
 	}
 
-	//-----redis
-
-	public void isEqualStoredRefreshToken(Long userId, String refreshToken) {
-		String redisKey = USER_TOKEN_PREFIX + userId;
-		String storedRefreshToken = (String)redisTemplate.opsForHash().get(redisKey, "refreshToken");
-
-		if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
-			throw new GlobalException(ErrorCode.JWT_NOT_MATCH);
-		}
-	}
-
 	public void updateRedisUserInfo(User user) {
 		redisUtil.updateUserInfo(user);
 	}
@@ -145,43 +130,9 @@ public class UserHelperImpl implements UserHelper {
 		return redisUtil.updateUserJwtToken(id);
 	}
 
-	public void clearRedisUserData(Long userId) {
-		redisTemplate.delete(USER_INFO_PREFIX + userId);
-		redisTemplate.delete(USER_TOKEN_PREFIX + userId);
-		redisTemplate.delete(MEMBERSHIP_INFO_PREFIX + userId);
-	}
-
-	public void deleteFromRedisByKey(String tokenKey) {
-		redisTemplate.delete(tokenKey);
-	}
-
-	public void hasKeyInRedis(String key) {
-		if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
-			throw new GlobalException(ErrorCode.NOT_FOUND);
-		}
-	}
-
-	public Map<Object, Object> getMapEntriesFromRedis(String key) {
-		return redisTemplate.opsForHash().entries(key);
-	}
-
-	public void setOpsForValueRedis(String key, String value) {
-		redisTemplate.opsForValue().set(key, value);
-	}
-
-	public void blacklistToken(String accessToken) {
-		Claims claims = jwtTokenProvider.parseJwtToken(accessToken);
-		long ttlMillis = jwtTokenProvider.calculateTtlMillis(claims.getExpiration());
-		String blacklistKey = BLACKLIST_PREFIX + accessToken;
-
-		setOpsForValueRedis(blacklistKey, "blacklisted");
-		redisTemplate.expire(blacklistKey, Math.max(ttlMillis, 1), TimeUnit.MILLISECONDS);
-
-	}
-
 	public UserTokenResult getUserTokenFromRedis(Long userId) {
 		String tokenKey = USER_TOKEN_PREFIX + userId;
-		hasKeyInRedis(tokenKey);
+		redisUtil.hasKeyInRedis(tokenKey);
 
 		Map<Object, Object> token = getMapEntriesFromRedis(tokenKey);
 		if (token == null || token.isEmpty()) {
@@ -190,26 +141,36 @@ public class UserHelperImpl implements UserHelper {
 		return new UserTokenResult(tokenKey, token);
 	}
 
+	@Override
+	public void removeUserMembershipInfoFromRedis(Long id) {
+		String membershipKey = MEMBERSHIP_INFO_PREFIX + id;
+		redisUtil.deleteFromRedisByKey(membershipKey);
+	}
+
 	//----mail
 	public String generateVerificationCode() {
-		return String.format("%06d", new Random().nextInt(1000000)); // 6자리 랜덤 숫자
+		return String.format("%06d", new Random().nextInt(1000000));
 	}
 
+	@Override
 	public void storeVerificationCode(String email, String code) {
 		String key = VERIFICATION_PREFIX + email;
-		redisTemplate.opsForValue().set(key, code, 5, TimeUnit.MINUTES); // 5분 TTL
+		redisUtil.setTtlAndOpsForValueRedis(key, code, 5L);
 	}
 
+	@Override
 	public String getVerificationCode(String email) {
 		String key = VERIFICATION_PREFIX + email;
-		return (String)redisTemplate.opsForValue().get(key);
+		return redisUtil.getOpsForValue(key);
 	}
 
+	@Override
 	public void removeVerificationCode(String email) {
 		String key = VERIFICATION_PREFIX + email;
-		redisTemplate.delete(key);
+		redisUtil.deleteFromRedisByKey(key);
 	}
 
+	@Override
 	public void checkDuplicatedVerificationRequest(String email) {
 		String key = VERIFICATION_PREFIX + email;
 		if (redisTemplate.hasKey(key)) {
@@ -231,11 +192,6 @@ public class UserHelperImpl implements UserHelper {
 		} catch (Exception e) {
 			throw new GlobalException(ErrorCode.MEMBERSHIP_FEIGN_REQUEST_FAIL);
 		}
-	}
-
-	public void removeUserMembershipInfoFromRedis(Long id) {
-		String membershipKey = MEMBERSHIP_INFO_PREFIX + id;
-		redisTemplate.delete(membershipKey);
 	}
 
 }
