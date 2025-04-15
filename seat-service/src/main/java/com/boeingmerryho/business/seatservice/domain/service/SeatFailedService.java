@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.seatservice.domain.ReservationStatus;
 import com.boeingmerryho.business.seatservice.domain.Seat;
+import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatCommonHelper;
 import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatListenerHelper;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SeatFailedService {
 	private final RedissonClient redissonClient;
+	private final SeatCommonHelper seatCommonHelper;
 	private final SeatListenerHelper seatListenerHelper;
 
 	@Transactional
@@ -31,7 +33,7 @@ public class SeatFailedService {
 			Seat seat = seatListenerHelper.getSeat(seatId);
 			RList<String> blockSeats = seatListenerHelper.getCacheBlocks(seat, date);
 
-			String cacheSeatKey = seatListenerHelper.makeCacheKey(seat, date);
+			String cacheSeatKey = seatCommonHelper.makeCacheKey(seat, date);
 
 			if (blockSeats.contains(cacheSeatKey)) {
 				RBucket<Map<String, String>> seatBucketKey = redissonClient.getBucket(cacheSeatKey);
