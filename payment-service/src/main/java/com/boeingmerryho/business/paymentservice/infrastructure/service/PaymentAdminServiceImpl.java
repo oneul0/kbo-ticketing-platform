@@ -1,13 +1,13 @@
 package com.boeingmerryho.business.paymentservice.infrastructure.service;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.paymentservice.application.PaymentAdminService;
+import com.boeingmerryho.business.paymentservice.application.PaymentStrategy;
+import com.boeingmerryho.business.paymentservice.application.PaymentStrategyFactory;
 import com.boeingmerryho.business.paymentservice.application.dto.PaymentApplicationMapper;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayCancelRequest;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayCancelResponse;
@@ -35,10 +35,8 @@ import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
 import com.boeingmerryho.business.paymentservice.infrastructure.KakaoApiClient;
-import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
-import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
 
@@ -53,11 +51,12 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 	String authPrefix;
 
 	private final KakaoApiClient kakaoApiClient;
-	private final PaySessionHelper paySessionHelper;
 	private final PaymentRepository paymentRepository;
+	private final PaymentStrategyFactory strategyFactory;
 	private final PaymentDetailRepository paymentDetailRepository;
 	private final PaymentApplicationMapper paymentApplicationMapper;
 
+	@Override
 	@Transactional
 	public PaymentTicketCancelResponseServiceDto cancelTicketPayment(
 		PaymentTicketCancelRequestServiceDto requestServiceDto
@@ -80,6 +79,7 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 		}
 	}
 
+	@Override
 	@Transactional
 	public PaymentMembershipCancelResponseServiceDto cancelMembershipPayment(
 		PaymentMembershipCancelRequestServiceDto requestServiceDto
@@ -91,6 +91,7 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 		return paymentApplicationMapper.toPaymentMembershipCancelResponseServiceDto(payment.getId());
 	}
 
+	@Override
 	@Transactional(readOnly = true)
 	public PaymentDetailAdminResponseServiceDto getPaymentDetail(
 		PaymentDetailRequestServiceDto requestServiceDto
@@ -101,6 +102,7 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 		return paymentApplicationMapper.toPaymentDetailAdminResponseServiceDto(paymentDetail);
 	}
 
+	@Override
 	@Transactional(readOnly = true)
 	public Page<PaymentDetailAdminResponseServiceDto> searchPaymentDetail(
 		PaymentDetailSearchRequestServiceDto requestServiceDto
@@ -122,13 +124,16 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 			.build();
 	}
 
+	@Override
+	@Transactional
 	public PaymentTicketRefundResponseServiceDto refundTicketPayment(
-		PaymentTicketRefundRequestServiceDto requestServiceDto) {
+		PaymentTicketRefundRequestServiceDto requestServiceDto
+	) {
 
 		PaymentTicket paymentTicket = paymentRepository.findByPaymentTicketId(requestServiceDto.id())
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_TICKET_NOT_FOUND));
 
-		Payment payment = getPayment(paymentTicket);
+		Payment payment = paymentTicket.getPayment();
 
 		if (payment.validateStatus(PaymentStatus.REFUNDED)) {    // 이미 환불된 결제 건
 			throw new PaymentException(ErrorCode.PAYMENT_ALREADY_REFUNDED);
@@ -162,20 +167,18 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 		);
 	}
 
-	private static Payment getPayment(PaymentTicket paymentTicket) {
-		Payment payment = paymentTicket.getPayment();
-		return payment;
-	}
-
+	@Override
+	@Transactional
 	public PaymentMembershipRefundResponseServiceDto refundMembershipPayment(
-		PaymentMembershipRefundRequestServiceDto requestServiceDto) {
+		PaymentMembershipRefundRequestServiceDto requestServiceDto
+	) {
 
 		PaymentMembership paymentMembership = paymentRepository.findByPaymentMembershipId(requestServiceDto.id())
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_TICKET_NOT_FOUND));
 
 		Payment payment = paymentMembership.getPayment();
 
-		if (payment.validateStatus(PaymentStatus.REFUNDED)) {    // 이미 환불된 결제 건
+		if (payment.validateStatus(PaymentStatus.REFUNDED)) {
 			throw new PaymentException(ErrorCode.PAYMENT_ALREADY_REFUNDED);
 		}
 
@@ -209,43 +212,13 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 	}
 
 	@Override
+	@Transactional
 	public PaymentApproveResponseServiceDto approvePayment(
-		PaymentApproveAdminRequestServiceDto requestServiceDto) {
-
+		PaymentApproveAdminRequestServiceDto requestServiceDto
+	) {
 		Payment payment = paymentRepository.findById(requestServiceDto.paymentId())
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
-
-		PaymentDetail paymentDetail = paymentDetailRepository.save(
-			PaymentDetail.builder()
-				.payment(payment)
-				.discountPrice(payment.getDiscountPrice())
-				.method(PaymentMethod.BANK_TRANSFER)
-				.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice())
-				.build()
-		);
-
-		if (payment.getType() == PaymentType.TICKET) {
-			List<Ticket> tickets = requestServiceDto.tickets();
-			for (int i = 0; i < tickets.size(); i++) {
-				paymentRepository.saveTicket(
-					PaymentTicket.builder()
-						.price(tickets.get(i).price())
-						.ticketNo(tickets.get(i).no())
-						.payment(payment)
-						.build()
-				);
-			}
-		}
-		if (payment.getType() == PaymentType.MEMBERSHIP) {
-			paymentRepository.saveMembership(
-				PaymentMembership.builder()
-					.price(payment.getTotalPrice())
-					.membershipUserId(requestServiceDto.userId())
-					.payment(payment)
-					.build()
-			);
-		}
-		paySessionHelper.deletePaymentExpiredTime(String.valueOf(payment.getId()));
-		return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
+		PaymentStrategy strategy = strategyFactory.getStrategy(PaymentMethod.BANK_TRANSFER);
+		return strategy.approve(payment, requestServiceDto);
 	}
 }

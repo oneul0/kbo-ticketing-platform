@@ -1,7 +1,5 @@
 package com.boeingmerryho.business.paymentservice.domain.entity;
 
-import java.time.LocalDateTime;
-
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 
 import jakarta.persistence.AttributeOverride;
@@ -60,17 +58,4 @@ public class PaymentDetail {
 	@Embedded
 	private AccountInfo accountInfo;
 
-	public void fillAccountInfo(
-		String accountNumber,
-		String accountBank,
-		LocalDateTime dueDate,
-		String accountHolder
-	) {
-		this.accountInfo = AccountInfo.builder()
-			.accountNumber(accountNumber)
-			.accountBank(accountBank)
-			.dueDate(dueDate)
-			.accountHolder(accountHolder)
-			.build();
-	}
 }

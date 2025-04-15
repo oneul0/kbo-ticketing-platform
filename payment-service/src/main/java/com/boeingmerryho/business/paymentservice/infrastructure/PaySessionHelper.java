@@ -40,4 +40,16 @@ public class PaySessionHelper {
 		paySessionService.deletePaymentExpiredTime(paymentId);
 	}
 
+	public void savePaymentPrice(String paymentId, Integer price) {
+		paySessionService.savePaymentPrice(paymentId, price);
+	}
+
+	public Optional<Integer> getPaymentPrice(String paymentId) {
+		return paySessionService.getPaymentPrice(paymentId);
+	}
+
+	public void deletePaymentPrice(String paymentId) {
+		paySessionService.deletePaymentPrice(paymentId);
+	}
+
 }
