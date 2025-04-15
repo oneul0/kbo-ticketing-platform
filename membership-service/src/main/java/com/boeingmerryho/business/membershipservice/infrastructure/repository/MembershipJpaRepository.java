@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -48,4 +49,11 @@ public interface MembershipJpaRepository extends JpaRepository<Membership, Long>
 		@Param("userId") Long userId,
 		@Param("season") Integer season
 	);
+
+	@Modifying(clearAutomatically = true)
+	@Query("UPDATE MembershipUser MU "
+		+ "SET MU.isActive = false "
+		+ "WHERE MU.season = :season "
+		+ "AND MU.isDeleted = false")
+	void bulkDeactivateBySeason(@Param("season") Integer season);
 }
