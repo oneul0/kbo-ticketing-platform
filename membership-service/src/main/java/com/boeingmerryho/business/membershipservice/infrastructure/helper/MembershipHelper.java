@@ -6,7 +6,9 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.boeingmerryho.business.membershipservice.application.dto.mapper.MembershipApplicationMapper;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUserDetailResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
+import com.boeingmerryho.business.membershipservice.domain.entity.MembershipUser;
 import com.boeingmerryho.business.membershipservice.domain.repository.MembershipRepository;
 import com.boeingmerryho.business.membershipservice.exception.MembershipErrorCode;
 
@@ -29,5 +31,20 @@ public class MembershipHelper {
 	public Membership readActiveMembership(Long membershipId) {
 		return membershipRepository.findByIdAndIsDeletedFalse(membershipId)
 			.orElseThrow(() -> new GlobalException(MembershipErrorCode.NOT_FOUND));
+	}
+
+	public MembershipUserDetailResponseServiceDto getMembershipUser(Integer season, Long userId) {
+		MembershipUser membershipUser = membershipRepository
+			.findByUserIdAndMembershipSeason(userId, season)
+			.orElseThrow(() -> new GlobalException(MembershipErrorCode.NOT_FOUND_MEMBERSHIP));
+
+		Membership membership = membershipUser.getMembership();
+
+		return new MembershipUserDetailResponseServiceDto(
+			membership.getSeason(),
+			membership.getName().name(),
+			membership.getDiscount(),
+			membershipUser.getIsActive()
+		);
 	}
 }

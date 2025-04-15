@@ -37,7 +37,7 @@ public class SeatSucceedService {
 			Seat seat = seatListenerHelper.getSeat(seatId);
 			RList<String> blockSeats = seatListenerHelper.getCacheBlocks(seat, date);
 
-			String cacheSeatKey = seatListenerHelper.makeCacheKey(seat, date);
+			String cacheSeatKey = seatCommonHelper.makeCacheKey(seat, date);
 
 			if (blockSeats.contains(cacheSeatKey)) {
 				RBucket<Map<String, String>> seatBucketKey = redissonClient.getBucket(cacheSeatKey);

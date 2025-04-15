@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.seatservice.domain.ReservationStatus;
 import com.boeingmerryho.business.seatservice.domain.Seat;
+import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatCommonHelper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,13 +22,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CreateCacheSeatsService {
 	private final RedissonClient redissonClient;
-
-	private final String seatPrefix = "seat:";
+	private final SeatCommonHelper seatCommonHelper;
 
 	@Transactional
 	public void createSeatBucket(List<Seat> seats, LocalDate date) {
 		for (Seat seat : seats) {
-			String cacheKey = makeCacheKey(seat, date);
+			String cacheKey = seatCommonHelper.makeCacheKey(seat, date);
 			Map<String, String> cacheValue = makeCacheValue(seat);
 
 			RBucket<Map<String, String>> bucket = redissonClient.getBucket(cacheKey);
@@ -41,20 +41,6 @@ public class CreateCacheSeatsService {
 				blockSeats.add(cacheKey);
 			}
 		}
-	}
-
-	private String makeCacheKey(Seat seat, LocalDate date) {
-		StringBuilder builder = new StringBuilder()
-			.append(seatPrefix)
-			.append(date)
-			.append(":")
-			.append(seat.getSeatBlock())
-			.append(":")
-			.append(seat.getSeatColumn())
-			.append(":")
-			.append(seat.getSeatRow());
-
-		return builder.toString();
 	}
 
 	private Map<String, String> makeCacheValue(Seat seat) {
@@ -72,7 +58,7 @@ public class CreateCacheSeatsService {
 
 	private String makeBlockKey(Seat seat, LocalDate date) {
 		StringBuilder builder = new StringBuilder()
-			.append(seatPrefix)
+			.append(seatCommonHelper.seatPrefix)
 			.append(date)
 			.append(":")
 			.append(seat.getSeatBlock());
