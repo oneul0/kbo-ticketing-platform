@@ -42,7 +42,7 @@ public class MembershipController {
 		@PathVariable Long membershipId
 	) {
 		// TODO: userId 받아오기
-		Long userId = 1L;
+		Long userId = 6L;
 		MembershipUserCreateResponseServiceDto responseServiceDto = membershipReserveService.reserveMembership(
 			mapper.toMembershipUserCreateRequestServiceDto(membershipId, userId));
 		MembershipUserCreateResponseDto responseDto = mapper.toMembershipUserCreateResponseDto(responseServiceDto);

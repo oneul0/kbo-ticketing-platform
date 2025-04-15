@@ -3,8 +3,8 @@ package com.boeingmerryho.business.membershipservice.infrastructure.kafka.listen
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import com.boeingmerryho.business.membershipservice.application.dto.kafka.MembershipPaymentEvent;
 import com.boeingmerryho.business.membershipservice.application.service.kafka.ListenerService;
-import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipPaymentEvent;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +17,15 @@ public class PaymentSuccessKafkaListener {
 
 	private final ListenerService listenerService;
 
-	@KafkaListener(topics = "membership-succeed", groupId = "membership-payment")
+	@KafkaListener(topics = "payment-membership-process", groupId = "membership-service")
 	public void membershipSucceed(MembershipPaymentEvent response) {
 		try {
-			listenerService.membershipSucceed(response);
+			switch (response.event()) {
+				case "success" -> listenerService.paymentSucceed(response);
+				case "fail" -> listenerService.paymentFailure(response);
+				case "cancel" -> listenerService.paymentCancel(response);
+				default -> log.warn("알 수 없는 이벤트 타입: {}", response.event());
+			}
 		} catch (GlobalException e) {
 			log.warn(e.getMessage());
 		}

@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.membershipservice.presentation.dto.response;
+package com.boeingmerryho.business.membershipservice.application.dto.kafka;
 
 public record MembershipPaymentEvent(
 	String event,
