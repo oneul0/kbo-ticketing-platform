@@ -20,13 +20,12 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class RedisUtilImpl implements RedisUtil {
-	private final RedisTemplate<String, Object> redisTemplate;
-	private final JwtTokenProvider jwtTokenProvider;
-
 	private static final String USER_INFO_PREFIX = "user:info:";
 	private static final String USER_TOKEN_PREFIX = "user:token:";
 	private static final String BLACKLIST_PREFIX = "blacklist:";
 	private static final String MEMBERSHIP_INFO_PREFIX = "user:membership:info:";
+	private final RedisTemplate<String, Object> redisTemplate;
+	private final JwtTokenProvider jwtTokenProvider;
 
 	@Override
 	public void updateUserInfo(User user) {
@@ -77,10 +76,8 @@ public class RedisUtilImpl implements RedisUtil {
 	}
 
 	@Override
-	public void hasKeyInRedis(String key) {
-		if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
-			throw new GlobalException(ErrorCode.NOT_FOUND);
-		}
+	public Boolean hsaKeyInRedis(String key) {
+		return Boolean.FALSE.equals(redisTemplate.hasKey(key));
 	}
 
 	@Override

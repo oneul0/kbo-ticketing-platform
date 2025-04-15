@@ -1,9 +1,6 @@
 package com.boeingmerryho.business.userservice.application;
 
 import java.time.LocalDate;
-import java.util.Map;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminRegisterRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserRegisterRequestServiceDto;
@@ -37,42 +34,13 @@ public interface UserHelper {
 
 	void checkEmailExists(String email, UserRepository userRepository);
 
-	String encodePassword(String password, PasswordEncoder passwordEncoder);
+	String encodePassword(String password);
 
 	void isAdminRole(UserRoleType type);
 
-	void isEqualStoredRefreshToken(Long userId, String refreshToken);
-
-	void updateRedisUserInfo(User user);
-
-	Map<String, String> updateUserJwtTokenRedis(Long id);
-
-	void clearRedisUserData(Long userId);
-
-	void deleteFromRedisByKey(String tokenKey);
-
-	void hasKeyInRedis(String key);
-
-	Map<Object, Object> getMapEntriesFromRedis(String key);
-
-	void setOpsForValueRedis(String key, String value);
-
-	void blacklistToken(String accessToken);
-
 	UserTokenResult getUserTokenFromRedis(Long userId);
 
-	String generateVerificationCode();
-
-	void storeVerificationCode(String email, String code);
-
-	String getVerificationCode(String email);
-
-	void removeVerificationCode(String email);
-
-	void checkDuplicatedVerificationRequest(String email);
-
-	String getNotifyLoginResponse(Long id);
-
 	void removeUserMembershipInfoFromRedis(Long id);
+
 }
 
