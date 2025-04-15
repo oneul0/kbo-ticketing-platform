@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
+import com.boeingmerryho.business.membershipservice.domain.entity.MembershipUser;
 import com.boeingmerryho.business.membershipservice.domain.type.MembershipType;
 
 public interface MembershipRepository {
@@ -20,4 +21,8 @@ public interface MembershipRepository {
 	Optional<Membership> findActiveMembershipByUserIdAndSeasonAndIsDeletedFalse(Long userId, int season);
 
 	List<Membership> findAll();
+
+	Optional<Membership> findMembershipUserWithMembership(Long membershipUserId);
+
+	Optional<MembershipUser> findByUserIdAndMembershipSeason(Long userId, Integer season);
 }

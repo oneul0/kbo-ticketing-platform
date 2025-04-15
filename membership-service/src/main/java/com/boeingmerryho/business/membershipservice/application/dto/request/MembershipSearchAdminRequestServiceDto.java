@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.membershipservice.presentation.dto.request;
+package com.boeingmerryho.business.membershipservice.application.dto.request;
 
 import org.springframework.data.domain.Pageable;
 
