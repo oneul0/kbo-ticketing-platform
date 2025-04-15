@@ -1,6 +1,7 @@
 package com.boeingmerryho.business.paymentservice.application;
 
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.PaymentSession;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentApproveAdminRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentApproveRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentReadyRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
@@ -21,6 +22,12 @@ public interface PaymentStrategy {
 		PaymentSession paymentSession,
 		Payment payment,
 		PaymentApproveRequestServiceDto requestDto) {
+		throw new PaymentException(ErrorCode.PAYMENT_UNSUPPORTED);
+	}
+
+	default PaymentApproveResponseServiceDto approve(
+		Payment payment,
+		PaymentApproveAdminRequestServiceDto requestDto) {
 		throw new PaymentException(ErrorCode.PAYMENT_UNSUPPORTED);
 	}
 }

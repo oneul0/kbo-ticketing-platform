@@ -31,7 +31,7 @@ public class PaymentMembership {
 	private Payment payment;
 
 	@Column(nullable = false)
-	private Long membershipUserId;
+	private Long membershipId;    // membershipId 깔끔 명료 예본 TODO eureka flyway
 
 	@Column(nullable = false)
 	private Integer price;

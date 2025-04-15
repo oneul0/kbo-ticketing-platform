@@ -1,9 +1,13 @@
-package com.boeingmerryho.business.paymentservice.infrastructure;
+package com.boeingmerryho.business.paymentservice.infrastructure.service;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.boeingmerryho.business.paymentservice.application.PaymentStrategy;
 import com.boeingmerryho.business.paymentservice.application.dto.PaymentApplicationMapper;
@@ -25,8 +29,9 @@ import com.boeingmerryho.business.paymentservice.domain.repository.PaymentDetail
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
-import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
-import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
+import com.boeingmerryho.business.paymentservice.infrastructure.KafkaProducerHelper;
+import com.boeingmerryho.business.paymentservice.infrastructure.KakaoApiClient;
+import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
@@ -56,23 +61,25 @@ public class KakaoPayStrategy implements PaymentStrategy {
 	private final KakaoApiClient kakaoApiClient;
 	private final PaySessionHelper paySessionHelper;
 	private final PaymentRepository paymentRepository;
+	private final KafkaProducerHelper kafkaProducerHelper;
 	private final PaymentDetailRepository paymentDetailRepository;
 	private final PaymentApplicationMapper paymentApplicationMapper;
 
 	@Override
+	@Transactional
 	public PaymentReadyResponseServiceDto pay(
 		Payment payment,
 		PaymentReadyRequestServiceDto requestServiceDto
 	) {
 
-		Integer price = paySessionHelper.getPaymentPrice(payment.getId().toString())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_PRICE_INVALID));
-
-		int quantity = requestServiceDto.tickets() == null ? 1 : requestServiceDto.tickets().size();
-
-		if (requestServiceDto.price() != price * quantity) {    // 서비스에서 받은 가격 * 요청이 들어온 수량 == 결제 요청 금액 검증
-			throw new PaymentException(ErrorCode.PAYMENT_PRICE_INVALID);
-		}
+		// Integer price = paySessionHelper.getPaymentPrice(payment.getId().toString())
+		// 	.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_PRICE_INVALID));
+		//
+		// int quantity = requestServiceDto.tickets() == null ? 1 : requestServiceDto.tickets().size();
+		//
+		// if (requestServiceDto.price() != price * quantity) {
+		// 	throw new PaymentException(ErrorCode.PAYMENT_PRICE_INVALID);
+		// }
 
 		KakaoPayReadyRequest request = KakaoPayReadyRequest.builder()
 			.cid(cid)
@@ -122,13 +129,11 @@ public class KakaoPayStrategy implements PaymentStrategy {
 
 			paySessionHelper.savePaymentInfo(String.valueOf(requestServiceDto.paymentId()), session);
 		}
-
 		log.info("[Payment Ready] tid: {}, nextRedirectPcUrl: {}, createdAt: {}",
 			response.tid(),
 			response.nextRedirectPcUrl(),
 			response.createdAt()
 		);
-
 		return paymentApplicationMapper.toPaymentReadyResponseServiceDto(
 			requestServiceDto.paymentId(),
 			null,
@@ -138,59 +143,93 @@ public class KakaoPayStrategy implements PaymentStrategy {
 	}
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public PaymentApproveResponseServiceDto approve(
 		PaymentSession paymentSession,
 		Payment payment,
 		PaymentApproveRequestServiceDto requestServiceDto
 	) {
-		KakaoPayApproveRequest request = KakaoPayApproveRequest.builder()
-			.cid(paymentSession.cid())
-			.tid(paymentSession.tid())
-			.partnerOrderId(paymentSession.partnerOrderId())
-			.partnerUserId(paymentSession.partnerUserId())
-			.pgToken(requestServiceDto.pgToken())
-			.build();
-		KakaoPayApproveResponse response = kakaoApiClient.callApprove(request, secretKey, authPrefix);
-
-		PaymentDetail paymentDetail = paymentDetailRepository.save(
-			PaymentDetail.builder()
-				.kakaoPayInfo(
-					KakaoPayInfo.builder()
-						.cid(paymentSession.cid())
-						.tid(paymentSession.tid())
-						.build()
-				)
-				.payment(payment)
-				.discountPrice(payment.getDiscountPrice() - response.amount().discount())
-				.method(PaymentMethod.KAKAOPAY)
-				.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice() + response.amount().discount())
-				.build()
-		);
-
-		if (payment.getType() == PaymentType.TICKET) {
-			List<Ticket> tickets = paymentSession.tickets();
-			for (int i = 0; i < tickets.size(); i++) {
-				paymentRepository.saveTicket(
-					PaymentTicket.builder()
-						.price(tickets.get(i).price())
-						.ticketNo(tickets.get(i).no())
+		try {
+			KakaoPayApproveRequest request = KakaoPayApproveRequest.builder()
+				.cid(paymentSession.cid())
+				.tid(paymentSession.tid())
+				.partnerOrderId(paymentSession.partnerOrderId())
+				.partnerUserId(paymentSession.partnerUserId())
+				.pgToken(requestServiceDto.pgToken())
+				.build();
+			KakaoPayApproveResponse response = kakaoApiClient.callApprove(request, secretKey, authPrefix);
+			PaymentDetail paymentDetail = paymentDetailRepository.save(
+				PaymentDetail.builder()
+					.kakaoPayInfo(
+						KakaoPayInfo.builder()
+							.cid(paymentSession.cid())
+							.tid(paymentSession.tid())
+							.build()
+					)
+					.payment(payment)
+					.discountPrice(payment.getDiscountPrice() - response.amount().discount())
+					.method(getSupportedMethod())
+					.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice() + response.amount().discount())
+					.build()
+			);
+			if (payment.getType() == PaymentType.TICKET) {
+				List<Ticket> tickets = paymentSession.tickets();
+				for (Ticket ticket : tickets) {
+					paymentRepository.saveTicket(
+						PaymentTicket.builder()
+							.price(ticket.price())
+							.ticketNo(ticket.no())
+							.payment(payment)
+							.build()
+					);
+				}
+			}
+			if (payment.getType() == PaymentType.MEMBERSHIP) {
+				paymentRepository.saveMembership(
+					PaymentMembership.builder()
+						.price(paymentSession.totalAmount())
+						.membershipId(paymentSession.membershipId())
 						.payment(payment)
 						.build()
 				);
 			}
-		}
-		if (payment.getType() == PaymentType.MEMBERSHIP) {
-			paymentRepository.saveMembership(
-				PaymentMembership.builder()
-					.price(paymentSession.totalAmount())
-					.membershipUserId(1L)
-					.payment(payment)
-					.build()
-			);
-		}
+			payment.confirmPayment();
 
-		payment.confirmPayment();
-		return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					if (payment.getType() == PaymentType.TICKET) {
+						List<String> tickets = paymentSession.tickets().stream()
+							.map(Ticket::no)
+							.toList();
+						kafkaProducerHelper.publishTicketPaymentSuccess(tickets);
+					}
+					if (payment.getType() == PaymentType.MEMBERSHIP) {
+						kafkaProducerHelper.publishMembershipPaymentSuccess(
+							requestServiceDto.userId(),
+							paymentSession.membershipId()
+						);
+					}
+				}
+			});
+
+			return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
+
+		} catch (Exception e) {
+			if (payment.getType() == PaymentType.TICKET) {
+				List<String> tickets = paymentSession.tickets().stream()
+					.map(Ticket::no)
+					.toList();
+				kafkaProducerHelper.publishTicketPaymentFailure(tickets);
+			}
+			if (payment.getType() == PaymentType.MEMBERSHIP) {
+				kafkaProducerHelper.publishMembershipPaymentFailure(
+					requestServiceDto.userId(),
+					paymentSession.membershipId()
+				);
+			}
+			throw e;
+		}
 	}
 
 	@Override
