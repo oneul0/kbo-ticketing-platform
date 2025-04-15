@@ -1,7 +1,6 @@
 package com.boeingmerryho.business.seatservice.domain.service;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -132,18 +131,6 @@ public class ProcessBlockSeatsService {
 				}
 			}
 		}
-	}
-
-	public String createCacheBlockKey(Integer blockId, LocalDate date) {
-		String seatPrefix = "seat:";
-
-		StringBuilder cacheBlockKey = new StringBuilder()
-			.append(seatPrefix)
-			.append(date)
-			.append(":")
-			.append(blockId);
-
-		return cacheBlockKey.toString();
 	}
 
 	public RList<String> getBlockSeats(String cacheBlockKey) {

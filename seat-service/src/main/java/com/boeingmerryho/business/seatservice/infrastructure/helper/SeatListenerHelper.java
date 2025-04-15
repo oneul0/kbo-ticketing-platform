@@ -41,36 +41,8 @@ public class SeatListenerHelper {
 	}
 
 	public RList<String> getCacheBlocks(Seat seat, LocalDate date) {
-		String cacheBlockKey = createCacheBlockKey(seat.getSeatBlock(), date);
+		String cacheBlockKey = seatCommonHelper.createCacheBlockKey(seat.getSeatBlock(), date);
 
 		return redissonClient.getList(cacheBlockKey);
-	}
-
-	public String createCacheBlockKey(Integer blockId, LocalDate date) {
-		String seatPrefix = "seat:";
-
-		StringBuilder cacheBlockKey = new StringBuilder()
-			.append(seatPrefix)
-			.append(date)
-			.append(":")
-			.append(blockId);
-
-		return cacheBlockKey.toString();
-	}
-
-	public String makeCacheKey(Seat seat, LocalDate date) {
-		String seatPrefix = "seat:";
-
-		StringBuilder builder = new StringBuilder()
-			.append(seatPrefix)
-			.append(date)
-			.append(":")
-			.append(seat.getSeatBlock())
-			.append(":")
-			.append(seat.getSeatColumn())
-			.append(":")
-			.append(seat.getSeatRow());
-
-		return builder.toString();
 	}
 }
