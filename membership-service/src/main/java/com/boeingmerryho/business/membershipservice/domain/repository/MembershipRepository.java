@@ -25,4 +25,6 @@ public interface MembershipRepository {
 	Optional<Membership> findMembershipUserWithMembership(Long membershipUserId);
 
 	Optional<MembershipUser> findByUserIdAndMembershipSeason(Long userId, Integer season);
+
+	Integer bulkDeactivateBySeason(Integer season);
 }
