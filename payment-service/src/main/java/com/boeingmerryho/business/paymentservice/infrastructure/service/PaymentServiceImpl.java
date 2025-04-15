@@ -30,7 +30,6 @@ import com.boeingmerryho.business.paymentservice.domain.repository.PaymentReposi
 import com.boeingmerryho.business.paymentservice.domain.type.DiscountType;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
-import com.boeingmerryho.business.paymentservice.infrastructure.KafkaProducerHelper;
 import com.boeingmerryho.business.paymentservice.infrastructure.MembershipApiClient;
 import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
@@ -46,7 +45,6 @@ public class PaymentServiceImpl implements PaymentService {
 	private final PaymentRepository paymentRepository;
 	private final PaymentStrategyFactory strategyFactory;
 	private final MembershipApiClient membershipApiClient;
-	private final KafkaProducerHelper kafkaProducerHelper;
 	private final PaymentDetailRepository paymentDetailRepository;
 	private final PaymentApplicationMapper paymentApplicationMapper;
 

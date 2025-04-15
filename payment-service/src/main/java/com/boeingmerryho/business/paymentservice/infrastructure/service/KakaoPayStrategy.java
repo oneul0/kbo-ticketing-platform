@@ -149,71 +149,87 @@ public class KakaoPayStrategy implements PaymentStrategy {
 		Payment payment,
 		PaymentApproveRequestServiceDto requestServiceDto
 	) {
-		KakaoPayApproveRequest request = KakaoPayApproveRequest.builder()
-			.cid(paymentSession.cid())
-			.tid(paymentSession.tid())
-			.partnerOrderId(paymentSession.partnerOrderId())
-			.partnerUserId(paymentSession.partnerUserId())
-			.pgToken(requestServiceDto.pgToken())
-			.build();
-		KakaoPayApproveResponse response = kakaoApiClient.callApprove(request, secretKey, authPrefix);
-
-		PaymentDetail paymentDetail = paymentDetailRepository.save(
-			PaymentDetail.builder()
-				.kakaoPayInfo(
-					KakaoPayInfo.builder()
-						.cid(paymentSession.cid())
-						.tid(paymentSession.tid())
-						.build()
-				)
-				.payment(payment)
-				.discountPrice(payment.getDiscountPrice() - response.amount().discount())
-				.method(getSupportedMethod())
-				.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice() + response.amount().discount())
-				.build()
-		);
-
-		if (payment.getType() == PaymentType.TICKET) {
-			List<Ticket> tickets = paymentSession.tickets();
-			for (int i = 0; i < tickets.size(); i++) {
-				paymentRepository.saveTicket(
-					PaymentTicket.builder()
-						.price(tickets.get(i).price())
-						.ticketNo(tickets.get(i).no())
+		try {
+			KakaoPayApproveRequest request = KakaoPayApproveRequest.builder()
+				.cid(paymentSession.cid())
+				.tid(paymentSession.tid())
+				.partnerOrderId(paymentSession.partnerOrderId())
+				.partnerUserId(paymentSession.partnerUserId())
+				.pgToken(requestServiceDto.pgToken())
+				.build();
+			KakaoPayApproveResponse response = kakaoApiClient.callApprove(request, secretKey, authPrefix);
+			PaymentDetail paymentDetail = paymentDetailRepository.save(
+				PaymentDetail.builder()
+					.kakaoPayInfo(
+						KakaoPayInfo.builder()
+							.cid(paymentSession.cid())
+							.tid(paymentSession.tid())
+							.build()
+					)
+					.payment(payment)
+					.discountPrice(payment.getDiscountPrice() - response.amount().discount())
+					.method(getSupportedMethod())
+					.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice() + response.amount().discount())
+					.build()
+			);
+			if (payment.getType() == PaymentType.TICKET) {
+				List<Ticket> tickets = paymentSession.tickets();
+				for (Ticket ticket : tickets) {
+					paymentRepository.saveTicket(
+						PaymentTicket.builder()
+							.price(ticket.price())
+							.ticketNo(ticket.no())
+							.payment(payment)
+							.build()
+					);
+				}
+			}
+			if (payment.getType() == PaymentType.MEMBERSHIP) {
+				paymentRepository.saveMembership(
+					PaymentMembership.builder()
+						.price(paymentSession.totalAmount())
+						.membershipId(paymentSession.membershipId())
 						.payment(payment)
 						.build()
 				);
 			}
-		}
-		if (payment.getType() == PaymentType.MEMBERSHIP) {
-			paymentRepository.saveMembership(
-				PaymentMembership.builder()
-					.price(paymentSession.totalAmount())
-					.membershipId(paymentSession.membershipId())
-					.payment(payment)
-					.build()
-			);
-		}
-		payment.confirmPayment();
+			payment.confirmPayment();
 
-		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-			@Override
-			public void afterCommit() {
-				if (payment.getType() == PaymentType.TICKET) {
-					List<String> tickets = paymentSession.tickets().stream()
-						.map(Ticket::no)
-						.toList();
-					kafkaProducerHelper.publishTicketPaymentSuccess(tickets);
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					if (payment.getType() == PaymentType.TICKET) {
+						List<String> tickets = paymentSession.tickets().stream()
+							.map(Ticket::no)
+							.toList();
+						kafkaProducerHelper.publishTicketPaymentSuccess(tickets);
+					}
+					if (payment.getType() == PaymentType.MEMBERSHIP) {
+						kafkaProducerHelper.publishMembershipPaymentSuccess(
+							requestServiceDto.userId(),
+							paymentSession.membershipId()
+						);
+					}
 				}
-				if (payment.getType() == PaymentType.MEMBERSHIP) {
-					kafkaProducerHelper.publishMembershipPaymentSuccess(
-						requestServiceDto.userId(),
-						paymentSession.membershipId()
-					);
-				}
+			});
+
+			return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
+
+		} catch (Exception e) {
+			if (payment.getType() == PaymentType.TICKET) {
+				List<String> tickets = paymentSession.tickets().stream()
+					.map(Ticket::no)
+					.toList();
+				kafkaProducerHelper.publishTicketPaymentFailure(tickets);
 			}
-		});
-		return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
+			if (payment.getType() == PaymentType.MEMBERSHIP) {
+				kafkaProducerHelper.publishMembershipPaymentFailure(
+					requestServiceDto.userId(),
+					paymentSession.membershipId()
+				);
+			}
+			throw e;
+		}
 	}
 
 	@Override

@@ -25,7 +25,6 @@ import com.boeingmerryho.business.paymentservice.domain.repository.PaymentReposi
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
 import com.boeingmerryho.business.paymentservice.infrastructure.KafkaProducerHelper;
-import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BankTransferStrategy implements PaymentStrategy {
 
-	private final PaySessionHelper paySessionHelper;
 	private final PaymentRepository paymentRepository;
 	private final KafkaProducerHelper kafkaProducerHelper;
 	private final PaymentDetailRepository paymentDetailRepository;
@@ -44,13 +42,12 @@ public class BankTransferStrategy implements PaymentStrategy {
 	@Transactional
 	public PaymentReadyResponseServiceDto pay(
 		Payment payment,
-		PaymentReadyRequestServiceDto requestDto) {
-
+		PaymentReadyRequestServiceDto requestDto
+	) {
 		String accountNumber = "110-333-482102";
 		String accountBank = "SHINHAN";
 		LocalDateTime dueDate = LocalDateTime.now().plusDays(1);
 		String accountHolder = "BOEING_KBO_" + "USERNAME";
-
 		paymentDetailRepository.save(PaymentDetail.builder()
 			.payment(payment)
 			.discountPrice(payment.getDiscountPrice())
@@ -66,7 +63,6 @@ public class BankTransferStrategy implements PaymentStrategy {
 			)
 			.build()
 		);
-
 		return paymentApplicationMapper.toPaymentReadyResponseServiceDto(
 			payment.getId(),
 			accountNumber,
@@ -80,58 +76,73 @@ public class BankTransferStrategy implements PaymentStrategy {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public PaymentApproveResponseServiceDto approve(
 		Payment payment,
-		PaymentApproveAdminRequestServiceDto requestServiceDto) {
-
-		PaymentDetail paymentDetail = paymentDetailRepository.save(
-			PaymentDetail.builder()
-				.payment(payment)
-				.discountPrice(payment.getDiscountPrice())
-				.method(PaymentMethod.BANK_TRANSFER)
-				.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice())
-				.build()
-		);
-
-		if (payment.getType() == PaymentType.TICKET) {
-			List<Ticket> tickets = requestServiceDto.tickets();
-			for (int i = 0; i < tickets.size(); i++) {
-				paymentRepository.saveTicket(
-					PaymentTicket.builder()
-						.price(tickets.get(i).price())
-						.ticketNo(tickets.get(i).no())
+		PaymentApproveAdminRequestServiceDto requestServiceDto
+	) {
+		try {
+			PaymentDetail paymentDetail = paymentDetailRepository.save(
+				PaymentDetail.builder()
+					.payment(payment)
+					.discountPrice(payment.getDiscountPrice())
+					.method(PaymentMethod.BANK_TRANSFER)
+					.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice())
+					.build()
+			);
+			if (payment.getType() == PaymentType.TICKET) {
+				List<Ticket> tickets = requestServiceDto.tickets();
+				for (int i = 0; i < tickets.size(); i++) {
+					paymentRepository.saveTicket(
+						PaymentTicket.builder()
+							.price(tickets.get(i).price())
+							.ticketNo(tickets.get(i).no())
+							.payment(payment)
+							.build()
+					);
+				}
+			}
+			if (payment.getType() == PaymentType.MEMBERSHIP) {
+				paymentRepository.saveMembership(
+					PaymentMembership.builder()
+						.price(payment.getTotalPrice())
+						.membershipId(requestServiceDto.userId())
 						.payment(payment)
 						.build()
 				);
 			}
-		}
-		if (payment.getType() == PaymentType.MEMBERSHIP) {
-			paymentRepository.saveMembership(
-				PaymentMembership.builder()
-					.price(payment.getTotalPrice())
-					.membershipId(requestServiceDto.userId())
-					.payment(payment)
-					.build()
-			);
-		}
-		payment.confirmPayment();
+			payment.confirmPayment();
 
-		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-			@Override
-			public void afterCommit() {
-				if (payment.getType() == PaymentType.TICKET) {
-					List<String> tickets = requestServiceDto.tickets().stream()
-						.map(Ticket::no)
-						.toList();
-					kafkaProducerHelper.publishTicketPaymentSuccess(tickets);
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					if (payment.getType() == PaymentType.TICKET) {
+						List<String> tickets = requestServiceDto.tickets().stream()
+							.map(Ticket::no)
+							.toList();
+						kafkaProducerHelper.publishTicketPaymentSuccess(tickets);
+					}
+					if (payment.getType() == PaymentType.MEMBERSHIP) {
+						kafkaProducerHelper.publishMembershipPaymentSuccess(
+							requestServiceDto.userId(),
+							requestServiceDto.membershipId()
+						);
+					}
 				}
-				if (payment.getType() == PaymentType.MEMBERSHIP) {
-					kafkaProducerHelper.publishMembershipPaymentSuccess(
-						requestServiceDto.userId(),
-						requestServiceDto.membershipId()
-					);
-				}
+			});
+			return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
+		} catch (Exception e) {
+			if (payment.getType() == PaymentType.TICKET) {
+				List<String> tickets = requestServiceDto.tickets().stream()
+					.map(Ticket::no)
+					.toList();
+				kafkaProducerHelper.publishTicketPaymentFailure(tickets);
 			}
-		});
-		return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
+			if (payment.getType() == PaymentType.MEMBERSHIP) {
+				kafkaProducerHelper.publishMembershipPaymentFailure(
+					requestServiceDto.userId(),
+					requestServiceDto.membershipId()
+				);
+			}
+			throw e;
+		}
 	}
 
 	@Override
