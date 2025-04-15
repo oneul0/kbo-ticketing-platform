@@ -17,7 +17,7 @@ public enum MembershipErrorCode implements BaseErrorCode {
 	UNKNOWN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBERSHIP_008", "알 수 없는 서버 오류가 발생했습니다."),
 	PAYMENT_REQUEST_FAILED(HttpStatus.BAD_GATEWAY, "MEMBERSHIP_009", "결제 요청에 실패했습니다."),
 	NOT_FOUND_MEMBERSHIP(HttpStatus.NOT_FOUND, "MEMBERSHIP_010", "멤버십 정보가 조회되지 않습니다."),
-	;
+	NOT_FOUND_USER(HttpStatus.NOT_FOUND, "MEMBERSHIP_011", "선점된 멤버십이 존재하지 않습니다.");
 
 	private final HttpStatus status;
 	private final String errorCode;
