@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.userservice.application.UserHelper;
+import com.boeingmerryho.business.userservice.application.UserJwtHelper;
 import com.boeingmerryho.business.userservice.application.dto.mapper.UserApplicationMapper;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminCheckEmailRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRequestServiceDto;
@@ -59,6 +60,7 @@ public class UserAdminService {
 	private final PasswordEncoder passwordEncoder;
 
 	private final UserHelper userHelper;
+	private final UserJwtHelper userJwtHelper;
 	private final EmailService emailService;
 
 	@Value("${admin.key}")
@@ -67,7 +69,7 @@ public class UserAdminService {
 	@Transactional
 	public Long registerUserAdmin(UserAdminRegisterRequestServiceDto dto) {
 		validateAdminKey(dto.adminKey());
-		userHelper.validateRegisterRequest(dto, userRepository);
+		userHelper.validateRegisterRequest(dto);
 
 		User user = User.withAdminRole(
 			dto.username(),
@@ -95,7 +97,7 @@ public class UserAdminService {
 	@Transactional(readOnly = true)
 	@Cacheable(cacheNames = "user", key = "#dto.id()")
 	public UserAdminFindResponseDto findUserAdmin(UserAdminFindRequestServiceDto dto) {
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 		return userApplicationMapper.toUserAdminFindResponseDto(user);
 	}
 
@@ -119,7 +121,7 @@ public class UserAdminService {
 	public UserAdminUpdateRoleResponseDto updateUserRole(UserAdminUpdateRoleRequestServiceDto dto) {
 		userHelper.isAdminRole(dto.newRole());
 
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 
 		UserRoleType oldRole = user.getRole();
 		user.updateRoleType(dto.newRole());
@@ -130,7 +132,7 @@ public class UserAdminService {
 
 	@Transactional
 	public Long deleteUserRole(UserAdminDeleteRoleRequestServiceDto dto) {
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 
 		user.deleteRoleType();
 		userHelper.updateRedisUserInfo(user);
@@ -139,7 +141,7 @@ public class UserAdminService {
 
 	@Transactional
 	public Long deleteUser(UserAdminDeleteRequestServiceDto dto) {
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 		user.softDelete(user.getId());
 
 		userHelper.clearRedisUserData(user.getId());
@@ -153,13 +155,13 @@ public class UserAdminService {
 		String accessToken = (String)result.token().get("accessToken");
 		userHelper.blacklistToken(accessToken);
 
-		userHelper.deleteKeyFromRedis(result.tokenKey());
+		userHelper.deleteFromRedisByKey(result.tokenKey());
 
 		userHelper.clearRedisUserData(userId);
 	}
 
 	public UserLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto dto) {
-		User user = userHelper.findUserByEmail(dto.email(), userRepository);
+		User user = userHelper.findUserByEmail(dto.email());
 		userHelper.updateRedisUserInfo(user);
 
 		Map<String, String> tokenMap = userHelper.updateUserJwtTokenRedis(user.getId());
@@ -175,7 +177,7 @@ public class UserAdminService {
 
 	@Transactional
 	public Long withdrawUser(UserAdminWithdrawRequestServiceDto dto) {
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 		user.softDelete(user.getId());
 
 		userHelper.clearRedisUserData(user.getId());
@@ -187,20 +189,20 @@ public class UserAdminService {
 		String refreshToken = dto.refreshToken();
 
 		log.debug("refresh requested refreshToken : {}", refreshToken);
-		userHelper.isValidRefreshToken(refreshToken);
+		userJwtHelper.isValidRefreshToken(refreshToken);
 
-		Long userId = userHelper.getUserIdFromToken(refreshToken);
+		Long userId = userJwtHelper.getUserIdFromToken(refreshToken);
 
 		userHelper.isEqualStoredRefreshToken(userId, refreshToken);
 
-		String newAccessToken = userHelper.generateAccessToken(userId);
+		String newAccessToken = userJwtHelper.generateAccessToken(userId);
 
 		return new UserAdminRefreshTokenResponseDto(newAccessToken);
 	}
 
 	@Transactional
 	public UserAdminUpdateResponseDto updateUser(UserAdminUpdateRequestServiceDto dto) {
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 
 		if (!userHelper.isEmpty(dto.password())) {
 			user.updatePassword(passwordEncoder.encode(dto.password()));
@@ -223,7 +225,7 @@ public class UserAdminService {
 	@Transactional
 	public UserAdminUpdateResponseDto updateMe(UserAdminUpdateRequestServiceDto dto) {
 
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 
 		if (!userHelper.isEmpty(dto.password())) {
 			String encodedPassword = userHelper.encodePassword(dto.password(), passwordEncoder);

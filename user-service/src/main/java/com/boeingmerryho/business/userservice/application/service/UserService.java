@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.userservice.application.UserHelper;
+import com.boeingmerryho.business.userservice.application.UserJwtHelper;
 import com.boeingmerryho.business.userservice.application.dto.mapper.UserApplicationMapper;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserCheckEmailRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserEmailVerificationCheckRequestServiceDto;
@@ -47,11 +48,12 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final UserHelper userHelper;
+	private final UserJwtHelper userJwtHelper;
 	private final EmailService emailService;
 
 	@Transactional
 	public Long registerUser(UserRegisterRequestServiceDto dto) {
-		userHelper.validateRegisterRequest(dto, userRepository);
+		userHelper.validateRegisterRequest(dto);
 
 		User user = User.withDefaultRole(
 			dto.username(),
@@ -65,7 +67,7 @@ public class UserService {
 	}
 
 	public UserLoginResponseDto loginUser(UserLoginRequestServiceDto dto) {
-		User user = userHelper.findUserByEmail(dto.email(), userRepository);
+		User user = userHelper.findUserByEmail(dto.email());
 		userHelper.updateRedisUserInfo(user);
 
 		Map<String, String> tokenMap = userHelper.updateUserJwtTokenRedis(user.getId());
@@ -86,7 +88,7 @@ public class UserService {
 		String accessToken = (String)result.token().get("accessToken");
 		userHelper.blacklistToken(accessToken);
 
-		userHelper.deleteKeyFromRedis(result.tokenKey());
+		userHelper.deleteFromRedisByKey(result.tokenKey());
 
 		userHelper.clearRedisUserData(userId);
 	}
@@ -94,14 +96,14 @@ public class UserService {
 	@Transactional(readOnly = true)
 	@Cacheable(cacheNames = "user", key = "'user:' + #dto.id()")
 	public UserFindResponseDto findUser(UserFindRequestServiceDto dto) {
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 		return userApplicationMapper.toUserFindResponseDto(user);
 	}
 
 	@Transactional
 	public UserAdminUpdateResponseDto updateMe(UserUpdateRequestServiceDto dto) {
 
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 
 		if (!userHelper.isEmpty(dto.password())) {
 			String encodedPassword = userHelper.encodePassword(dto.password(), passwordEncoder);
@@ -124,7 +126,7 @@ public class UserService {
 
 	@Transactional
 	public Long withdrawUser(UserWithdrawRequestServiceDto dto) {
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 		user.softDelete(user.getId());
 
 		userHelper.clearRedisUserData(user.getId());
@@ -143,13 +145,13 @@ public class UserService {
 		String refreshToken = dto.refreshToken();
 
 		log.debug("refresh requested refreshToken : {}", refreshToken);
-		userHelper.isValidRefreshToken(refreshToken);
+		userJwtHelper.isValidRefreshToken(refreshToken);
 
-		Long userId = userHelper.getUserIdFromToken(refreshToken);
+		Long userId = userJwtHelper.getUserIdFromToken(refreshToken);
 
 		userHelper.isEqualStoredRefreshToken(userId, refreshToken);
 
-		String newAccessToken = userHelper.generateAccessToken(userId);
+		String newAccessToken = userJwtHelper.generateAccessToken(userId);
 
 		return new UserRefreshTokenResponseDto(newAccessToken);
 	}

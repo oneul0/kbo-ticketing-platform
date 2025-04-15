@@ -15,19 +15,19 @@ import com.boeingmerryho.business.userservice.exception.ErrorCode;
 
 public interface UserHelper {
 
-	User findUserById(Long id, UserRepository userRepository);
+	User findUserById(Long id);
 
-	User findUserByEmail(String email, UserRepository userRepository);
+	User findUserByEmail(String email);
 
-	void validateRegisterRequest(UserAdminRegisterRequestServiceDto dto, UserRepository userRepository);
+	void validateRegisterRequest(UserAdminRegisterRequestServiceDto dto);
 
-	void validateRegisterRequest(UserRegisterRequestServiceDto dto, UserRepository userRepository);
+	void validateRegisterRequest(UserRegisterRequestServiceDto dto);
 
 	void validateCommonFields(String email, String password, String username, String nickname, LocalDate birth);
 
-	void validateRequiredField(String field, ErrorCode errorCode);
+	void validateRequiredStringField(String field, ErrorCode errorCode);
 
-	void validateRequiredField(LocalDate field, ErrorCode errorCode);
+	void validateRequiredDateField(LocalDate field, ErrorCode errorCode);
 
 	boolean isEmpty(String field);
 
@@ -39,17 +39,9 @@ public interface UserHelper {
 
 	String encodePassword(String password, PasswordEncoder passwordEncoder);
 
-	void checkMasterRole(User user);
-
 	void isAdminRole(UserRoleType type);
 
-	void isValidRefreshToken(String refreshToken);
-
-	Long getUserIdFromToken(String refreshToken);
-
 	void isEqualStoredRefreshToken(Long userId, String refreshToken);
-
-	String generateAccessToken(Long userId);
 
 	void updateRedisUserInfo(User user);
 
@@ -57,7 +49,7 @@ public interface UserHelper {
 
 	void clearRedisUserData(Long userId);
 
-	void deleteKeyFromRedis(String tokenKey);
+	void deleteFromRedisByKey(String tokenKey);
 
 	void hasKeyInRedis(String key);
 

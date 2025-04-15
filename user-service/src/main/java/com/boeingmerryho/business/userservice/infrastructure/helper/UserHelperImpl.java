@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.userservice.infrastructure;
+package com.boeingmerryho.business.userservice.infrastructure.helper;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -49,45 +49,46 @@ public class UserHelperImpl implements UserHelper {
 	private final UserRepository userRepository;
 	private final MembershipClient membershipClient;
 
-	public User findUserById(Long id, UserRepository userRepository) {
+	public User findUserById(Long id) {
 		return userRepository.findById(id)
 			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 	}
 
-	public User findUserByEmail(String email, UserRepository userRepository) {
+	public User findUserByEmail(String email) {
 		return userRepository.findByEmail(email)
 			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 	}
 
-	public void validateRegisterRequest(UserAdminRegisterRequestServiceDto dto, UserRepository userRepository) {
+	//todo: 합칠 수 있으면 합치기
+	public void validateRegisterRequest(UserAdminRegisterRequestServiceDto dto) {
 		validateCommonFields(dto.email(), dto.password(), dto.username(), dto.nickname(), dto.birth());
 		checkEmailExists(dto.email(), userRepository);
 	}
 
-	public void validateRegisterRequest(UserRegisterRequestServiceDto dto, UserRepository userRepository) {
+	public void validateRegisterRequest(UserRegisterRequestServiceDto dto) {
 		validateCommonFields(dto.email(), dto.password(), dto.username(), dto.nickname(), dto.birth());
 		checkEmailExists(dto.email(), userRepository);
 	}
 
 	public void validateCommonFields(String email, String password, String username, String nickname,
 		LocalDate birth) {
-		validateRequiredField(email, ErrorCode.EMAIL_NULL);
-		validateRequiredField(password, ErrorCode.PASSWORD_NULL);
-		validateRequiredField(username, ErrorCode.USERNAME_NULL);
-		validateRequiredField(nickname, ErrorCode.USERNAME_NULL);
-		validateRequiredField(birth, ErrorCode.USERNAME_NULL);
+		validateRequiredStringField(email, ErrorCode.EMAIL_NULL);
+		validateRequiredStringField(password, ErrorCode.PASSWORD_NULL);
+		validateRequiredStringField(username, ErrorCode.USERNAME_NULL);
+		validateRequiredStringField(nickname, ErrorCode.USERNAME_NULL);
+		validateRequiredDateField(birth, ErrorCode.USERNAME_NULL);
 
 		verifyEmailFormat(email);
 		verifyPasswordFormat(password);
 	}
 
-	public void validateRequiredField(String field, ErrorCode errorCode) {
+	public void validateRequiredStringField(String field, ErrorCode errorCode) {
 		if (isEmpty(field)) {
 			throw new GlobalException(errorCode);
 		}
 	}
 
-	public void validateRequiredField(LocalDate field, ErrorCode errorCode) {
+	public void validateRequiredDateField(LocalDate field, ErrorCode errorCode) {
 		if (field == null) {
 			throw new GlobalException(errorCode);
 		}
@@ -119,26 +120,13 @@ public class UserHelperImpl implements UserHelper {
 		return passwordEncoder.encode(password);
 	}
 
-	public void checkMasterRole(User user) {
-		if (user.isAdmin()) {
-			throw new GlobalException(ErrorCode.CANNOT_GRANT_MASTER_ROLE);
-		}
-	}
-
 	public void isAdminRole(UserRoleType type) {
 		if (type.equals(UserRoleType.ADMIN)) {
 			throw new GlobalException(ErrorCode.CANNOT_GRANT_MASTER_ROLE);
 		}
 	}
 
-	//-----jwt
-	public void isValidRefreshToken(String refreshToken) {
-		jwtTokenProvider.validateRefreshToken(refreshToken);
-	}
-
-	public Long getUserIdFromToken(String refreshToken) {
-		return Long.valueOf(jwtTokenProvider.getUserIdFromToken(refreshToken));
-	}
+	//-----redis
 
 	public void isEqualStoredRefreshToken(Long userId, String refreshToken) {
 		String redisKey = USER_TOKEN_PREFIX + userId;
@@ -147,15 +135,7 @@ public class UserHelperImpl implements UserHelper {
 		if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
 			throw new GlobalException(ErrorCode.JWT_NOT_MATCH);
 		}
-
-		findUserById(userId, userRepository);
 	}
-
-	public String generateAccessToken(Long userId) {
-		return jwtTokenProvider.generateAccessToken(userId);
-	}
-
-	//-----redis
 
 	public void updateRedisUserInfo(User user) {
 		redisUtil.updateUserInfo(user);
@@ -171,12 +151,12 @@ public class UserHelperImpl implements UserHelper {
 		redisTemplate.delete(MEMBERSHIP_INFO_PREFIX + userId);
 	}
 
-	public void deleteKeyFromRedis(String tokenKey) {
+	public void deleteFromRedisByKey(String tokenKey) {
 		redisTemplate.delete(tokenKey);
 	}
 
 	public void hasKeyInRedis(String key) {
-		if (!redisTemplate.hasKey(key)) {
+		if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
 			throw new GlobalException(ErrorCode.NOT_FOUND);
 		}
 	}
