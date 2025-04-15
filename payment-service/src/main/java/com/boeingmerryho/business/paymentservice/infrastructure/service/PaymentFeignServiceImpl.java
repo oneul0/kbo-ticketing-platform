@@ -26,10 +26,11 @@ public class PaymentFeignServiceImpl implements PaymentFeignService {
 		Payment payment = paymentRepository.save(
 			Payment.builder()
 				.userId(requestServiceDto.userId())
-				.totalPrice(requestServiceDto.totalPrice())
+				.totalPrice(requestServiceDto.price() * requestServiceDto.quantity())
 				.type(PaymentType.from(requestServiceDto.paymentType()))
 				.build()
 		);
+		paySessionHelper.savePaymentPrice(payment.getId().toString(), requestServiceDto.price());
 		paySessionHelper.savePaymentExpiredTime(payment.getId().toString(), requestServiceDto.expiredTime());
 		return paymentApplicationMapper.toPaymentCreationResponseServiceDto(payment);
 	}

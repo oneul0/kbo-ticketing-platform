@@ -53,4 +53,14 @@ public class RedisConfig {
 		return template;
 	}
 
+	@Bean
+	public RedisTemplate<String, Integer> redisTemplateForPaymentPrice(
+		RedisConnectionFactory factory) {
+		RedisTemplate<String, Integer> template = new RedisTemplate<>();
+		template.setConnectionFactory(factory);
+		template.setKeySerializer(new StringRedisSerializer());
+		template.setValueSerializer(new Jackson2JsonRedisSerializer<>(Integer.class));
+		return template;
+	}
+
 }
