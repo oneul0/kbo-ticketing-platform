@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.userservice.application.UserHelper;
+import com.boeingmerryho.business.userservice.application.UserJwtHelper;
+import com.boeingmerryho.business.userservice.application.UserVerificationHelper;
 import com.boeingmerryho.business.userservice.application.dto.mapper.UserApplicationMapper;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminCheckEmailRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminDeleteRequestServiceDto;
@@ -29,6 +31,7 @@ import com.boeingmerryho.business.userservice.application.dto.request.other.User
 import com.boeingmerryho.business.userservice.application.dto.response.admin.UserAdminFindResponseDto;
 import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
 import com.boeingmerryho.business.userservice.application.dto.response.other.UserLoginResponseServiceDto;
+import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
 import com.boeingmerryho.business.userservice.application.utils.mail.EmailService;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
@@ -59,6 +62,9 @@ public class UserAdminService {
 	private final PasswordEncoder passwordEncoder;
 
 	private final UserHelper userHelper;
+	private final RedisUtil redisUtil;
+	private final UserJwtHelper userJwtHelper;
+	private final UserVerificationHelper userVerificationHelper;
 	private final EmailService emailService;
 
 	@Value("${admin.key}")
@@ -67,11 +73,11 @@ public class UserAdminService {
 	@Transactional
 	public Long registerUserAdmin(UserAdminRegisterRequestServiceDto dto) {
 		validateAdminKey(dto.adminKey());
-		userHelper.validateRegisterRequest(dto, userRepository);
+		userHelper.validateRegisterRequest(dto);
 
 		User user = User.withAdminRole(
 			dto.username(),
-			userHelper.encodePassword(dto.password(), passwordEncoder),
+			userHelper.encodePassword(dto.password()),
 			dto.email(),
 			dto.nickname(),
 			dto.birth()
@@ -95,7 +101,7 @@ public class UserAdminService {
 	@Transactional(readOnly = true)
 	@Cacheable(cacheNames = "user", key = "#dto.id()")
 	public UserAdminFindResponseDto findUserAdmin(UserAdminFindRequestServiceDto dto) {
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 		return userApplicationMapper.toUserAdminFindResponseDto(user);
 	}
 
@@ -119,30 +125,30 @@ public class UserAdminService {
 	public UserAdminUpdateRoleResponseDto updateUserRole(UserAdminUpdateRoleRequestServiceDto dto) {
 		userHelper.isAdminRole(dto.newRole());
 
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 
 		UserRoleType oldRole = user.getRole();
 		user.updateRoleType(dto.newRole());
-		userHelper.updateRedisUserInfo(user);
+		redisUtil.updateUserInfo(user);
 
 		return userApplicationMapper.toUserAdminUpdateRoleResponseDto(dto.id(), oldRole, dto.newRole());
 	}
 
 	@Transactional
 	public Long deleteUserRole(UserAdminDeleteRoleRequestServiceDto dto) {
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 
 		user.deleteRoleType();
-		userHelper.updateRedisUserInfo(user);
+		redisUtil.updateUserInfo(user);
 		return user.getId();
 	}
 
 	@Transactional
 	public Long deleteUser(UserAdminDeleteRequestServiceDto dto) {
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 		user.softDelete(user.getId());
 
-		userHelper.clearRedisUserData(user.getId());
+		redisUtil.clearRedisUserData(user.getId());
 		return user.getId();
 	}
 
@@ -151,34 +157,34 @@ public class UserAdminService {
 
 		UserTokenResult result = userHelper.getUserTokenFromRedis(userId);
 		String accessToken = (String)result.token().get("accessToken");
-		userHelper.blacklistToken(accessToken);
+		redisUtil.blacklistToken(accessToken);
 
-		userHelper.deleteKeyFromRedis(result.tokenKey());
+		redisUtil.deleteFromRedisByKey(result.tokenKey());
 
-		userHelper.clearRedisUserData(userId);
+		redisUtil.clearRedisUserData(userId);
 	}
 
 	public UserLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto dto) {
-		User user = userHelper.findUserByEmail(dto.email(), userRepository);
-		userHelper.updateRedisUserInfo(user);
+		User user = userHelper.findUserByEmail(dto.email());
+		redisUtil.updateUserInfo(user);
 
-		Map<String, String> tokenMap = userHelper.updateUserJwtTokenRedis(user.getId());
+		Map<String, String> tokenMap = redisUtil.updateUserJwtToken(user.getId());
 		UserLoginResponseServiceDto serviceDto = UserLoginResponseServiceDto.fromTokens(
 			tokenMap.get("accessToken"),
 			tokenMap.get("refreshToken")
 		);
 
-		userHelper.getNotifyLoginResponse(user.getId());
+		userVerificationHelper.getNotifyLoginResponse(user.getId());
 
 		return userApplicationMapper.toUserLoginResponseDto(serviceDto);
 	}
 
 	@Transactional
 	public Long withdrawUser(UserAdminWithdrawRequestServiceDto dto) {
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 		user.softDelete(user.getId());
 
-		userHelper.clearRedisUserData(user.getId());
+		redisUtil.clearRedisUserData(user.getId());
 		return user.getId();
 	}
 
@@ -187,20 +193,20 @@ public class UserAdminService {
 		String refreshToken = dto.refreshToken();
 
 		log.debug("refresh requested refreshToken : {}", refreshToken);
-		userHelper.isValidRefreshToken(refreshToken);
+		userJwtHelper.isValidRefreshToken(refreshToken);
 
-		Long userId = userHelper.getUserIdFromToken(refreshToken);
+		Long userId = userJwtHelper.getUserIdFromToken(refreshToken);
 
-		userHelper.isEqualStoredRefreshToken(userId, refreshToken);
+		redisUtil.isEqualStoredRefreshToken(userId, refreshToken);
 
-		String newAccessToken = userHelper.generateAccessToken(userId);
+		String newAccessToken = userJwtHelper.generateAccessToken(userId);
 
 		return new UserAdminRefreshTokenResponseDto(newAccessToken);
 	}
 
 	@Transactional
 	public UserAdminUpdateResponseDto updateUser(UserAdminUpdateRequestServiceDto dto) {
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 
 		if (!userHelper.isEmpty(dto.password())) {
 			user.updatePassword(passwordEncoder.encode(dto.password()));
@@ -223,10 +229,10 @@ public class UserAdminService {
 	@Transactional
 	public UserAdminUpdateResponseDto updateMe(UserAdminUpdateRequestServiceDto dto) {
 
-		User user = userHelper.findUserById(dto.id(), userRepository);
+		User user = userHelper.findUserById(dto.id());
 
 		if (!userHelper.isEmpty(dto.password())) {
-			String encodedPassword = userHelper.encodePassword(dto.password(), passwordEncoder);
+			String encodedPassword = userHelper.encodePassword(dto.password());
 			user.updatePassword(encodedPassword);
 		}
 		if (!userHelper.isEmpty(dto.username())) {
@@ -239,28 +245,28 @@ public class UserAdminService {
 			user.updateBirth(dto.birth());
 		}
 
-		userHelper.updateRedisUserInfo(user);
+		redisUtil.updateUserInfo(user);
 
 		return userApplicationMapper.toUserAdminUpdateResponseDto(user.getId());
 	}
 
 	public UserAdminVerificationResponseDto sendVerificationCode(
 		UserAdminEmailVerificationRequestServiceDto dto) {
-		userHelper.checkDuplicatedVerificationRequest(dto.email());
+		userVerificationHelper.checkDuplicatedVerificationRequest(dto.email());
 		userHelper.verifyEmailFormat(dto.email());
-		String code = userHelper.generateVerificationCode();
-		userHelper.storeVerificationCode(dto.email(), code);
+		String code = userVerificationHelper.generateVerificationCode();
+		userVerificationHelper.storeVerificationCode(dto.email(), code);
 		emailService.sendVerificationEmail(dto.email(), code);
 		return userApplicationMapper.toUserAdminVerificationResponseDto(dto.email()).success("인증 메일 발송 성공");
 	}
 
 	public UserAdminVerificationResponseDto verifyCode(
 		UserAdminEmailVerificationCheckRequestServiceDto dto) {
-		String storedCode = userHelper.getVerificationCode(dto.email());
+		String storedCode = userVerificationHelper.getVerificationCode(dto.email());
 		if (storedCode == null || !storedCode.equals(dto.code())) {
 			throw new GlobalException(ErrorCode.VERIFICATION_FAIL);
 		}
-		userHelper.removeVerificationCode(dto.email());
+		userVerificationHelper.removeVerificationCode(dto.email());
 
 		return UserAdminVerificationResponseDto.success("메일 인증 성공");
 	}
