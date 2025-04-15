@@ -6,17 +6,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.membershipservice.application.dto.mapper.MembershipApplicationMapper;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipSearchAdminRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUpdateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipCreateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipSearchAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUpdateResponseServiceDto;
-import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUserDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipAdminHelper;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipRedisHelper;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipValidator;
-import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipSearchAdminRequestServiceDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -63,10 +62,5 @@ public class MembershipAdminService {
 	@Transactional
 	public void deleteStore(Long id) {
 		membershipAdminHelper.deleteStore(id);
-	}
-
-	@Transactional(readOnly = true)
-	public MembershipUserDetailAdminResponseServiceDto getMembershipUserDetail(Long id) {
-		return membershipAdminHelper.getMembershipUserDetailInfo(id);
 	}
 }

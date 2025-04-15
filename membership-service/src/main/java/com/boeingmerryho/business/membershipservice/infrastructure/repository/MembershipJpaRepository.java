@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
+import com.boeingmerryho.business.membershipservice.domain.entity.MembershipUser;
 import com.boeingmerryho.business.membershipservice.domain.repository.MembershipRepository;
 import com.boeingmerryho.business.membershipservice.domain.type.MembershipType;
 
@@ -31,9 +32,20 @@ public interface MembershipJpaRepository extends JpaRepository<Membership, Long>
 		@Param("season") int season
 	);
 
-	@Query("SELECT M " +
-		"FROM Membership M " +
-		"JOIN M.users MU " +
+	@Query("SELECT MU " +
+		"FROM MembershipUser MU " +
+		"JOIN FETCH MU.membership " +
 		"WHERE MU.id = :membershipUserId ")
-	Optional<Membership> findMembershipByMembershipUserId(@Param("membershipUserId") Long membershipUserId);
+	Optional<Membership> findMembershipUserWithMembership(@Param("membershipUserId") Long membershipUserId);
+
+	@Query("SELECT MU "
+		+ "FROM MembershipUser MU "
+		+ "JOIN FETCH MU.membership M "
+		+ "WHERE MU.userId = :userId "
+		+ "AND M.season = :season "
+		+ "AND MU.isDeleted = false")
+	Optional<MembershipUser> findByUserIdAndMembershipSeason(
+		@Param("userId") Long userId,
+		@Param("season") Integer season
+	);
 }
