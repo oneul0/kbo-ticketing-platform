@@ -1,6 +1,5 @@
 package com.boeingmerryho.business.seatservice.domain.service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +13,7 @@ import com.boeingmerryho.business.seatservice.application.dto.mapper.SeatApplica
 import com.boeingmerryho.business.seatservice.application.dto.request.CacheBlockServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.response.CacheSeatServiceResponseDto;
 import com.boeingmerryho.business.seatservice.exception.SeatErrorCode;
+import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatCommonHelper;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +22,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GetCacheBlockSeatsService {
 	private final RedissonClient redissonClient;
+	private final SeatCommonHelper seatCommonHelper;
 	private final SeatApplicationMapper seatApplicationMapper;
 
 	public RList<String> getBlocks(CacheBlockServiceRequestDto request) {
-		String cacheBlockKey = createCacheBlockKey(request.blockId(), request.date());
+		String cacheBlockKey = seatCommonHelper.createCacheBlockKey(request.blockId(), request.date());
 		RList<String> blockSeats = redissonClient.getList(cacheBlockKey);
 		if (!blockSeats.isExists()) {
 			throw new GlobalException(SeatErrorCode.NOT_FOUND_BLOCK);
@@ -56,17 +57,5 @@ public class GetCacheBlockSeatsService {
 		}
 
 		return seats;
-	}
-
-	private String createCacheBlockKey(Integer blockId, LocalDate date) {
-		String seatPrefix = "seat:";
-
-		StringBuilder cacheBlockKey = new StringBuilder()
-			.append(seatPrefix)
-			.append(date)
-			.append(":")
-			.append(blockId);
-
-		return cacheBlockKey.toString();
 	}
 }

@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.seatservice.infrastructure.kafka.response;
+package com.boeingmerryho.business.seatservice.infrastructure.adaptor.kafka.listener;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;

@@ -18,6 +18,7 @@ import com.boeingmerryho.business.seatservice.application.dto.response.CacheSeat
 import com.boeingmerryho.business.seatservice.domain.service.GetCacheBlockSeatsService;
 import com.boeingmerryho.business.seatservice.domain.service.ProcessBlockSeatsService;
 import com.boeingmerryho.business.seatservice.exception.SeatErrorCode;
+import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatCommonHelper;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class SeatService {
+	private final SeatCommonHelper seatCommonHelper;
 	private final SeatApplicationMapper seatApplicationMapper;
 	private final ProcessBlockSeatsService processBlockSeatsService;
 	private final GetCacheBlockSeatsService getCacheBlockSeatsService;
@@ -47,7 +49,7 @@ public class SeatService {
 
 		ToTicketMatchDto matchInfo = processBlockSeatsService.getMatchInfo(serviceDto);
 
-		String cacheBlockKey = processBlockSeatsService.createCacheBlockKey(serviceDto.blockId(), serviceDto.date());
+		String cacheBlockKey = seatCommonHelper.createCacheBlockKey(serviceDto.blockId(), serviceDto.date());
 		RList<String> blockSeats = processBlockSeatsService.getBlockSeats(cacheBlockKey);
 
 		List<RLock> locks = new ArrayList<>();
