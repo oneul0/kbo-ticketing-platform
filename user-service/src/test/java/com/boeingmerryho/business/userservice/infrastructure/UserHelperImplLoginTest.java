@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import com.boeingmerryho.business.userservice.application.dto.request.feign.LoginSuccessRequest;
 import com.boeingmerryho.business.userservice.application.feign.MembershipClient;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
+import com.boeingmerryho.business.userservice.infrastructure.helper.UserHelperImpl;
 
 import feign.FeignException;
 import feign.Request;
