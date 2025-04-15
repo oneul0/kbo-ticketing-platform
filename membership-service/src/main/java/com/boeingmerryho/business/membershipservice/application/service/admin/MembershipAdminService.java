@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.membershipservice.application.dto.mapper.MembershipApplicationMapper;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipSearchAdminRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUpdateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipCreateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailAdminResponseServiceDto;
@@ -15,7 +16,6 @@ import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipAdminHelper;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipRedisHelper;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipValidator;
-import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipSearchAdminRequestServiceDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +35,7 @@ public class MembershipAdminService {
 		Membership saved = membershipAdminHelper.save(requestServiceDto);
 
 		membershipRedisHelper.preloadStock(saved.getId(), saved.getAvailableQuantity());
-		
+
 		return mapper.toMembershipCreateResponseServiceDto(saved);
 	}
 

@@ -8,16 +8,20 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Pageable;
 
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipCreateRequestServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipSearchAdminRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUpdateRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUserCreateRequestServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.request.MembershipUserSearchAdminRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipCreateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipDetailResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipSearchAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUpdateResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUserCreateResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUserDetailAdminResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUserDetailResponseServiceDto;
+import com.boeingmerryho.business.membershipservice.application.dto.response.MembershipUserSearchAdminResponseServiceDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipCreateRequestDto;
-import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipSearchAdminRequestServiceDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.request.MembershipUpdateRequestDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipCreateResponseDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipDetailAdminResponseDto;
@@ -25,6 +29,9 @@ import com.boeingmerryho.business.membershipservice.presentation.dto.response.Me
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipSearchAdminResponseDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipUpdateResponseDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipUserCreateResponseDto;
+import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipUserDetailAdminResponseDto;
+import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipUserDetailResponseDto;
+import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipUserSearchAdminResponseDto;
 
 import jakarta.validation.Valid;
 
@@ -52,7 +59,8 @@ public interface MembershipPresentationMapper {
 		Integer minAvailableQuantity,
 		Integer maxAvailableQuantity,
 		Integer minPrice,
-		Integer maxPrice);
+		Integer maxPrice,
+		Boolean isDeleted);
 
 	MembershipSearchAdminResponseDto toMembershipSearchAdminResponseDto(
 		MembershipSearchAdminResponseServiceDto membershipSearchAdminResponseServiceDto);
@@ -67,4 +75,23 @@ public interface MembershipPresentationMapper {
 
 	MembershipUserCreateResponseDto toMembershipUserCreateResponseDto(
 		MembershipUserCreateResponseServiceDto responseServiceDto);
+
+	MembershipUserDetailAdminResponseDto toMembershipUserDetailAdminResponseDto(
+		MembershipUserDetailAdminResponseServiceDto responseServiceDto);
+
+	MembershipUserSearchAdminRequestServiceDto toMembershipUserSearchAdminRequestServiceDto(
+		Pageable customPageable,
+		Long userId,
+		Long membershipId,
+		String name,
+		Integer season,
+		Double minDiscount,
+		Double maxDiscount,
+		Boolean isDeleted);
+
+	MembershipUserSearchAdminResponseDto toMembershipUserSearchAdminResponseDto(
+		MembershipUserSearchAdminResponseServiceDto membershipUserSearchAdminResponseServiceDto);
+
+	MembershipUserDetailResponseDto toMembershipUserDetailResponseDto(
+		MembershipUserDetailResponseServiceDto responseServiceDto);
 }
