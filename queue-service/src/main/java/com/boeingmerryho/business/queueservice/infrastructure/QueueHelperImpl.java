@@ -1,8 +1,8 @@
 package com.boeingmerryho.business.queueservice.infrastructure;
 
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
@@ -65,15 +65,25 @@ public class QueueHelperImpl implements QueueHelper {
 
 	@Override
 	public Long validateTicket(Date matchDate, Long ticketId) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String formattedDate = sdf.format(matchDate);
-		String ticketKey = TICKET_INFO_PREFIX + formattedDate + ":" + ticketId;
-		Optional<String> userIdValue = Optional.ofNullable(redisTemplateForCommonRedis.opsForValue().get(ticketKey))
-			.map(Object::toString);
-		if (userIdValue.isEmpty()) {
+		LocalDate date = matchDate.toInstant()
+			.atZone(ZoneId.systemDefault())
+			.toLocalDate();
+
+		String dateKey = "queue:ticket:" + date;
+		String userKey = "ticket:user:" + ticketId;
+
+		Boolean exists = redisTemplateForCommonRedis.opsForSet()
+			.isMember(dateKey, ticketId.toString());
+
+		if (Boolean.FALSE.equals(exists)) {
 			throw new GlobalException(ErrorCode.TICKET_IS_NOT_ACTIVATED);
 		}
-		return Long.parseLong(userIdValue.get());
+
+		String userIdValue = Optional.ofNullable(redisTemplateForCommonRedis.opsForValue().get(userKey))
+			.map(Object::toString)
+			.orElseThrow(() -> new GlobalException(ErrorCode.TICKET_IS_NOT_ACTIVATED));
+
+		return Long.parseLong(userIdValue);
 	}
 
 	@Override
