@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,7 +29,10 @@ import com.boeingmerryho.business.paymentservice.presentation.dto.response.Payme
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentTicketCancelResponseDto;
 import com.boeingmerryho.business.paymentservice.utils.PageableUtils;
 
+import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
+import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -40,60 +44,93 @@ public class PaymentController {
 	private final PaymentPresentationMapper paymentPresentationMapper;
 
 	@PostMapping("/pay")
+	@RequiredRoles({
+		UserRoleType.NORMAL,
+		UserRoleType.SENIOR
+	})
 	public ResponseEntity<SuccessResponse<PaymentReadyResponseDto>> pay(
+		@RequestAttribute Long userId,
 		@RequestBody @Valid PaymentReadyRequestDto requestDto
 	) {
 		PaymentReadyResponseServiceDto responseServiceDto = paymentService.pay(
-			paymentPresentationMapper.toPaymentReadyRequestServiceDto(1L, requestDto));    // TODO userId
-
+			paymentPresentationMapper.toPaymentReadyRequestServiceDto(userId, requestDto)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.PAYMENT_READY_REQUESTED,
 			paymentPresentationMapper.toPaymentReadyResponseDto(responseServiceDto));
 	}
 
 	@PostMapping("/approve")
+	@RequiredRoles({
+		UserRoleType.NORMAL,
+		UserRoleType.SENIOR
+	})
 	public ResponseEntity<SuccessResponse<PaymentApproveResponseDto>> approvePayment(
+		@RequestAttribute Long userId,
 		@RequestParam("pg_token") String pgToken,
 		@RequestBody PaymentApproveRequestDto requestDto
 	) {
 		PaymentApproveResponseServiceDto responseServiceDto = paymentService.approvePayment(
-			paymentPresentationMapper.toPaymentApproveRequestServiceDto(1L, pgToken, requestDto));    // TODO userId
-
+			paymentPresentationMapper.toPaymentApproveRequestServiceDto(userId, pgToken, requestDto)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.PAYMENT_APPROVED,
 			paymentPresentationMapper.toPaymentApproveResponseDto(responseServiceDto));
 	}
 
 	@PutMapping("/{id}/cancel/tickets")
+	@RequiredRoles({
+		UserRoleType.NORMAL,
+		UserRoleType.SENIOR
+	})
 	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(
+		@RequestAttribute Long userId,
 		@PathVariable Long id
 	) {
 		PaymentTicketCancelResponseServiceDto responseServiceDto = paymentService.cancelTicketPayment(
-			paymentPresentationMapper.toPaymentTicketCancelRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentTicketCancelRequestServiceDto(userId, id)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.TICKET_REFUND_REQUESTED,
 			paymentPresentationMapper.toPaymentTicketCancelResponseDto(responseServiceDto));
 	}
 
 	@PutMapping("/{id}/cancel/memberships")
+	@RequiredRoles({
+		UserRoleType.NORMAL,
+		UserRoleType.SENIOR
+	})
 	public ResponseEntity<SuccessResponse<PaymentMembershipCancelResponseDto>> cancelMembershipPayment(
+		@RequestAttribute Long userId,
 		@PathVariable Long id
 	) {
 		PaymentMembershipCancelResponseServiceDto responseServiceDto = paymentService.cancelMembershipPayment(
-			paymentPresentationMapper.toPaymentMembershipCancelRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentMembershipCancelRequestServiceDto(userId, id)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.MEMBERSHIP_REFUND_REQUESTED,
 			paymentPresentationMapper.toPaymentMembershipCancelResponseDto(responseServiceDto));
 	}
 
 	@GetMapping("/details/{id}")
+	@RequiredRoles({
+		UserRoleType.NORMAL,
+		UserRoleType.SENIOR
+	})
 	public ResponseEntity<SuccessResponse<PaymentDetailResponseDto>> getPaymentDetail(
+		@RequestAttribute Long userId,
 		@PathVariable Long id
 	) {
 		PaymentDetailResponseServiceDto responseServiceDto = paymentService.getPaymentDetail(
-			paymentPresentationMapper.toPaymentDetailRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentDetailRequestServiceDto(userId, id)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
 			paymentPresentationMapper.toPaymentDetailResponseDto(responseServiceDto));
 	}
 
 	@GetMapping("/details")
+	@RequiredRoles({
+		UserRoleType.NORMAL,
+		UserRoleType.SENIOR
+	})
 	public ResponseEntity<SuccessResponse<Page<PaymentDetailResponseDto>>> searchPaymentDetail(
+		HttpServletRequest request,
 		@RequestParam(value = "page", required = false, defaultValue = "1") int page,
 		@RequestParam(value = "size", required = false, defaultValue = "10") int size,
 		@RequestParam(value = "sortDirection", required = false, defaultValue = "DESC") String sortDirection,
@@ -101,12 +138,13 @@ public class PaymentController {
 		@RequestParam(value = "id", required = false) Long id,
 		@RequestParam(value = "paymentId", required = false) Long paymentId
 	) {
+		Long userId = (Long)request.getAttribute("userId");
 		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
 		Page<PaymentDetailResponseServiceDto> responseServiceDto = paymentService.searchPaymentDetail(
 			paymentPresentationMapper.toPaymentDetailSearchRequestServiceDto(
 				pageable,
 				id,
-				1L,        // TODO userId
+				userId,
 				paymentId,
 				Boolean.FALSE)
 		);
