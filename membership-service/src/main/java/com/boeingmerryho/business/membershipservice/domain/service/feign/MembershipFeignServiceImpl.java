@@ -10,9 +10,7 @@ import com.boeingmerryho.business.membershipservice.application.dto.request.Logi
 import com.boeingmerryho.business.membershipservice.application.service.feign.MembershipFeignService;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 import com.boeingmerryho.business.membershipservice.domain.repository.MembershipRepository;
-import com.boeingmerryho.business.membershipservice.exception.MembershipErrorCode;
 
-import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,15 +26,15 @@ public class MembershipFeignServiceImpl implements MembershipFeignService {
 	public void handleLoginSuccess(LoginSuccessRequest request) {
 		int currentYear = Year.now().getValue();
 
-		Membership membership = membershipRepository
+		membershipRepository
 			.findActiveMembershipByUserIdAndSeasonAndIsDeletedFalse(request.userId(), currentYear)
-			.orElseThrow(() -> new GlobalException(MembershipErrorCode.NOT_FOUND));
-
-		String key = MEMBERSHIP_INFO_PREFIX + request.userId();
-		Map<String, String> membershipInfo = Map.of(
-			"name", membership.getName().name()
-		);
-		redisTemplate.opsForHash().putAll(key, membershipInfo);
+			.ifPresent(membership -> {
+				String key = MEMBERSHIP_INFO_PREFIX + request.userId();
+				Map<String, Object> membershipInfo = Map.of(
+					"name", membership.getName().name()
+				);
+				redisTemplate.opsForHash().putAll(key, membershipInfo);
+			});
 	}
 
 	@Override

@@ -28,10 +28,14 @@ import com.boeingmerryho.business.membershipservice.presentation.dto.response.Me
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipUpdateResponseDto;
 import com.boeingmerryho.business.membershipservice.utils.PageableUtils;
 
+import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
+import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/v1/memberships")
@@ -41,6 +45,7 @@ public class MembershipAdminController {
 	private final MembershipAdminService membershipAdminService;
 
 	@PostMapping
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<MembershipCreateResponseDto>> createMembership(
 		@RequestBody @Valid MembershipCreateRequestDto requestDto
 	) {
@@ -52,6 +57,7 @@ public class MembershipAdminController {
 	}
 
 	@GetMapping("/{id}")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<MembershipDetailAdminResponseDto>> getMembershipDetail(
 		@PathVariable Long id
 	) {
@@ -61,6 +67,7 @@ public class MembershipAdminController {
 	}
 
 	@GetMapping
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<Page<MembershipSearchAdminResponseDto>>> searchMembership(
 		@RequestParam(value = "page", required = false, defaultValue = "1") int page,
 		@RequestParam(value = "size", required = false, defaultValue = "10") int size,
@@ -86,6 +93,7 @@ public class MembershipAdminController {
 	}
 
 	@PutMapping("/{id}")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<MembershipUpdateResponseDto>> updateMembership(
 		@PathVariable Long id,
 		@RequestBody MembershipUpdateRequestDto requestDto
@@ -98,6 +106,7 @@ public class MembershipAdminController {
 	}
 
 	@DeleteMapping("/{id}")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<Void>> deleteMembership(
 		@PathVariable Long id
 	) {
