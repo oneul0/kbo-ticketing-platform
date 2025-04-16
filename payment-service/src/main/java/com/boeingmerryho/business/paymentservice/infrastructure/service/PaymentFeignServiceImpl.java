@@ -1,6 +1,7 @@
 package com.boeingmerryho.business.paymentservice.infrastructure.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.paymentservice.application.PaymentFeignService;
 import com.boeingmerryho.business.paymentservice.application.dto.PaymentApplicationMapper;
@@ -22,6 +23,7 @@ public class PaymentFeignServiceImpl implements PaymentFeignService {
 	private final PaymentApplicationMapper paymentApplicationMapper;
 
 	@Override
+	@Transactional
 	public PaymentCreationResponseServiceDto createPayment(PaymentCreationRequestServiceDto requestServiceDto) {
 		Payment payment = paymentRepository.save(
 			Payment.builder()

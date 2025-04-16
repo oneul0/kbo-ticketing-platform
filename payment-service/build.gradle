@@ -30,7 +30,7 @@ ext {
 
 dependencies {
     // common
-    implementation 'io.github.boeingmerryho:common-library:1.0.4'
+    implementation 'io.github.boeingmerryho:common-library:1.1.2'
 
     // eureka
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
