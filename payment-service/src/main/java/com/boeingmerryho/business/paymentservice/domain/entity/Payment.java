@@ -64,9 +64,16 @@ public class Payment extends BaseEntity {
 		this.status = PaymentStatus.REFUND_REQUESTED;
 	}
 
-	private void updateDiscountInfo(int discountPrice, DiscountType discountType) {
-		this.discountPrice = discountPrice;
-		this.discountType = discountType;
+	public void updateDiscountInfo(Double discountRate, DiscountType discountType) {
+		if (discountType == DiscountType.NONE) {
+			this.discountPrice = this.totalPrice;
+			this.discountType = DiscountType.NONE;
+			return;
+		}
+		if (discountType == DiscountType.MEMBERSHIP) {
+			this.discountPrice = (int)Math.round(this.totalPrice * (1 - discountRate / 100));
+			this.discountType = DiscountType.MEMBERSHIP;
+		}
 	}
 
 	public boolean validateStatus(PaymentStatus status) {

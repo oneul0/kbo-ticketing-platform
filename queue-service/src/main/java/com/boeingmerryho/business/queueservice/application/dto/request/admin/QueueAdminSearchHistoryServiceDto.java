@@ -4,5 +4,16 @@ import java.util.Date;
 
 import org.springframework.data.domain.Pageable;
 
-public record QueueAdminSearchHistoryServiceDto(Long storeId, Date startDate, Date endDate, Pageable pageable) {
+import com.boeingmerryho.business.queueservice.domain.model.CancelReason;
+import com.boeingmerryho.business.queueservice.domain.model.QueueStatus;
+
+public record QueueAdminSearchHistoryServiceDto(
+	Long storeId,
+	Long userId,
+	QueueStatus status,
+	Date startDate,
+	CancelReason cancelReason,
+	Date endDate,
+	Pageable pageable
+) {
 }

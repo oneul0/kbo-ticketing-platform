@@ -19,7 +19,7 @@ public class MembershipValidator {
 	public void validateNotDuplicated(Integer season, String name) {
 		try {
 			MembershipType type = MembershipType.valueOf(name);
-			boolean exists = membershipRepository.existsBySeasonAndName(season, type);
+			boolean exists = membershipRepository.existsBySeasonAndNameAndIsDeletedFalse(season, type);
 			if (exists) {
 				throw new GlobalException(MembershipErrorCode.ALREADY_REGISTERED);
 			}

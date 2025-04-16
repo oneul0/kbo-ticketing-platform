@@ -37,8 +37,8 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/admin/v1/memberships")
 public class MembershipAdminController {
 
-	private final MembershipAdminService membershipAdminService;
 	private final MembershipPresentationMapper mapper;
+	private final MembershipAdminService membershipAdminService;
 
 	@PostMapping
 	public ResponseEntity<SuccessResponse<MembershipCreateResponseDto>> createMembership(
@@ -73,13 +73,14 @@ public class MembershipAdminController {
 		@RequestParam(value = "minAvailableQuantity", required = false) Integer minAvailableQuantity,
 		@RequestParam(value = "maxAvailableQuantity", required = false) Integer maxAvailableQuantity,
 		@RequestParam(value = "minPrice", required = false) Integer minPrice,
-		@RequestParam(value = "maxPrice", required = false) Integer maxPrice
+		@RequestParam(value = "maxPrice", required = false) Integer maxPrice,
+		@RequestParam(value = "isDeleted", required = false) Boolean isDeleted
 	) {
 		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
 
 		Page<MembershipSearchAdminResponseServiceDto> responseServiceDto = membershipAdminService.searchMembership(
 			mapper.toMembershipSearchAdminRequestServiceDto(pageable, name, season, minDiscount, maxDiscount,
-				minAvailableQuantity, maxAvailableQuantity, minPrice, maxPrice));
+				minAvailableQuantity, maxAvailableQuantity, minPrice, maxPrice, isDeleted));
 		return SuccessResponse.of(MembershipSuccessCode.FETCHED_MEMBERSHIPS,
 			responseServiceDto.map(mapper::toMembershipSearchAdminResponseDto));
 	}

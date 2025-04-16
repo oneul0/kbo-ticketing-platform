@@ -2,9 +2,11 @@ package com.boeingmerryho.business.queueservice.application.dto.mapper;
 
 import org.mapstruct.Mapper;
 
+import com.boeingmerryho.business.queueservice.domain.entity.Queue;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminCallUserResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminDeleteUserResponseDto;
-import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminItemListResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminHistoryListResponseDto;
+import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminSearchHistoryResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueCancelResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserRankResponseDto;
@@ -22,5 +24,7 @@ public interface QueueApplicationMapper {
 
 	QueueAdminCallUserResponseDto toQueueAdminCallUserResponseDto(Long storeId, Long userId, Integer sequence);
 
-	QueueAdminItemListResponseDto toQueueAdminItemListResponseDto(Long userId, Integer sequence);
+	QueueAdminSearchHistoryResponseDto toQueueAdminSearchHistoryResponseDto(Queue queue);
+
+	QueueAdminHistoryListResponseDto toQueueAdminItemListResponseDto(Long userId, Integer sequence);
 }

@@ -18,17 +18,17 @@ import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 public interface MembershipApplicationMapper {
 
 	@BeanMapping(ignoreByDefault = true)
+	MembershipUserCreateResponseServiceDto toMembershipUserCreateResponseServiceDto(
+		MembershipUserCreateRequestServiceDto requestDto,
+		Long paymentId);
+
 	MembershipCreateResponseServiceDto toMembershipCreateResponseServiceDto(Membership saved);
 
-	MembershipDetailAdminResponseServiceDto toMembershipDetailAdminResponseServiceDto(Membership membershipDetail);
+	MembershipUpdateResponseServiceDto toMembershipUpdateResponseServiceDto(Membership updated);
 
 	MembershipDetailResponseServiceDto toMembershipDetailResponseServiceDto(Membership membership);
 
 	MembershipSearchAdminResponseServiceDto toMembershipSearchAdminResponseServiceDto(Membership membership);
 
-	MembershipUpdateResponseServiceDto toMembershipUpdateResponseServiceDto(Membership updated);
-
-	MembershipUserCreateResponseServiceDto toMembershipUserCreateResponseServiceDto(
-		MembershipUserCreateRequestServiceDto requestDto,
-		Long paymentId);
+	MembershipDetailAdminResponseServiceDto toMembershipDetailAdminResponseServiceDto(Membership membershipDetail);
 }

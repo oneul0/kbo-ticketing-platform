@@ -4,6 +4,6 @@ import org.springframework.data.domain.Page;
 
 public record QueueAdminSearchResponseDto(
 	Long storeId,
-	Page<QueueAdminItemListResponseDto> queuePageDto
+	Page<QueueAdminHistoryListResponseDto> queuePageDto
 ) {
 }
