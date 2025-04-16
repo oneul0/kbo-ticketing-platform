@@ -9,6 +9,6 @@ import com.boeingmerryho.business.membershipservice.presentation.dto.response.Pa
 
 @FeignClient(name = "payment-service")
 public interface PaymentFeignClient {
-	@PostMapping("/payments/create")
+	@PostMapping("/payment-service/payments/create")
 	PaymentCreationResponseDto createPayment(@RequestBody PaymentRequestDto dto);
 }

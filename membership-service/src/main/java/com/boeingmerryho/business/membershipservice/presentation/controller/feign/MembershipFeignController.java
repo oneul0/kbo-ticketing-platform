@@ -17,13 +17,13 @@ public class MembershipFeignController {
 
 	private final MembershipFeignService membershipFeignService;
 
-	@PostMapping("/membership/user/login")
+	@PostMapping("/membership-service/memberships/users/login")
 	public ResponseEntity<String> notifyLogin(@RequestBody LoginSuccessRequest request) {
 		membershipFeignService.handleLoginSuccess(request);
 		return ResponseEntity.ok("사용자 멤버십 정보 등록 완료");
 	}
 
-	@PostMapping("/membership/payment/discount")
+	@PostMapping("/membership-service/memberships/payments/discount")
 	public ResponseEntity<Double> getDiscount(@RequestBody UserDiscountRequest request) {
 		Double discount = membershipFeignService.getDiscountById(request.userId());
 		return ResponseEntity.ok(discount);
