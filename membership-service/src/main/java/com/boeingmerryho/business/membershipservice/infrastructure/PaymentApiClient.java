@@ -8,6 +8,7 @@ import com.boeingmerryho.business.membershipservice.application.dto.request.Memb
 import com.boeingmerryho.business.membershipservice.application.dto.request.PaymentRequestDto;
 import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 import com.boeingmerryho.business.membershipservice.infrastructure.client.PaymentFeignClient;
+import com.boeingmerryho.business.membershipservice.presentation.dto.response.PaymentCreationResponseDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +21,8 @@ public class PaymentApiClient {
 	private final static Integer QUANTITY = 1;
 	private final static String PAYMENT_TYPE = "MEMBERSHIP";
 
-	public Long getPaymentId(MembershipUserCreateRequestServiceDto requestDto, Membership membership) {
+	public PaymentCreationResponseDto getPaymentId(MembershipUserCreateRequestServiceDto requestDto,
+		Membership membership) {
 		PaymentRequestDto paymentInfo = new PaymentRequestDto(
 			requestDto.userId(),
 			membership.getPrice(),

@@ -17,7 +17,7 @@ public class TicketKafkaProducer {
 	private final KafkaTemplate<String, Object> kafkaTemplate;
 
 	public void publishTicketPayment(TicketPaymentEvent successDto) {
-		kafkaTemplate.send("ticket-payment", successDto).thenAccept(
+		kafkaTemplate.send("ticket-payment-process", successDto).thenAccept(
 			result -> {
 				RecordMetadata meta = result.getRecordMetadata();
 				log.info("[Kafka Producing Success] - topic: {}, offset: {}, partition: {}",
