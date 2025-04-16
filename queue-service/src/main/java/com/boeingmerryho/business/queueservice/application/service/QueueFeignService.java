@@ -2,22 +2,27 @@ package com.boeingmerryho.business.queueservice.application.service;
 
 import java.text.SimpleDateFormat;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.boeingmerryho.business.queueservice.application.dto.request.feign.IssuedTicketDto;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class QueueFeignService {
 
 	private static final String TICKET_INFO_PREFIX = "queue:ticket:";
 
 	private final RedisTemplate<String, Object> redisTemplate;
+
+	public QueueFeignService(
+		@Qualifier("redisTemplateForStoreQueueRedis") RedisTemplate<String, Object> redisTemplateForStoreQueueRedis
+	) {
+		this.redisTemplate = redisTemplateForStoreQueueRedis;
+	}
 
 	public void cacheIssuedTicket(IssuedTicketDto dto) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
