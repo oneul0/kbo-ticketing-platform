@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,7 +54,10 @@ public class QueueAdminController {
 	@Description("대기열 강제 취소 api. manager, admin 사용 가능")
 	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	@DeleteMapping("/stores/{id}")
-	public ResponseEntity<?> deleteUserFromQueue(@PathVariable(name = "id") Long storeId, @RequestParam Long userId) {
+	public ResponseEntity<?> deleteUserFromQueue(
+		@PathVariable(name = "id") Long storeId,
+		@RequestParam Long userId
+	) {
 		QueueAdminDeleteUserServiceDto serviceDto = queuePresentationMapper.toQueueAdminDeleteUserServiceDto(storeId,
 			userId);
 		QueueAdminDeleteUserResponseDto sequence = queueAdminService.deleteUserFromQueue(serviceDto);
@@ -104,9 +108,9 @@ public class QueueAdminController {
 	@Description("가게의 대기열 기록을 삭제하는 api. manager, admin 사용 가능")
 	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	@DeleteMapping("/stores/history/{id}")
-	public ResponseEntity<SuccessResponse<Long>> deleteQueueHistory(@PathVariable(name = "id") Long id,
-		@RequestParam Long userId
-		//todo : @RequestAttribute Long userId 로 수정
+	public ResponseEntity<SuccessResponse<Long>> deleteQueueHistory(
+		@PathVariable(name = "id") Long id,
+		@RequestAttribute Long userId
 	) {
 
 		QueueAdminDeleteHistoryServiceDto serviceDto = queuePresentationMapper.toQueueAdminDeleteHistoryServiceDto(id,
@@ -118,9 +122,9 @@ public class QueueAdminController {
 	@Description("가게의 대기열 기록을 수정하는 api. manager, admin 사용 가능")
 	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	@PutMapping("/stores/history/{id}")
-	public ResponseEntity<SuccessResponse<Long>> updateQueueHistory(@PathVariable(name = "id") Long id,
-		@RequestParam Long userId,
-		//todo : @RequestAttribute Long userId 로 수정
+	public ResponseEntity<SuccessResponse<Long>> updateQueueHistory(
+		@PathVariable(name = "id") Long id,
+		@RequestAttribute Long userId,
 		@RequestBody QueueAdminUpdateHistoryRequestDto requestDto) {
 
 		QueueAdminUpdateHistoryServiceDto serviceDto = queuePresentationMapper.toQueueAdminUpdateHistoryServiceDto(
