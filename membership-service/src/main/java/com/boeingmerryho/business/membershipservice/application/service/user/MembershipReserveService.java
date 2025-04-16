@@ -11,6 +11,7 @@ import com.boeingmerryho.business.membershipservice.domain.entity.Membership;
 import com.boeingmerryho.business.membershipservice.infrastructure.PaymentApiClient;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipHelper;
 import com.boeingmerryho.business.membershipservice.infrastructure.helper.MembershipRedisHelper;
+import com.boeingmerryho.business.membershipservice.presentation.dto.response.PaymentCreationResponseDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,8 +30,8 @@ public class MembershipReserveService {
 		reservationHelper.reserve(requestDto.membershipId(), requestDto.userId(), Duration.ofMinutes(8));
 
 		Membership membership = membershipHelper.readActiveMembership(requestDto.membershipId());
-		Long paymentId = paymentApiClient.getPaymentId(requestDto, membership);
+		PaymentCreationResponseDto responseDto = paymentApiClient.getPaymentId(requestDto, membership);
 
-		return mapper.toMembershipUserCreateResponseServiceDto(requestDto, paymentId);
+		return mapper.toMembershipUserCreateResponseServiceDto(requestDto, responseDto.paymentId());
 	}
 }
