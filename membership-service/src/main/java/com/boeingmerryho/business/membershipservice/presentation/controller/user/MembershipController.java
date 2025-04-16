@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +19,8 @@ import com.boeingmerryho.business.membershipservice.presentation.dto.mapper.Memb
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipDetailResponseDto;
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipUserCreateResponseDto;
 
+import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
+import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -38,11 +41,11 @@ public class MembershipController {
 	}
 
 	@PostMapping("/{membershipId}/reserve")
+	@RequiredRoles({UserRoleType.NORMAL, UserRoleType.SENIOR})
 	public ResponseEntity<SuccessResponse<MembershipUserCreateResponseDto>> reserveMembership(
-		@PathVariable Long membershipId
+		@PathVariable Long membershipId,
+		@RequestAttribute Long userId
 	) {
-		// TODO: userId 받아오기
-		Long userId = 6L;
 		MembershipUserCreateResponseServiceDto responseServiceDto = membershipReserveService.reserveMembership(
 			mapper.toMembershipUserCreateRequestServiceDto(membershipId, userId));
 		MembershipUserCreateResponseDto responseDto = mapper.toMembershipUserCreateResponseDto(responseServiceDto);
