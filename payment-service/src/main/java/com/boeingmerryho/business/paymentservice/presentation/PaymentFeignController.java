@@ -2,7 +2,6 @@ package com.boeingmerryho.business.paymentservice.presentation;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.paymentservice.application.PaymentFeignService;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/payment-service")
 public class PaymentFeignController {
 
 	private final PaymentFeignService paymentFeignService;
