@@ -29,7 +29,10 @@ import com.boeingmerryho.business.paymentservice.presentation.dto.response.Payme
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentTicketRefundResponseDto;
 import com.boeingmerryho.business.paymentservice.utils.PageableUtils;
 
+import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
+import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -40,69 +43,114 @@ public class PaymentAdminController {
 	private final PaymentPresentationMapper paymentPresentationMapper;
 
 	@PostMapping("/approve")
+	@RequiredRoles({
+		UserRoleType.MANAGER,
+		UserRoleType.ADMIN
+	})
 	public ResponseEntity<SuccessResponse<PaymentApproveResponseDto>> approvePayment(
+		HttpServletRequest request,
 		@RequestBody PaymentApproveRequestDto requestDto
 	) {
+		Long userId = (Long)request.getAttribute("userId");
 		PaymentApproveResponseServiceDto responseServiceDto = paymentAdminService.approvePayment(
-			paymentPresentationMapper.toPaymentApproveAdminRequestServiceDto(1L, requestDto));    // TODO userId
-
+			paymentPresentationMapper.toPaymentApproveAdminRequestServiceDto(userId, requestDto)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.PAYMENT_APPROVED,
 			paymentPresentationMapper.toPaymentApproveResponseDto(responseServiceDto));
 	}
 
 	@PostMapping("/refund/tickets/{id}")
+	@RequiredRoles({
+		UserRoleType.MANAGER,
+		UserRoleType.ADMIN
+	})
 	public ResponseEntity<SuccessResponse<PaymentTicketRefundResponseDto>> refundTicketPayment(
+		HttpServletRequest request,
 		@PathVariable Long id
 	) {
+		Long userId = (Long)request.getAttribute("userId");
 		PaymentTicketRefundResponseServiceDto responseServiceDto = paymentAdminService.refundTicketPayment(
-			paymentPresentationMapper.toPaymentTicketRefundRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentTicketRefundRequestServiceDto(userId, id)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.TICKET_REFUNDED,
 			paymentPresentationMapper.toPaymentTicketRefundResponseDto(responseServiceDto));
 	}
 
 	@PostMapping("/refund/memberships/{id}")
+	@RequiredRoles({
+		UserRoleType.MANAGER,
+		UserRoleType.ADMIN
+	})
 	public ResponseEntity<SuccessResponse<PaymentMembershipRefundResponseDto>> refundMembershipPayment(
+		HttpServletRequest request,
 		@PathVariable Long id
 	) {
+		Long userId = (Long)request.getAttribute("userId");
 		PaymentMembershipRefundResponseServiceDto responseServiceDto = paymentAdminService.refundMembershipPayment(
-			paymentPresentationMapper.toPaymentMembershipRefundRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentMembershipRefundRequestServiceDto(userId, id)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.MEMBERSHIP_REFUNDED,
 			paymentPresentationMapper.toPaymentMembershipRefundResponseDto(responseServiceDto));
 	}
 
 	@PutMapping("/{id}/cancel/tickets")
+	@RequiredRoles({
+		UserRoleType.MANAGER,
+		UserRoleType.ADMIN
+	})
 	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(
+		HttpServletRequest request,
 		@PathVariable Long id
 	) {
+		Long userId = (Long)request.getAttribute("userId");
 		PaymentTicketCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelTicketPayment(
-			paymentPresentationMapper.toPaymentTicketCancelRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentTicketCancelRequestServiceDto(userId, id)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.TICKET_REFUND_REQUESTED,
 			paymentPresentationMapper.toPaymentTicketCancelResponseDto(responseServiceDto));
 	}
 
 	@PutMapping("/{id}/cancel/memberships")
+	@RequiredRoles({
+		UserRoleType.MANAGER,
+		UserRoleType.ADMIN
+	})
 	public ResponseEntity<SuccessResponse<PaymentMembershipCancelResponseDto>> cancelMembershipPayment(
+		HttpServletRequest request,
 		@PathVariable Long id
 	) {
+		Long userId = (Long)request.getAttribute("userId");
 		PaymentMembershipCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelMembershipPayment(
-			paymentPresentationMapper.toPaymentMembershipCancelRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentMembershipCancelRequestServiceDto(userId, id)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.MEMBERSHIP_REFUND_REQUESTED,
 			paymentPresentationMapper.toPaymentMembershipCancelResponseDto(responseServiceDto));
 	}
 
 	@GetMapping("/details/{id}")
+	@RequiredRoles({
+		UserRoleType.MANAGER,
+		UserRoleType.ADMIN
+	})
 	public ResponseEntity<SuccessResponse<PaymentDetailAdminResponseDto>> getPaymentDetail(
+		HttpServletRequest request,
 		@PathVariable Long id
 	) {
+		Long userId = (Long)request.getAttribute("userId");
 		PaymentDetailAdminResponseServiceDto responseServiceDto = paymentAdminService.getPaymentDetail(
-			paymentPresentationMapper.toPaymentDetailRequestServiceDto(id));
+			paymentPresentationMapper.toPaymentDetailRequestServiceDto(userId, id)
+		);
 		return SuccessResponse.of(PaymentSuccessCode.FETCHED_PAYMENT_DETAIL,
 			paymentPresentationMapper.toPaymentDetailAdminResponseDto(responseServiceDto));
-
 	}
 
 	@GetMapping("/details")
+	@RequiredRoles({
+		UserRoleType.MANAGER,
+		UserRoleType.ADMIN
+	})
 	public ResponseEntity<SuccessResponse<Page<PaymentDetailAdminResponseDto>>> searchPaymentDetail(
+		HttpServletRequest request,
 		@RequestParam(value = "page", required = false, defaultValue = "1") int page,
 		@RequestParam(value = "size", required = false, defaultValue = "10") int size,
 		@RequestParam(value = "sortDirection", required = false, defaultValue = "DESC") String sortDirection,

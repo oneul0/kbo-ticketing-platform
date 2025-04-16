@@ -38,12 +38,18 @@ import com.boeingmerryho.business.paymentservice.presentation.dto.response.Payme
 @Mapper(componentModel = "spring")
 public interface PaymentPresentationMapper {
 
-	PaymentTicketCancelRequestServiceDto toPaymentTicketCancelRequestServiceDto(Long id);
+	PaymentTicketCancelRequestServiceDto toPaymentTicketCancelRequestServiceDto(
+		Long userId,
+		Long id
+	);
 
 	PaymentTicketCancelResponseDto toPaymentTicketCancelResponseDto(
 		PaymentTicketCancelResponseServiceDto responseServiceDto);
 
-	PaymentDetailRequestServiceDto toPaymentDetailRequestServiceDto(Long id);
+	PaymentDetailRequestServiceDto toPaymentDetailRequestServiceDto(
+		Long userId,
+		Long id
+	);
 
 	PaymentDetailResponseDto toPaymentDetailResponseDto(PaymentDetailResponseServiceDto responseServiceDto);
 
@@ -58,12 +64,18 @@ public interface PaymentPresentationMapper {
 	PaymentDetailAdminResponseDto toPaymentDetailAdminResponseDto(
 		PaymentDetailAdminResponseServiceDto responseServiceDto);
 
-	PaymentMembershipCancelRequestServiceDto toPaymentMembershipCancelRequestServiceDto(Long id);
+	PaymentMembershipCancelRequestServiceDto toPaymentMembershipCancelRequestServiceDto(
+		Long userId,
+		Long id
+	);
 
 	PaymentMembershipCancelResponseDto toPaymentMembershipCancelResponseDto(
 		PaymentMembershipCancelResponseServiceDto responseServiceDto);
 
-	PaymentReadyRequestServiceDto toPaymentReadyRequestServiceDto(Long userId, PaymentReadyRequestDto requestDto);
+	PaymentReadyRequestServiceDto toPaymentReadyRequestServiceDto(
+		Long userId,
+		PaymentReadyRequestDto requestDto
+	);
 
 	PaymentReadyResponseDto toPaymentReadyResponseDto(PaymentReadyResponseServiceDto responseServiceDto);
 
@@ -86,9 +98,15 @@ public interface PaymentPresentationMapper {
 	PaymentTicketRefundResponseDto toPaymentTicketRefundResponseDto(
 		PaymentTicketRefundResponseServiceDto responseServiceDto);
 
-	PaymentTicketRefundRequestServiceDto toPaymentTicketRefundRequestServiceDto(Long id);
+	PaymentTicketRefundRequestServiceDto toPaymentTicketRefundRequestServiceDto(
+		Long userId,
+		Long id
+	);
 
-	PaymentMembershipRefundRequestServiceDto toPaymentMembershipRefundRequestServiceDto(Long id);
+	PaymentMembershipRefundRequestServiceDto toPaymentMembershipRefundRequestServiceDto(
+		Long userId,
+		Long id
+	);
 
 	PaymentCreationRequestServiceDto toPaymentCreationRequestServiceDto(PaymentCreationRequestDto requestDto);
 

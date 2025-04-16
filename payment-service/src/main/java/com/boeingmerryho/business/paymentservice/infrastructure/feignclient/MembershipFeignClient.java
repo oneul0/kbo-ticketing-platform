@@ -7,11 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.boeingmerryho.business.paymentservice.application.dto.membership.UserDiscountRequest;
 
-@SuppressWarnings("checkstyle:RegexpMultiline")
 @FeignClient(name = "membership-service")
 public interface MembershipFeignClient {
 	@PostMapping(
-		value = "/membership/payment/discount",
+		value = "/membership-service/payment/discount",
 		consumes = MediaType.APPLICATION_JSON_VALUE
 	)
 	Double getDiscount(
