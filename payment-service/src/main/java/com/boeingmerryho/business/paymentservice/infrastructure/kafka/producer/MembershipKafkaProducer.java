@@ -17,7 +17,7 @@ public class MembershipKafkaProducer {
 	private final KafkaTemplate<String, Object> kafkaTemplate;
 
 	public void publishMembershipPayment(MembershipPaymentEvent successDto) {
-		kafkaTemplate.send("payment-membership", successDto).thenAccept(
+		kafkaTemplate.send("payment-membership-process", successDto).thenAccept(
 			result -> {
 				RecordMetadata meta = result.getRecordMetadata();
 				log.info("[Kafka Producing Success] - topic: {}, offset: {}, partition: {}",
