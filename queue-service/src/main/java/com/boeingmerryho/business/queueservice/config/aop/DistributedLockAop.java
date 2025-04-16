@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import com.boeingmerryho.business.queueservice.exception.LockErrorCode;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -22,14 +21,21 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Aspect
 @Component
-@RequiredArgsConstructor
 @Slf4j
 // @Sl4j
 public class DistributedLockAop {
 	private static final String REDISSON_LOCK_PREFIX = "LOCK:";
 
-	private final RedissonClient redissonClient;
 	private final AopForTransaction transactionHandlerForAop;
+	private final RedissonClient redissonClient;
+
+	public DistributedLockAop(
+		RedissonClient redissonClientForStoreQueue,
+		AopForTransaction transactionHandlerForAop
+	) {
+		this.redissonClient = redissonClientForStoreQueue;
+		this.transactionHandlerForAop = transactionHandlerForAop;
+	}
 
 	@Around("@annotation(distributedLock)")
 	public Object lock(ProceedingJoinPoint joinPoint, DistributedLock distributedLock) {
