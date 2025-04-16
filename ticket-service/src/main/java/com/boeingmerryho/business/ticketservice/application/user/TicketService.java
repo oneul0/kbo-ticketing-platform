@@ -17,6 +17,7 @@ import com.boeingmerryho.business.ticketservice.domain.repository.TicketReposito
 import com.boeingmerryho.business.ticketservice.domain.service.CreateTicketService;
 import com.boeingmerryho.business.ticketservice.exception.ErrorCode;
 import com.boeingmerryho.business.ticketservice.exception.TicketException;
+import com.boeingmerryho.business.ticketservice.infrastructure.adapter.kafka.dto.response.SeatInfo;
 import com.boeingmerryho.business.ticketservice.infrastructure.adapter.kafka.dto.response.SeatListenerDto;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class TicketService {
 
 	private final TicketRepository ticketRepository;
 	private final CreateTicketService createTicketService;
+	private final TicketPaymentService ticketPaymentService;
 	private final TicketApplicationMapper mapper;
 
 	@Transactional(readOnly = true)
@@ -51,6 +53,9 @@ public class TicketService {
 		for (Ticket ticket : tickets) {
 			ticketRepository.save(ticket);
 		}
+
+		List<SeatInfo> seats = requestDto.seatsInfo();
+		ticketPaymentService.createPaymentForTickets(tickets, seats);
 	}
 
 	private TicketSearchCriteria createTicketSearchCriteria(TicketSearchRequestServiceDto requestDto) {
