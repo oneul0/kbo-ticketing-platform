@@ -69,17 +69,17 @@ public class QueueHelperImpl implements QueueHelper {
 			.atZone(ZoneId.systemDefault())
 			.toLocalDate();
 
-		String dateKey = "queue:ticket:" + date;
+		String dateKey = TICKET_INFO_PREFIX + date;
 		String userKey = "ticket:user:" + ticketId;
 
-		Boolean exists = redisTemplateForCommonRedis.opsForSet()
+		Boolean exists = redisTemplateForStoreQueueRedis.opsForSet()
 			.isMember(dateKey, ticketId.toString());
 
 		if (Boolean.FALSE.equals(exists)) {
 			throw new GlobalException(ErrorCode.TICKET_IS_NOT_ACTIVATED);
 		}
 
-		String userIdValue = Optional.ofNullable(redisTemplateForCommonRedis.opsForValue().get(userKey))
+		String userIdValue = Optional.ofNullable(redisTemplateForStoreQueueRedis.opsForValue().get(userKey))
 			.map(Object::toString)
 			.orElseThrow(() -> new GlobalException(ErrorCode.TICKET_IS_NOT_ACTIVATED));
 

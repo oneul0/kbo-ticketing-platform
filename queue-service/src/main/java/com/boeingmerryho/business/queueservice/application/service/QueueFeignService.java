@@ -19,12 +19,12 @@ public class QueueFeignService {
 
 	private static final String TICKET_INFO_PREFIX = "queue:ticket:";
 
-	private final RedisTemplate<String, Object> redisTemplate;
+	private final RedisTemplate<String, Object> redisTemplateForStoreQueueRedis;
 
 	public QueueFeignService(
 		@Qualifier("redisTemplateForStoreQueueRedis") RedisTemplate<String, Object> redisTemplateForStoreQueueRedis
 	) {
-		this.redisTemplate = redisTemplateForStoreQueueRedis;
+		this.redisTemplateForStoreQueueRedis = redisTemplateForStoreQueueRedis;
 	}
 
 	public void cacheIssuedTicket(IssuedTicketDto dto) {
@@ -37,13 +37,13 @@ public class QueueFeignService {
 		String dateKey = "queue:ticket:" + matchDate;
 		String userKey = "ticket:user:" + dto.ticketId();
 
-		redisTemplate.opsForSet().add(dateKey, dto.ticketId().toString());
+		redisTemplateForStoreQueueRedis.opsForSet().add(dateKey, dto.ticketId().toString());
 
-		redisTemplate.opsForValue().set(userKey, dto.userId().toString(), ttlDays, TimeUnit.DAYS);
+		redisTemplateForStoreQueueRedis.opsForValue().set(userKey, dto.userId().toString(), ttlDays, TimeUnit.DAYS);
 
-		if (Boolean.FALSE.equals(redisTemplate.hasKey(dateKey)) ||
-			redisTemplate.getExpire(dateKey, TimeUnit.SECONDS) == -1) {
-			redisTemplate.expire(dateKey, ttlDays, TimeUnit.DAYS);
+		if (!Boolean.TRUE.equals(redisTemplateForStoreQueueRedis.hasKey(dateKey)) ||
+			redisTemplateForStoreQueueRedis.getExpire(dateKey, TimeUnit.SECONDS) == -1) {
+			redisTemplateForStoreQueueRedis.expire(dateKey, ttlDays, TimeUnit.DAYS);
 		}
 	}
 
