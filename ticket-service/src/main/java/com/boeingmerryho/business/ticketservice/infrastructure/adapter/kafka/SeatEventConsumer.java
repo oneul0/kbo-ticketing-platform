@@ -18,7 +18,11 @@ public class SeatEventConsumer {
 
 	private final TicketService ticketService;
 
-	@KafkaListener(topics = "ticket-created", groupId = "ticket-seat")
+	@KafkaListener(
+		topics = "ticket-created",
+		groupId = "ticket-seat",
+		containerFactory = "seatKafkaListenerContainerFactory"
+	)
 	public void consume(SeatListenerDto dto) {
 		try {
 			Long userId = Long.parseLong(dto.seatsInfo().get(0).userId());

@@ -16,4 +16,6 @@ public interface TicketRepository {
 	Page<Ticket> findByCriteria(TicketSearchCriteria criteria, Pageable pageable);
 
 	Optional<Ticket> findActiveTicketById(Long id);
+
+	Optional<Ticket> findByTicketNo(String ticketNo);
 }
