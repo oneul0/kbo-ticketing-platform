@@ -6,6 +6,7 @@ public record AdminTicketResponseServiceDto(
 	Long seatId,
 	Long userId,
 	String ticketNo,
+	Integer price,
 	String status,
 	Boolean isDeleted
 ) {
