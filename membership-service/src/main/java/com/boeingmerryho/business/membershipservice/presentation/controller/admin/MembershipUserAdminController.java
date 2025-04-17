@@ -19,6 +19,8 @@ import com.boeingmerryho.business.membershipservice.presentation.dto.response.Me
 import com.boeingmerryho.business.membershipservice.presentation.dto.response.MembershipUserSearchAdminResponseDto;
 import com.boeingmerryho.business.membershipservice.utils.PageableUtils;
 
+import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
+import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +33,7 @@ public class MembershipUserAdminController {
 	private final MembershipUserAdminService membershipUserAdminService;
 
 	@GetMapping("/users/{id}")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<MembershipUserDetailAdminResponseDto>> getMembershipUserDetail(
 		@PathVariable Long id
 	) {
@@ -42,6 +45,7 @@ public class MembershipUserAdminController {
 	}
 
 	@GetMapping("/users")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<Page<MembershipUserSearchAdminResponseDto>>> searchMembershipUser(
 		@RequestParam(value = "page", required = false, defaultValue = "1") int page,
 		@RequestParam(value = "size", required = false, defaultValue = "10") int size,
@@ -66,6 +70,7 @@ public class MembershipUserAdminController {
 	}
 
 	@PostMapping("/{season}/deactivate")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<Integer>> deactivateUsersOfSeason(@PathVariable Integer season) {
 		Integer count = membershipUserAdminService.deactivateUsersOfSeason(season);
 		return SuccessResponse.of(MembershipSuccessCode.DEACTIVATED_MEMBERSHIP_USERS, count);

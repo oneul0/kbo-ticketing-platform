@@ -18,7 +18,7 @@ public class PaymentFeignController {
 	private final PaymentFeignService paymentFeignService;
 	private final PaymentPresentationMapper paymentPresentationMapper;
 
-	@PostMapping("/payments/create")
+	@PostMapping("/payment-service/payments/create")
 	public PaymentCreationResponseDto createPayment(
 		@RequestBody PaymentCreationRequestDto requestDto
 	) {
