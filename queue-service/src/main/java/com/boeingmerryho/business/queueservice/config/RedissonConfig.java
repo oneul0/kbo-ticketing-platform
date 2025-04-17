@@ -3,11 +3,10 @@ package com.boeingmerryho.business.queueservice.config;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.redisson.spring.data.connection.RedissonConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -19,7 +18,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-@Profile("!test")
 @Configuration
 public class RedissonConfig {
 
@@ -47,12 +45,17 @@ public class RedissonConfig {
 		return Redisson.create(config);
 	}
 
+	@Bean
+	public RedissonConnectionFactory redissonConnectionFactoryForStoreQueueRedis(
+		RedissonClient redissonClientForStoreQueue) {
+		return new RedissonConnectionFactory(redissonClientForStoreQueue);
+	}
+
 	@Bean(name = "redisTemplateForStoreQueueRedis")
 	public RedisTemplate<String, Object> redisTemplateForStoreQueueRedis(
-		RedisConnectionFactory redisConnectionFactoryForStoreQueueRedis) {
-
+		RedissonConnectionFactory redissonConnectionFactoryForStoreQueueRedis) {
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
-		template.setConnectionFactory(redisConnectionFactoryForStoreQueueRedis);
+		template.setConnectionFactory(redissonConnectionFactoryForStoreQueueRedis);
 
 		ObjectMapper objectMapper = new ObjectMapper()
 			.registerModule(new JavaTimeModule())
