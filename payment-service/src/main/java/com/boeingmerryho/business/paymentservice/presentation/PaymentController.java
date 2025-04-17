@@ -32,7 +32,6 @@ import com.boeingmerryho.business.paymentservice.utils.PageableUtils;
 import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
 import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -130,7 +129,7 @@ public class PaymentController {
 		UserRoleType.SENIOR
 	})
 	public ResponseEntity<SuccessResponse<Page<PaymentDetailResponseDto>>> searchPaymentDetail(
-		HttpServletRequest request,
+		@RequestAttribute Long userId,
 		@RequestParam(value = "page", required = false, defaultValue = "1") int page,
 		@RequestParam(value = "size", required = false, defaultValue = "10") int size,
 		@RequestParam(value = "sortDirection", required = false, defaultValue = "DESC") String sortDirection,
@@ -138,7 +137,6 @@ public class PaymentController {
 		@RequestParam(value = "id", required = false) Long id,
 		@RequestParam(value = "paymentId", required = false) Long paymentId
 	) {
-		Long userId = (Long)request.getAttribute("userId");
 		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
 		Page<PaymentDetailResponseServiceDto> responseServiceDto = paymentService.searchPaymentDetail(
 			paymentPresentationMapper.toPaymentDetailSearchRequestServiceDto(

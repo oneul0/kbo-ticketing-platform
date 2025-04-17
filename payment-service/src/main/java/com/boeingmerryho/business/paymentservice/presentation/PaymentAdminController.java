@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,7 +33,6 @@ import com.boeingmerryho.business.paymentservice.utils.PageableUtils;
 import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
 import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -48,10 +48,9 @@ public class PaymentAdminController {
 		UserRoleType.ADMIN
 	})
 	public ResponseEntity<SuccessResponse<PaymentApproveResponseDto>> approvePayment(
-		HttpServletRequest request,
+		@RequestAttribute Long userId,
 		@RequestBody PaymentApproveRequestDto requestDto
 	) {
-		Long userId = (Long)request.getAttribute("userId");
 		PaymentApproveResponseServiceDto responseServiceDto = paymentAdminService.approvePayment(
 			paymentPresentationMapper.toPaymentApproveAdminRequestServiceDto(userId, requestDto)
 		);
@@ -65,10 +64,9 @@ public class PaymentAdminController {
 		UserRoleType.ADMIN
 	})
 	public ResponseEntity<SuccessResponse<PaymentTicketRefundResponseDto>> refundTicketPayment(
-		HttpServletRequest request,
+		@RequestAttribute Long userId,
 		@PathVariable Long id
 	) {
-		Long userId = (Long)request.getAttribute("userId");
 		PaymentTicketRefundResponseServiceDto responseServiceDto = paymentAdminService.refundTicketPayment(
 			paymentPresentationMapper.toPaymentTicketRefundRequestServiceDto(userId, id)
 		);
@@ -82,10 +80,9 @@ public class PaymentAdminController {
 		UserRoleType.ADMIN
 	})
 	public ResponseEntity<SuccessResponse<PaymentMembershipRefundResponseDto>> refundMembershipPayment(
-		HttpServletRequest request,
+		@RequestAttribute Long userId,
 		@PathVariable Long id
 	) {
-		Long userId = (Long)request.getAttribute("userId");
 		PaymentMembershipRefundResponseServiceDto responseServiceDto = paymentAdminService.refundMembershipPayment(
 			paymentPresentationMapper.toPaymentMembershipRefundRequestServiceDto(userId, id)
 		);
@@ -99,10 +96,9 @@ public class PaymentAdminController {
 		UserRoleType.ADMIN
 	})
 	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(
-		HttpServletRequest request,
+		@RequestAttribute Long userId,
 		@PathVariable Long id
 	) {
-		Long userId = (Long)request.getAttribute("userId");
 		PaymentTicketCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelTicketPayment(
 			paymentPresentationMapper.toPaymentTicketCancelRequestServiceDto(userId, id)
 		);
@@ -116,10 +112,9 @@ public class PaymentAdminController {
 		UserRoleType.ADMIN
 	})
 	public ResponseEntity<SuccessResponse<PaymentMembershipCancelResponseDto>> cancelMembershipPayment(
-		HttpServletRequest request,
+		@RequestAttribute Long userId,
 		@PathVariable Long id
 	) {
-		Long userId = (Long)request.getAttribute("userId");
 		PaymentMembershipCancelResponseServiceDto responseServiceDto = paymentAdminService.cancelMembershipPayment(
 			paymentPresentationMapper.toPaymentMembershipCancelRequestServiceDto(userId, id)
 		);
@@ -133,10 +128,9 @@ public class PaymentAdminController {
 		UserRoleType.ADMIN
 	})
 	public ResponseEntity<SuccessResponse<PaymentDetailAdminResponseDto>> getPaymentDetail(
-		HttpServletRequest request,
+		@RequestAttribute Long userId,
 		@PathVariable Long id
 	) {
-		Long userId = (Long)request.getAttribute("userId");
 		PaymentDetailAdminResponseServiceDto responseServiceDto = paymentAdminService.getPaymentDetail(
 			paymentPresentationMapper.toPaymentDetailRequestServiceDto(userId, id)
 		);
@@ -150,7 +144,6 @@ public class PaymentAdminController {
 		UserRoleType.ADMIN
 	})
 	public ResponseEntity<SuccessResponse<Page<PaymentDetailAdminResponseDto>>> searchPaymentDetail(
-		HttpServletRequest request,
 		@RequestParam(value = "page", required = false, defaultValue = "1") int page,
 		@RequestParam(value = "size", required = false, defaultValue = "10") int size,
 		@RequestParam(value = "sortDirection", required = false, defaultValue = "DESC") String sortDirection,
@@ -161,7 +154,6 @@ public class PaymentAdminController {
 		@RequestParam(value = "isDeleted", required = false) Boolean isDeleted
 	) {
 		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
-
 		Page<PaymentDetailAdminResponseServiceDto> responseServiceDto = paymentAdminService.searchPaymentDetail(
 			paymentPresentationMapper.toPaymentDetailSearchRequestServiceDto(pageable, id, userId, paymentId, isDeleted)
 		);
