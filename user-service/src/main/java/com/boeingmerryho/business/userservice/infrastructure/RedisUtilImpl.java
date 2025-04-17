@@ -77,7 +77,7 @@ public class RedisUtilImpl implements RedisUtil {
 
 	@Override
 	public Boolean hsaKeyInRedis(String key) {
-		return Boolean.FALSE.equals(redisTemplate.hasKey(key));
+		return Boolean.TRUE.equals(redisTemplate.hasKey(key));
 	}
 
 	@Override
@@ -118,6 +118,27 @@ public class RedisUtilImpl implements RedisUtil {
 		if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
 			throw new GlobalException(ErrorCode.JWT_NOT_MATCH);
 		}
+	}
+
+	@Override
+	public void rollbackUserInfo(Long id) {
+		String userInfoKey = USER_INFO_PREFIX + id;
+		redisTemplate.delete(userInfoKey);
+	}
+
+	@Override
+	public void rollbackUserJwtToken(Long id) {
+		String tokenKey = USER_TOKEN_PREFIX + id;
+
+		Map<Object, Object> tokenEntry = getMapEntriesFromRedis(tokenKey);
+		String accessToken = (String)tokenEntry.get("accessToken");
+
+		redisTemplate.delete(tokenKey);
+
+		if (accessToken != null) {
+			blacklistToken(accessToken);
+		}
+
 	}
 
 }

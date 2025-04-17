@@ -1,25 +1,24 @@
-package com.boeingmerryho.business.userservice.config.interceptor;
+package com.boeingmerryho.business.userservice.config.auth;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.boeingmerryho.business.userservice.presentation.interceptor.AdminCheckInterceptor;
-import com.boeingmerryho.business.userservice.presentation.interceptor.UserCheckInterceptor;
+import io.github.boeingmerryho.commonlibrary.interceptor.AdminCheckInterceptor;
+import io.github.boeingmerryho.commonlibrary.interceptor.UserCheckInterceptor;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-	private final RedisTemplate<String, Object> redisTemplate;
+	private final RedisUserInfoProvider userInfoProvider;
 
-	public WebMvcConfig(RedisTemplate<String, Object> redisTemplate) {
-		this.redisTemplate = redisTemplate;
+	public WebMvcConfig(RedisUserInfoProvider userInfoProvider) {
+		this.userInfoProvider = userInfoProvider;
 	}
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(new AdminCheckInterceptor(redisTemplate))
+		registry.addInterceptor(new AdminCheckInterceptor(userInfoProvider))
 			.excludePathPatterns(
 				"/api/**",
 				"/error/**",
@@ -29,11 +28,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				"/admin/v1/users/login"
 			);
 
-		registry.addInterceptor(new UserCheckInterceptor(redisTemplate))
+		registry.addInterceptor(new UserCheckInterceptor(userInfoProvider))
 			.excludePathPatterns(
 				"/admin/**",
 				"/error/**",
-				
+
 				"/api/v1/users/register",
 				"/api/v1/users/check",
 				"/api/v1/users/login"
