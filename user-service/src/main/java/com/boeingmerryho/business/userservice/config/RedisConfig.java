@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.userservice.config.security;
+package com.boeingmerryho.business.userservice.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
