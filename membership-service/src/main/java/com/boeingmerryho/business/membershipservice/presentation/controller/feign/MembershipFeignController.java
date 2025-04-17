@@ -23,7 +23,7 @@ public class MembershipFeignController {
 		return ResponseEntity.ok("사용자 멤버십 정보 등록 완료");
 	}
 
-	@PostMapping("/membership-service/memberships/payments/discount")
+	@PostMapping("/membership-service/payments/discount")
 	public ResponseEntity<Double> getDiscount(@RequestBody UserDiscountRequest request) {
 		Double discount = membershipFeignService.getDiscountById(request.userId());
 		return ResponseEntity.ok(discount);
