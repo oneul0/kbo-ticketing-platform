@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class QueueFeignService {
 
 	private static final String TICKET_INFO_PREFIX = "queue:ticket:";
+	private static final String TICKET_USER_INFO_PREFIX = "ticket:user:";
 
 	private final RedisTemplate<String, Object> redisTemplateForStoreQueueRedis;
 
@@ -34,8 +35,8 @@ public class QueueFeignService {
 			.toLocalDate();
 
 		long ttlDays = Math.max(ChronoUnit.DAYS.between(today, matchDate), 1);
-		String dateKey = "queue:ticket:" + matchDate;
-		String userKey = "ticket:user:" + dto.ticketId();
+		String dateKey = TICKET_INFO_PREFIX + matchDate;
+		String userKey = TICKET_USER_INFO_PREFIX + dto.ticketId();
 
 		redisTemplateForStoreQueueRedis.opsForSet().add(dateKey, dto.ticketId().toString());
 

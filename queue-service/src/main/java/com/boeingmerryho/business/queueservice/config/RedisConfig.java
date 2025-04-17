@@ -3,6 +3,7 @@ package com.boeingmerryho.business.queueservice.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -35,6 +36,7 @@ public class RedisConfig {
 	private String commonPassword;
 
 	@Bean
+	@Primary
 	public RedisConnectionFactory redisConnectionFactoryForCommonRedis() {
 		RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(commonHost, commonPort);
 		config.setUsername(commonUsername);

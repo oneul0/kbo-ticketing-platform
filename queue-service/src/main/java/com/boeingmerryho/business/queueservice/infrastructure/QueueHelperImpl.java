@@ -36,23 +36,20 @@ public class QueueHelperImpl implements QueueHelper {
 	private static final String TICKET_INFO_PREFIX = "queue:ticket:";
 	private static final String STORE_AVAILABILITY_CHECK_PREFIX = "queue:availability:";
 	private static final String WAITLIST_INFO_PREFIX = "queue:waitlist:store:";
+	private static final String TICKET_USER_INFO_PREFIX = "ticket:user:";
 
 	private static final Long WAITLIST_INFO_EXPIRE_DAY = 1L;
 
-	//todo: 분리하기
-	private final RedisTemplate<String, Object> redisTemplateForCommonRedis;
 	private final RedisTemplate<String, Object> redisTemplateForStoreQueueRedis;
 
 	private final QueueRepository queueRepository;
 	private final CustomQueueRepository customQueueRepository;
 
 	public QueueHelperImpl(
-		RedisTemplate<String, Object> redisTemplate,
 		@Qualifier("redisTemplateForStoreQueueRedis") RedisTemplate<String, Object> redisTemplateForStoreQueueRedis,
 		QueueRepository queueRepository,
 		CustomQueueRepository customQueueRepository
 	) {
-		this.redisTemplateForCommonRedis = redisTemplate;
 		this.redisTemplateForStoreQueueRedis = redisTemplateForStoreQueueRedis;
 		this.queueRepository = queueRepository;
 		this.customQueueRepository = customQueueRepository;
@@ -60,30 +57,49 @@ public class QueueHelperImpl implements QueueHelper {
 
 	@Override
 	public Boolean validateStoreIsActive(Long storeId) {
-		return redisTemplateForStoreQueueRedis.hasKey(STORE_AVAILABILITY_CHECK_PREFIX + storeId);
+		String storeAvailabilityKey = STORE_AVAILABILITY_CHECK_PREFIX + storeId;
+
+		Boolean isActive = (Boolean)redisTemplateForStoreQueueRedis.opsForValue().get(storeAvailabilityKey);
+
+		return Boolean.TRUE.equals(isActive);
 	}
 
 	@Override
 	public Long validateTicket(Date matchDate, Long ticketId) {
-		LocalDate date = matchDate.toInstant()
-			.atZone(ZoneId.systemDefault())
-			.toLocalDate();
+		LocalDate date = parseDateToLocalDate(matchDate);
 
 		String dateKey = TICKET_INFO_PREFIX + date;
-		String userKey = "ticket:user:" + ticketId;
+		String userKey = TICKET_USER_INFO_PREFIX + ticketId;
 
-		Boolean exists = redisTemplateForStoreQueueRedis.opsForSet()
-			.isMember(dateKey, ticketId.toString());
+		Boolean exists = isExistsInRedisSet(dateKey, ticketId.toString());
 
-		if (Boolean.FALSE.equals(exists)) {
+		if (!Boolean.TRUE.equals(exists)) {
 			throw new GlobalException(ErrorCode.TICKET_IS_NOT_ACTIVATED);
 		}
 
-		String userIdValue = Optional.ofNullable(redisTemplateForStoreQueueRedis.opsForValue().get(userKey))
-			.map(Object::toString)
-			.orElseThrow(() -> new GlobalException(ErrorCode.TICKET_IS_NOT_ACTIVATED));
-
+		String userIdValue = getOpsForValueInRedisWithErrorCode(userKey, ErrorCode.TICKET_NOT_FOUND);
+		log.info("userIdValue : {}", userIdValue);
 		return Long.parseLong(userIdValue);
+	}
+
+	@Override
+	public String getOpsForValueInRedisWithErrorCode(String key, ErrorCode errorCode) {
+		return Optional.ofNullable(redisTemplateForStoreQueueRedis.opsForValue().get(key))
+			.map(Object::toString)
+			.orElseThrow(() -> new GlobalException(errorCode));
+	}
+
+	@Override
+	public Boolean isExistsInRedisSet(String setKey, String elementsKey) {
+		return redisTemplateForStoreQueueRedis.opsForSet()
+			.isMember(setKey, elementsKey);
+	}
+
+	@Override
+	public LocalDate parseDateToLocalDate(Date date) {
+		return date.toInstant()
+			.atZone(ZoneId.systemDefault())
+			.toLocalDate();
 	}
 
 	@Override
