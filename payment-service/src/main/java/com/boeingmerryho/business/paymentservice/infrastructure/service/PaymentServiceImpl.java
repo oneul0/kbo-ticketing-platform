@@ -1,6 +1,7 @@
 package com.boeingmerryho.business.paymentservice.infrastructure.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ import com.boeingmerryho.business.paymentservice.infrastructure.MembershipApiCli
 import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
+import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
 
@@ -53,15 +55,15 @@ public class PaymentServiceImpl implements PaymentService {
 	public PaymentReadyResponseServiceDto pay(
 		PaymentReadyRequestServiceDto requestServiceDto
 	) {
-		// assertInExpiredTimePayment(requestServiceDto.paymentId());
-		Payment payment = paymentRepository.findById(requestServiceDto.paymentId())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
-		Double discount = membershipApiClient.getDiscount(requestServiceDto.userId())
-			.orElseThrow(() -> new PaymentException(ErrorCode.MEMBERSHIP_SERVICE_UNAVAILABLE));
-		payment.updateDiscountInfo(
-			discount,
-			DiscountType.from(requestServiceDto.discountType())
+		assertInExpiredTimePayment(requestServiceDto.paymentId());
+		Payment payment = getPayment(requestServiceDto.paymentId());
+		assertAvailablePayment(
+			payment,
+			requestServiceDto.userId(),
+			requestServiceDto.price(),
+			requestServiceDto.tickets()
 		);
+		calculateDiscountPrice(requestServiceDto, payment);
 		PaymentStrategy strategy = strategyFactory.getStrategy(requestServiceDto.method());
 		return strategy.pay(payment, requestServiceDto);
 	}
@@ -71,10 +73,8 @@ public class PaymentServiceImpl implements PaymentService {
 	public PaymentApproveResponseServiceDto approvePayment(
 		PaymentApproveRequestServiceDto requestServiceDto
 	) {
-		PaymentSession paymentSession = paySessionHelper.getPaymentInfo(String.valueOf(requestServiceDto.paymentId()))
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_INFO_NOT_FOUND));
-		Payment payment = paymentRepository.findById(requestServiceDto.paymentId())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
+		PaymentSession paymentSession = getPaymentSession(requestServiceDto);
+		Payment payment = getPayment(requestServiceDto.paymentId());
 		PaymentStrategy strategy = strategyFactory.getStrategy(paymentSession.method());
 		PaymentApproveResponseServiceDto responseServiceDto = strategy.approve(
 			paymentSession,
@@ -88,10 +88,13 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	@Transactional
 	public PaymentTicketCancelResponseServiceDto cancelTicketPayment(
-		PaymentTicketCancelRequestServiceDto requestServiceDto) {
-		Payment payment = paymentRepository.findById(requestServiceDto.id())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
-		assertCancellablePayment(payment);
+		PaymentTicketCancelRequestServiceDto requestServiceDto
+	) {
+		Payment payment = getPayment(requestServiceDto.id());
+		assertCancellablePayment(
+			payment,
+			requestServiceDto.userId()
+		);
 		payment.requestCancel();
 		return paymentApplicationMapper.toPaymentTicketCancelResponseServiceDto(payment.getId());
 	}
@@ -99,10 +102,13 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	@Transactional
 	public PaymentMembershipCancelResponseServiceDto cancelMembershipPayment(
-		PaymentMembershipCancelRequestServiceDto requestServiceDto) {
-		Payment payment = paymentRepository.findById(requestServiceDto.id())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
-		assertCancellablePayment(payment);
+		PaymentMembershipCancelRequestServiceDto requestServiceDto
+	) {
+		Payment payment = getPayment(requestServiceDto.id());
+		assertCancellablePayment(
+			payment,
+			requestServiceDto.userId()
+		);
 		payment.requestCancel();
 		return paymentApplicationMapper.toPaymentMembershipCancelResponseServiceDto(payment.getId());
 	}
@@ -110,20 +116,38 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	@Transactional(readOnly = true)
 	public PaymentDetailResponseServiceDto getPaymentDetail(
-		PaymentDetailRequestServiceDto requestServiceDto) {
-		PaymentDetail paymentDetail = paymentDetailRepository.findById(requestServiceDto.id())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
+		PaymentDetailRequestServiceDto requestServiceDto
+	) {
+		PaymentDetail paymentDetail = getDetail(requestServiceDto.id());
 		return paymentApplicationMapper.toPaymentDetailResponseServiceDto(paymentDetail);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Page<PaymentDetailResponseServiceDto> searchPaymentDetail(
-		PaymentDetailSearchRequestServiceDto requestServiceDto) {
+		PaymentDetailSearchRequestServiceDto requestServiceDto
+	) {
 		Page<PaymentDetail> paymentDetails = paymentRepository.searchPaymentDetail(
 			createSearchContext(requestServiceDto)
 		);
 		return paymentDetails.map(paymentApplicationMapper::toPaymentDetailResponseServiceDto);
+	}
+
+	private Payment getPayment(Long paymentId) {
+		return paymentRepository.findById(paymentId)
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
+	}
+
+	private PaymentSession getPaymentSession(
+		PaymentApproveRequestServiceDto requestServiceDto
+	) {
+		return paySessionHelper.getPaymentInfo(String.valueOf(requestServiceDto.paymentId()))
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_INFO_NOT_FOUND));
+	}
+
+	private PaymentDetail getDetail(Long detailId) {
+		return paymentDetailRepository.findById(detailId)
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
 	}
 
 	private void assertInExpiredTimePayment(Long paymentId) {
@@ -135,7 +159,45 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 	}
 
-	private void assertCancellablePayment(Payment payment) {
+	private void assertAvailablePayment(
+		Payment payment,
+		Long userId,
+		int inputPrice,
+		List<Ticket> tickets
+	) {
+		if (!payment.validateUser(userId)) {
+			throw new PaymentException(ErrorCode.UNAUTHORIZED);
+		}
+		if (!payment.validateStatus(PaymentStatus.PENDING)) {
+			throw new PaymentException(ErrorCode.PAYMENT_INVALID);
+		}
+		int price = paySessionHelper.getPaymentPrice(payment.getId().toString())
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_INVALID));
+		int quantity = tickets == null ? 1 : tickets.size();
+		if (inputPrice != price * quantity) {
+			throw new PaymentException(ErrorCode.PAYMENT_INVALID);
+		}
+	}
+
+	private void calculateDiscountPrice(
+		PaymentReadyRequestServiceDto requestServiceDto,
+		Payment payment
+	) {
+		Double discount = membershipApiClient.getDiscount(requestServiceDto.userId())
+			.orElseThrow(() -> new PaymentException(ErrorCode.MEMBERSHIP_SERVICE_UNAVAILABLE));
+		payment.updateDiscountInfo(
+			discount,
+			DiscountType.from(requestServiceDto.discountType())
+		);
+	}
+
+	private void assertCancellablePayment(
+		Payment payment,
+		Long userId
+	) {
+		if (!payment.validateUser(userId)) {
+			throw new PaymentException(ErrorCode.UNAUTHORIZED);
+		}
 		if (!payment.validateStatus(PaymentStatus.CONFIRMED)) {
 			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
 		}

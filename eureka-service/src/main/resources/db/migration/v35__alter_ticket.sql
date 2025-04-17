@@ -1,1 +1,0 @@
-ALTER TABLE p_ticket ADD price INT NOT NULL;
