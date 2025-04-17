@@ -42,7 +42,7 @@ public class SeatService {
 	}
 
 	@Transactional
-	public void processBlockSeats(CacheSeatsProcessServiceRequestDto serviceDto) {
+	public void processBlockSeats(Long userId, CacheSeatsProcessServiceRequestDto serviceDto) {
 		if (serviceDto.serviceRequestSeatInfos().size() > 4) {
 			throw new GlobalException(SeatErrorCode.NOT_EXCEED_4_SEAT);
 		}
@@ -63,6 +63,6 @@ public class SeatService {
 			requestSeats,
 			serviceDto.serviceRequestSeatInfos()
 		);
-		processBlockSeatsService.processBlockSeats(matchInfo, locks, requestSeats, seatInfos);
+		processBlockSeatsService.processBlockSeats(userId, matchInfo, locks, requestSeats, seatInfos);
 	}
 }

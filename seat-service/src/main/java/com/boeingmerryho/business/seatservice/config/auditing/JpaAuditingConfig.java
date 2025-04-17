@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.seatservice.config;
+package com.boeingmerryho.business.seatservice.config.auditing;
 
 import java.util.Optional;
 
