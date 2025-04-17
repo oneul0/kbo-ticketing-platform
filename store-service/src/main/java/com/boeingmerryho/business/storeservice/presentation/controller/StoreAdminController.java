@@ -28,6 +28,8 @@ import com.boeingmerryho.business.storeservice.presentation.dto.response.StoreSe
 import com.boeingmerryho.business.storeservice.presentation.dto.response.StoreUpdateResponseDto;
 import com.boeingmerryho.business.storeservice.utils.PageableUtils;
 
+import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
+import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,7 @@ public class StoreAdminController {
 	private final StoreAdminService storeAdminService;
 
 	@PostMapping
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<StoreCreateResponseDto>> createStore(
 		@RequestBody @Valid StoreCreateRequestDto requestDto
 	) {
@@ -52,6 +55,7 @@ public class StoreAdminController {
 	}
 
 	@GetMapping("/{id}")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<StoreDetailAdminResponseDto>> getStoreDetail(
 		@PathVariable Long id
 	) {
@@ -61,6 +65,7 @@ public class StoreAdminController {
 	}
 
 	@GetMapping
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<Page<StoreSearchAdminResponseDto>>> searchStore(
 		@RequestParam(value = "page", required = false, defaultValue = "1") int page,
 		@RequestParam(value = "size", required = false, defaultValue = "10") int size,
@@ -80,6 +85,7 @@ public class StoreAdminController {
 	}
 
 	@PutMapping("/{id}")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<StoreUpdateResponseDto>> updateStore(
 		@PathVariable Long id,
 		@RequestBody StoreUpdateRequestDto requestDto
@@ -92,6 +98,7 @@ public class StoreAdminController {
 	}
 
 	@PutMapping("/{id}/open")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<StoreUpdateResponseDto>> openStore(
 		@PathVariable Long id
 	) {
@@ -101,6 +108,7 @@ public class StoreAdminController {
 	}
 
 	@PutMapping("/{id}/close")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<StoreUpdateResponseDto>> closeStore(
 		@PathVariable Long id
 	) {
@@ -110,18 +118,21 @@ public class StoreAdminController {
 	}
 
 	@PutMapping("/{id}/queue/enable")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<Void>> enableQueue(@PathVariable Long id) {
 		storeAdminService.enableQueue(id);
 		return SuccessResponse.of(StoreSuccessCode.QUEUE_ENABLED);
 	}
 
 	@PutMapping("/{id}/queue/disable")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<Void>> disableQueue(@PathVariable Long id) {
 		storeAdminService.disableQueue(id);
 		return SuccessResponse.of(StoreSuccessCode.QUEUE_DISABLED);
 	}
 
 	@DeleteMapping("/{id}")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<SuccessResponse<Void>> deleteStore(@PathVariable Long id) {
 		storeAdminService.deleteStore(id);
 		return SuccessResponse.of(StoreSuccessCode.DELETE_STORE);

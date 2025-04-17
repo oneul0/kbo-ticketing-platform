@@ -13,19 +13,22 @@ import com.boeingmerryho.business.storeservice.domain.repository.StoreRepository
 import com.boeingmerryho.business.storeservice.exception.StoreErrorCode;
 import com.boeingmerryho.business.storeservice.infrastructure.kafka.scheduler.StoreQueueSchedulerProducer;
 
+import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
+import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import lombok.RequiredArgsConstructor;
 
 //TODO: 배포시 삭제 예정
 @RestController
-@RequestMapping("/test/schedule")
+@RequestMapping("/admin/v1/stores")
 @RequiredArgsConstructor
 public class StoreQueueScheduleTestController {
 
 	private final StoreRepository storeRepository;
 	private final StoreQueueSchedulerProducer schedulerProducer;
 
-	@PostMapping("/{storeId}")
+	@PostMapping("/test/schedule/{storeId}")
+	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	public ResponseEntity<String> testSchedule(@PathVariable Long storeId) {
 		Store store = storeRepository.findByIdAndIsDeletedFalse(storeId)
 			.orElseThrow(() -> new GlobalException(StoreErrorCode.NOT_FOUND));
