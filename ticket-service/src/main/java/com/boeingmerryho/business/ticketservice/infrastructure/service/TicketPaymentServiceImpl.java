@@ -1,6 +1,7 @@
 package com.boeingmerryho.business.ticketservice.infrastructure.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +35,6 @@ public class TicketPaymentServiceImpl implements TicketPaymentService {
 	@Transactional
 	public void createPaymentForTickets(List<Ticket> tickets, List<SeatInfo> seats) {
 		String userId = tickets.get(0).getUserId().toString();
-		List<String> ticketNos = tickets.stream()
-			.map(Ticket::getTicketNo)
-			.toList();
 
 		// TODO : 에러 처리
 		PaymentCreationResponseDto responseDto = paymentClient.createPayment(createRequestDto(tickets, seats));
@@ -44,19 +42,23 @@ public class TicketPaymentServiceImpl implements TicketPaymentService {
 		String redisKey = "ticket:payment:" + userId;
 		Map<String, Object> paymentInfoMap = new HashMap<>();
 		paymentInfoMap.put("paymentId", responseDto.paymentId());
-		paymentInfoMap.put("ticketNos", ticketNos);
+
+		List<Map<String, Object>> ticketInfoList = new ArrayList<>();
+		for (Ticket ticket : tickets) {
+			Map<String, Object> ticketInfo = new HashMap<>();
+			ticketInfo.put("ticketNo", ticket.getTicketNo());
+			ticketInfo.put("price", ticket.getPrice());
+			ticketInfoList.add(ticketInfo);
+		}
+		paymentInfoMap.put("ticketInfos", ticketInfoList);
 
 		redisTemplate.opsForHash().putAll(redisKey, paymentInfoMap); // TODO : TTL 설정하기(무통장입금일 경우 고려하기)
 	}
 
 	private PaymentCreationRequestDto createRequestDto(List<Ticket> tickets, List<SeatInfo> seats) {
-		Integer totalPrice = seats.stream()
-			.mapToInt(seat -> Integer.parseInt(seat.price()))
-			.sum();
-
 		return new PaymentCreationRequestDto(
 			tickets.get(0).getUserId(),
-			totalPrice,
+			tickets.get(0).getPrice(),
 			tickets.size(),
 			"TICKET",
 			LocalDateTime.parse(seats.get(0).expiredAt())
