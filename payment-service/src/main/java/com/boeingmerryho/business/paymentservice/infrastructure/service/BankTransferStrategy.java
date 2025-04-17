@@ -65,10 +65,13 @@ public class BankTransferStrategy implements PaymentStrategy {
 		);
 		return paymentApplicationMapper.toPaymentReadyResponseServiceDto(
 			payment.getId(),
+			payment.getDiscountPrice(),
 			accountNumber,
 			accountBank,
 			dueDate,
-			accountHolder
+			accountHolder,
+			null,
+			payment.getCreatedAt()
 		);
 	}
 

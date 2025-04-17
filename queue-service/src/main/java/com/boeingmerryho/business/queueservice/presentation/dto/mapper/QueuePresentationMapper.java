@@ -24,8 +24,7 @@ import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.Q
 public interface QueuePresentationMapper {
 
 	@Mapping(target = "userId", source = "userId")
-		// QueueJoinServiceDto toQueueJoinServiceDto(QueueJoinRequestDto requestDto, Long userId);
-	QueueJoinServiceDto toQueueJoinServiceDto(QueueJoinRequestDto requestDto);
+	QueueJoinServiceDto toQueueJoinServiceDto(QueueJoinRequestDto requestDto, Long userId);
 
 	@Mapping(target = "storeId", source = "storeId")
 	@Mapping(target = "userId", source = "userId")
