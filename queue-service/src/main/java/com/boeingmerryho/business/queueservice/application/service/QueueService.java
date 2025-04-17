@@ -39,13 +39,14 @@ public class QueueService {
 		Long ticketId = dto.ticketId();
 		Date matchDate = new Date();
 
-		Long ticketUserId = helper.validateTicket(matchDate, ticketId);
-		if (!Objects.equals(userId, ticketUserId)) {
-			throw new GlobalException(ErrorCode.USER_IS_NOT_MATCHED);
-		}
-
 		if (!helper.validateStoreIsActive(storeId)) {
 			throw new GlobalException(ErrorCode.STORE_IS_NOT_ACTIVATED);
+		}
+
+		Long ticketUserId = helper.validateTicket(matchDate, ticketId);
+		log.info("ticketUserId : {}", ticketUserId);
+		if (!Objects.equals(userId, ticketUserId)) {
+			throw new GlobalException(ErrorCode.USER_IS_NOT_MATCHED);
 		}
 
 		helper.joinUserInQueue(storeId, userId, ticketId);
