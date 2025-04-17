@@ -120,4 +120,25 @@ public class RedisUtilImpl implements RedisUtil {
 		}
 	}
 
+	@Override
+	public void rollbackUserInfo(Long id) {
+		String userInfoKey = USER_INFO_PREFIX + id;
+		redisTemplate.delete(userInfoKey);
+	}
+
+	@Override
+	public void rollbackUserJwtToken(Long id) {
+		String tokenKey = USER_TOKEN_PREFIX + id;
+
+		Map<Object, Object> tokenEntry = getMapEntriesFromRedis(tokenKey);
+		String accessToken = (String)tokenEntry.get("accessToken");
+
+		redisTemplate.delete(tokenKey);
+
+		if (accessToken != null) {
+			blacklistToken(accessToken);
+		}
+
+	}
+
 }

@@ -166,17 +166,24 @@ public class UserAdminService {
 
 	public UserLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto dto) {
 		User user = userHelper.findUserByEmail(dto.email());
-		redisUtil.updateUserInfo(user);
+		try {
+			redisUtil.updateUserInfo(user);
 
-		Map<String, String> tokenMap = redisUtil.updateUserJwtToken(user.getId());
-		UserLoginResponseServiceDto serviceDto = UserLoginResponseServiceDto.fromTokens(
-			tokenMap.get("accessToken"),
-			tokenMap.get("refreshToken")
-		);
+			Map<String, String> tokenMap = redisUtil.updateUserJwtToken(user.getId());
+			UserLoginResponseServiceDto serviceDto = UserLoginResponseServiceDto.fromTokens(
+				tokenMap.get("accessToken"),
+				tokenMap.get("refreshToken")
+			);
 
-		userVerificationHelper.getNotifyLoginResponse(user.getId());
+			userVerificationHelper.getNotifyLoginResponse(user.getId());
 
-		return userApplicationMapper.toUserLoginResponseDto(serviceDto);
+			return userApplicationMapper.toUserLoginResponseDto(serviceDto);
+		} catch (Exception e) {
+			redisUtil.rollbackUserInfo(user.getId());
+			redisUtil.rollbackUserJwtToken(user.getId());
+
+			throw new GlobalException(ErrorCode.LOGIN_FAILED);
+		}
 	}
 
 	@Transactional
