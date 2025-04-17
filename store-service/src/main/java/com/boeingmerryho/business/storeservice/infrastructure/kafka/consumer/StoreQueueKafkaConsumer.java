@@ -18,7 +18,7 @@ public class StoreQueueKafkaConsumer {
 	private final ObjectMapper objectMapper;
 	private final StoreQueueAdminHelper storeQueueAdminHelper;
 
-	@KafkaListener(topics = "${store.queue.schedule.topic}", groupId = "store-queue-scheduler-group")
+	@KafkaListener(topics = "${store.queue.schedule.topic}", groupId = "store-queue-scheduler")
 	public void listen(String message) {
 		try {
 			StoreQueueScheduleMessage parsed = objectMapper.readValue(message, StoreQueueScheduleMessage.class);
