@@ -18,6 +18,7 @@ import com.boeingmerryho.business.ticketservice.presentation.user.dto.mapper.Tic
 import com.boeingmerryho.business.ticketservice.presentation.user.dto.request.TicketSearchRequestDto;
 import com.boeingmerryho.business.ticketservice.utils.PageableUtils;
 
+import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -38,11 +39,11 @@ public class TicketController {
 		@RequestParam(value = "matchId", required = false) Long matchId,
 		@RequestParam(value = "seatId", required = false) Long seatId,
 		@RequestParam(value = "ticketNo", required = false) String ticketNo,
-		@RequestParam(value = "status", required = false) String status
+		@RequestParam(value = "status", required = false) String status,
+		@RequestAttribute("userId") Long userId
 	) {
 		Pageable pageable = PageableUtils.customPageable(page, size, sortDirection, by);
-		// TODO : Request Header 의 userId 사용하기
-		Long userId = 1L;
+
 		TicketSearchRequestDto requestDto = new TicketSearchRequestDto(
 			matchId, seatId, userId, ticketNo, status
 		);
