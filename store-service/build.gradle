@@ -39,7 +39,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
     // common
-    implementation 'io.github.boeingmerryho:common-library:1.0.4'
+    implementation 'io.github.boeingmerryho:common-library:1.1.2'
 
     // querydsl
     implementation "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
