@@ -80,6 +80,7 @@ public class ProcessBlockSeatsService {
 	}
 
 	public void processBlockSeats(
+		Long userId,
 		ToTicketMatchDto matchInfo,
 		List<RLock> locks,
 		List<String> requestSeats,
@@ -107,7 +108,7 @@ public class ProcessBlockSeatsService {
 				}
 
 				seatBucketValue.put("status", ReservationStatus.PROCESSING.name());
-				seatBucketValue.put("userId", "1");
+				seatBucketValue.put("userId", String.valueOf(userId));
 				seatBucketValue.put("createdAt", LocalDateTime.now().toString());
 				seatBucketValue.put("expiredAt", LocalDateTime.now().plusMinutes(9).toString());
 

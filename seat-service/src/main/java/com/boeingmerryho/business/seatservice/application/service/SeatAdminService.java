@@ -1,5 +1,6 @@
 package com.boeingmerryho.business.seatservice.application.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -19,9 +20,11 @@ import com.boeingmerryho.business.seatservice.application.dto.response.SeatInAct
 import com.boeingmerryho.business.seatservice.application.dto.response.SeatUpdateServiceResponseDto;
 import com.boeingmerryho.business.seatservice.domain.Seat;
 import com.boeingmerryho.business.seatservice.domain.service.CreateCacheSeatsService;
+import com.boeingmerryho.business.seatservice.exception.SeatErrorCode;
 import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatAdminServiceHelper;
 import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatCommonHelper;
 
+import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -96,6 +99,10 @@ public class SeatAdminService {
 
 	@Transactional
 	public void createCacheSeats(CacheSeatCreateServiceRequestDto create) {
+		if (create.date().isBefore(LocalDate.now())) {
+			throw new GlobalException(SeatErrorCode.INVALID_ACCESS);
+		}
+
 		List<Seat> seats = seatAdminServiceHelper.getSeatsByIsActiveIsTrue();
 		createCacheSeatsService.createSeatBucket(seats, create.date());
 
