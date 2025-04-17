@@ -146,4 +146,11 @@ public class UserHelperImpl implements UserHelper {
 		redisUtil.deleteFromRedisByKey(membershipKey);
 	}
 
+	@Override
+	public void validatePassword(String requestPassword, String storedPassword) {
+		if (!passwordEncoder.matches(requestPassword, storedPassword)) {
+			throw new GlobalException(ErrorCode.PASSWORD_NOT_MATCHED);
+		}
+	}
+
 }

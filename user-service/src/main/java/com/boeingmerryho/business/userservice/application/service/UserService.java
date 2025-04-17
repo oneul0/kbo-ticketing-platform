@@ -68,6 +68,9 @@ public class UserService {
 
 	public UserLoginResponseDto loginUser(UserLoginRequestServiceDto dto) {
 		User user = userHelper.findUserByEmail(dto.email());
+
+		userHelper.validatePassword(dto.password(), user.getPassword());
+
 		try {
 			redisUtil.updateUserInfo(user);
 
