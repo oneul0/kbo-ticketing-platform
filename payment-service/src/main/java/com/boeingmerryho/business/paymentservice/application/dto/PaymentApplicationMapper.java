@@ -39,10 +39,13 @@ public interface PaymentApplicationMapper {
 
 	PaymentReadyResponseServiceDto toPaymentReadyResponseServiceDto(
 		Long paymentId,
+		Integer price,
 		String accountNumber,
 		String accountBank,
 		LocalDateTime dueDate,
-		String accountHolder
+		String accountHolder,
+		String nextRedirectPcUrl,
+		LocalDateTime createdAt
 	);
 
 	@Mapping(target = "userId", source = "paymentDetail.payment.userId")
