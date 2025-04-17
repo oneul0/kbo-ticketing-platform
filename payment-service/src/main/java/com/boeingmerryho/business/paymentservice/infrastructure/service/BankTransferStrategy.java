@@ -15,6 +15,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.request.Payment
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentReadyRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.domain.entity.AccountInfo;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
@@ -144,6 +145,14 @@ public class BankTransferStrategy implements PaymentStrategy {
 			}
 			throw e;
 		}
+	}
+
+	@Override
+	public PaymentRefundResponseServiceDto refund(
+		PaymentDetail paymentDetail
+	) {
+		paymentDetail.getPayment().refundPayment();
+		return paymentApplicationMapper.toPaymentRefundResponseServiceDto(paymentDetail);
 	}
 
 	@Override
