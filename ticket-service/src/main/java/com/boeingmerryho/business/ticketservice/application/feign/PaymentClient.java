@@ -9,6 +9,6 @@ import com.boeingmerryho.business.ticketservice.application.feign.dto.response.P
 @FeignClient(name = "payment-service")
 public interface PaymentClient {
 
-	@PostMapping("/payments/create")
+	@PostMapping("/payment-service/payments/create")
 	PaymentCreationResponseDto createPayment(PaymentCreationRequestDto requestDto);
 }

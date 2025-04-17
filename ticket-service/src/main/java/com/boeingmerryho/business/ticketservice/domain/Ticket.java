@@ -43,6 +43,9 @@ public class Ticket extends BaseEntity {
 	private String ticketNo;
 
 	@Column(nullable = false)
+	private Integer price;
+
+	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private TicketStatus status;
 

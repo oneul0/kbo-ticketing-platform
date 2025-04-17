@@ -21,22 +21,22 @@ public class CreateTicketService {
 	public List<Ticket> createTickets(SeatListenerDto requestDto) {
 		MatchInfo matchInfo = requestDto.matchInfo();
 		return requestDto.seatsInfo().stream()
-			.map(seat -> {
-				String ticketNo = generateTicketNo(matchInfo, seat);
-				return Ticket.builder()
-					.matchId(Long.parseLong(matchInfo.id()))
-					.seatId(Long.parseLong(seat.id()))
-					.userId(Long.parseLong(seat.userId()))
-					.ticketNo(ticketNo)
-					.status(TicketStatus.PENDING)
-					.build();
-			})
+			.map(seat -> Ticket.builder()
+				.matchId(Long.parseLong(matchInfo.id()))
+				.seatId(Long.parseLong(seat.id()))
+				.userId(Long.parseLong(seat.userId()))
+				.ticketNo(generateTicketNo(matchInfo, seat))
+				.price(Integer.parseInt(seat.price()))
+				.status(TicketStatus.PENDING)
+				.build()
+			)
 			.toList();
 	}
 
 	private String generateTicketNo(MatchInfo matchInfo, SeatInfo seatInfo) {
 		return String.format("%s-%s-%s-%s",
 			matchInfo.matchDay().replaceAll("-", ""), matchInfo.stadiumId(), matchInfo.id(),
-			String.format("%s%02d%02d", seatInfo.block(), Integer.parseInt(seatInfo.column()), Integer.parseInt(seatInfo.row())));
+			String.format("%s%02d%02d", seatInfo.block(), Integer.parseInt(seatInfo.column()),
+				Integer.parseInt(seatInfo.row())));
 	}
 }
