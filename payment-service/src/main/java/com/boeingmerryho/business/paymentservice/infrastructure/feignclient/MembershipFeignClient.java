@@ -10,7 +10,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.membership.User
 @FeignClient(name = "membership-service")
 public interface MembershipFeignClient {
 	@PostMapping(
-		value = "/membership-service/payment/discount",
+		value = "/membership-service/payments/discount",
 		consumes = MediaType.APPLICATION_JSON_VALUE
 	)
 	Double getDiscount(
