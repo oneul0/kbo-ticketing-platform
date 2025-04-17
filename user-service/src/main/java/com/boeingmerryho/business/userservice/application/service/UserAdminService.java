@@ -107,16 +107,8 @@ public class UserAdminService {
 
 	@Transactional(readOnly = true)
 	@Cacheable(cacheNames = "users")
-	public Page<UserAdminSearchResponseDto> searchAdminUsers(UserAdminSearchRequestServiceDto dto, Pageable pageable) {
-		UserSearchCriteria criteria = UserSearchCriteria.fromAdmin(dto);
-		Page<User> users = customUserRepository.findDynamicQuery(criteria, pageable);
-		return users.map(userApplicationMapper::toUserAdminSearchResponseDto);
-	}
-
-	@Transactional(readOnly = true)
-	@Cacheable(cacheNames = "users")
 	public Page<UserAdminSearchResponseDto> searchUsers(UserAdminSearchRequestServiceDto dto, Pageable pageable) {
-		UserSearchCriteria criteria = UserSearchCriteria.fromAdmin(dto); // 일반 검색 DTO 사용
+		UserSearchCriteria criteria = UserSearchCriteria.fromAdmin(dto);
 		Page<User> users = customUserRepository.findDynamicQuery(criteria, pageable);
 		return users.map(userApplicationMapper::toUserAdminSearchResponseDto);
 	}

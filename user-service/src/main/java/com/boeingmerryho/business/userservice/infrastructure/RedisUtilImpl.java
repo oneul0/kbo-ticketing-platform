@@ -77,7 +77,7 @@ public class RedisUtilImpl implements RedisUtil {
 
 	@Override
 	public Boolean hsaKeyInRedis(String key) {
-		return Boolean.FALSE.equals(redisTemplate.hasKey(key));
+		return Boolean.TRUE.equals(redisTemplate.hasKey(key));
 	}
 
 	@Override

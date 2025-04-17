@@ -38,7 +38,6 @@ import com.boeingmerryho.business.userservice.presentation.dto.mapper.UserPresen
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminEmailVerificationCheckRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminEmailVerificationRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminLoginRequestDto;
-import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminLogoutRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminRegisterRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminSearchRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminTokenRefreshRequestDto;
@@ -214,12 +213,11 @@ public class UserAdminController {
 	@Description("로그인했던 사용자 id를 받아 로그아웃")
 	@PostMapping("/logout")
 	public ResponseEntity<?> logoutUser(
-		@RequestAttribute("userId") String userId,
-		@RequestBody UserAdminLogoutRequestDto requestDto
+		@RequestAttribute("userId") Long userId
 	) {
 		log.info("logout user id : {}", userId);
 		UserLogoutRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminLogoutRequestServiceDto(
-			requestDto, Long.valueOf(userId));
+			userId);
 		userAdminService.logoutUser(requestServiceDto);
 		return SuccessResponse.of(UserSuccessCode.USER_LOGOUT_SUCCESS);
 	}
