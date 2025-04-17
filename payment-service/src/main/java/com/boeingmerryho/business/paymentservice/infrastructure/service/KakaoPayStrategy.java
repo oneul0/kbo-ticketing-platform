@@ -32,8 +32,6 @@ import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
 import com.boeingmerryho.business.paymentservice.infrastructure.KafkaProducerHelper;
 import com.boeingmerryho.business.paymentservice.infrastructure.KakaoApiClient;
 import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
-import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
-import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
@@ -73,16 +71,6 @@ public class KakaoPayStrategy implements PaymentStrategy {
 		Payment payment,
 		PaymentReadyRequestServiceDto requestServiceDto
 	) {
-
-		Integer price = paySessionHelper.getPaymentPrice(payment.getId().toString())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_PRICE_INVALID));
-
-		int quantity = requestServiceDto.tickets() == null ? 1 : requestServiceDto.tickets().size();
-
-		if (requestServiceDto.price() != price * quantity) {
-			throw new PaymentException(ErrorCode.PAYMENT_PRICE_INVALID);
-		}
-
 		KakaoPayReadyRequest request = KakaoPayReadyRequest.builder()
 			.cid(cid)
 			.partnerOrderId(requestServiceDto.paymentId().toString())

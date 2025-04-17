@@ -61,22 +61,10 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 	public PaymentTicketCancelResponseServiceDto cancelTicketPayment(
 		PaymentTicketCancelRequestServiceDto requestServiceDto
 	) {
-		Payment payment = paymentRepository.findById(requestServiceDto.id())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
+		Payment payment = getPayment(requestServiceDto.id());
 		assertCancellablePayment(payment);
 		payment.requestCancel();
 		return paymentApplicationMapper.toPaymentTicketCancelResponseServiceDto(payment.getId());
-	}
-
-	private void assertCancellablePayment(
-		Payment payment
-	) {
-		if (!payment.validateStatus(PaymentStatus.CONFIRMED)) {
-			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
-		}
-		if (!payment.validateType(PaymentType.TICKET)) {
-			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
-		}
 	}
 
 	@Override
@@ -84,8 +72,7 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 	public PaymentMembershipCancelResponseServiceDto cancelMembershipPayment(
 		PaymentMembershipCancelRequestServiceDto requestServiceDto
 	) {
-		Payment payment = paymentRepository.findById(requestServiceDto.id())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
+		Payment payment = getPayment(requestServiceDto.userId());
 		assertCancellablePayment(payment);
 		payment.requestCancel();
 		return paymentApplicationMapper.toPaymentMembershipCancelResponseServiceDto(payment.getId());
@@ -96,9 +83,7 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 	public PaymentDetailAdminResponseServiceDto getPaymentDetail(
 		PaymentDetailRequestServiceDto requestServiceDto
 	) {
-		PaymentDetail paymentDetail = paymentDetailRepository.findById(requestServiceDto.id())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
-
+		PaymentDetail paymentDetail = getDetail(requestServiceDto.id());
 		return paymentApplicationMapper.toPaymentDetailAdminResponseServiceDto(paymentDetail);
 	}
 
@@ -113,39 +98,18 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 		return paymentDetails.map(paymentApplicationMapper::toPaymentDetailAdminResponseServiceDto);
 	}
 
-	private PaymentDetailSearchContext createSearchContext(
-		PaymentDetailSearchRequestServiceDto requestServiceDto
-	) {
-		return PaymentDetailSearchContext.builder()
-			.id(requestServiceDto.id())
-			.paymentId(requestServiceDto.paymentId())
-			.customPageable(requestServiceDto.customPageable())
-			.isDeleted(requestServiceDto.isDeleted())
-			.build();
-	}
-
 	@Override
 	@Transactional
 	public PaymentTicketRefundResponseServiceDto refundTicketPayment(
 		PaymentTicketRefundRequestServiceDto requestServiceDto
 	) {
-
 		PaymentTicket paymentTicket = paymentRepository.findByPaymentTicketId(requestServiceDto.id())
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_TICKET_NOT_FOUND));
 
 		Payment payment = paymentTicket.getPayment();
+		assertRefundablePayment(payment);
 
-		if (payment.validateStatus(PaymentStatus.REFUNDED)) {    // 이미 환불된 결제 건
-			throw new PaymentException(ErrorCode.PAYMENT_ALREADY_REFUNDED);
-		}
-
-		if (!payment.validateStatus(PaymentStatus.REFUND_REQUESTED)) {
-			throw new PaymentException(ErrorCode.PAYMENT_REFUND_UNAVAILABLE);
-		}
-
-		PaymentDetail paymentDetail = paymentDetailRepository.findPaymentDetailByPaymentId(
-				payment.getId())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
+		PaymentDetail paymentDetail = getDetailByPaymentId(payment.getId());
 
 		// TODO 가상 계좌 환불
 		// TODO 전략패턴
@@ -177,18 +141,9 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_TICKET_NOT_FOUND));
 
 		Payment payment = paymentMembership.getPayment();
+		assertRefundablePayment(payment);
 
-		if (payment.validateStatus(PaymentStatus.REFUNDED)) {
-			throw new PaymentException(ErrorCode.PAYMENT_ALREADY_REFUNDED);
-		}
-
-		if (!payment.validateStatus(PaymentStatus.REFUND_REQUESTED)) {
-			throw new PaymentException(ErrorCode.PAYMENT_REFUND_UNAVAILABLE);
-		}
-
-		PaymentDetail paymentDetail = paymentDetailRepository.findPaymentDetailByPaymentId(
-				payment.getId())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
+		PaymentDetail paymentDetail = getDetailByPaymentId(payment.getId());
 
 		// TODO 가상 계좌 환불
 		// TODO 전략패턴
@@ -220,5 +175,53 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
 		PaymentStrategy strategy = strategyFactory.getStrategy(PaymentMethod.BANK_TRANSFER);
 		return strategy.approve(payment, requestServiceDto);
+	}
+
+	private Payment getPayment(Long userId) {
+		return paymentRepository.findById(userId)
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
+	}
+
+	private PaymentDetail getDetail(Long detailId) {
+		return paymentDetailRepository.findById(detailId)
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
+	}
+
+	private PaymentDetail getDetailByPaymentId(Long paymentId) {
+		return paymentDetailRepository.findPaymentDetailByPaymentId(paymentId)
+			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
+	}
+
+	private void assertCancellablePayment(
+		Payment payment
+	) {
+		if (!payment.validateStatus(PaymentStatus.CONFIRMED)) {
+			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
+		}
+		if (!payment.validateType(PaymentType.TICKET)) {
+			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
+		}
+	}
+
+	private void assertRefundablePayment(
+		Payment payment
+	) {
+		if (payment.validateStatus(PaymentStatus.REFUNDED)) {
+			throw new PaymentException(ErrorCode.PAYMENT_ALREADY_REFUNDED);
+		}
+		if (!payment.validateStatus(PaymentStatus.REFUND_REQUESTED)) {
+			throw new PaymentException(ErrorCode.PAYMENT_REFUND_UNAVAILABLE);
+		}
+	}
+
+	private PaymentDetailSearchContext createSearchContext(
+		PaymentDetailSearchRequestServiceDto requestServiceDto
+	) {
+		return PaymentDetailSearchContext.builder()
+			.id(requestServiceDto.id())
+			.paymentId(requestServiceDto.paymentId())
+			.customPageable(requestServiceDto.customPageable())
+			.isDeleted(requestServiceDto.isDeleted())
+			.build();
 	}
 }
