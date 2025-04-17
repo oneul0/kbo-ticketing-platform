@@ -1,13 +1,13 @@
 package com.boeingmerryho.business.queueservice.config;
 
-import org.redisson.api.RedissonClient;
-import org.redisson.spring.data.connection.RedissonConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -36,12 +36,12 @@ public class RedisConfig {
 	private String commonPassword;
 
 	@Bean
-	public RedisConnectionFactory redisConnectionFactoryForCommonRedis(
-		RedissonClient redissonClientForCommon
-	) {
+	@Primary
+	public RedisConnectionFactory redisConnectionFactoryForCommonRedis() {
 		RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(commonHost, commonPort);
+		config.setUsername(commonUsername);
 		config.setPassword(commonPassword);
-		return new RedissonConnectionFactory(redissonClientForCommon);
+		return new LettuceConnectionFactory(config);
 	}
 
 	@Bean
