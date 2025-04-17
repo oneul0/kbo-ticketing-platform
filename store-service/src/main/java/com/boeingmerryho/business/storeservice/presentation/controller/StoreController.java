@@ -18,6 +18,8 @@ import com.boeingmerryho.business.storeservice.presentation.dto.response.StoreDe
 import com.boeingmerryho.business.storeservice.presentation.dto.response.StoreSearchResponseDto;
 import com.boeingmerryho.business.storeservice.utils.PageableUtils;
 
+import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
+import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +32,7 @@ public class StoreController {
 	private final StorePresentationMapper mapper;
 
 	@GetMapping("/{id}")
+	@RequiredRoles({UserRoleType.NORMAL, UserRoleType.SENIOR})
 	public ResponseEntity<SuccessResponse<StoreDetailResponseDto>> getStoreDetail(
 		@PathVariable Long id
 	) {
@@ -39,6 +42,7 @@ public class StoreController {
 	}
 
 	@GetMapping
+	@RequiredRoles({UserRoleType.NORMAL, UserRoleType.SENIOR})
 	public ResponseEntity<SuccessResponse<Page<StoreSearchResponseDto>>> searchStore(
 		@RequestParam(value = "page", required = false, defaultValue = "1") int page,
 		@RequestParam(value = "size", required = false, defaultValue = "10") int size,
