@@ -12,7 +12,7 @@ public enum UserSuccessCode implements SuccessCode {
 	USER_WITHDRAW_SUCCESS("회원 탈퇴에 성공했습니다.", HttpStatus.OK),
 	USER_ROLE_DELETED_SUCCESS("사용자의 ROLE을 삭제했습니다.", HttpStatus.OK),
 	USER_SEARCH_SUCCESS("검색에 성공했습니다.", HttpStatus.OK),
-	USER_EMAIL_CHECK_SUCCESS("검색에 성공했습니다.", HttpStatus.OK),
+	USER_EMAIL_CHECK_SUCCESS("이메일 중복 체크에 성공했습니다.", HttpStatus.OK),
 
 	USER_TOKEN_ISSUE_SUCCESS("사용자 ACCESS TOKEN발급에 성공했습니다.", HttpStatus.OK),
 
