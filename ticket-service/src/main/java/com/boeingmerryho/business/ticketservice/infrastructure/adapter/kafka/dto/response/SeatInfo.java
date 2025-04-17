@@ -6,6 +6,7 @@ public record SeatInfo(
 	String block,
 	String column,
 	String row,
+	String price,
 	String createdAt,
 	String expiredAt
 ) {

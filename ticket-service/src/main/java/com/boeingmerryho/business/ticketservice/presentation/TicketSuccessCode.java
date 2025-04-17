@@ -12,6 +12,7 @@ public enum TicketSuccessCode implements SuccessCode {
 	TICKET_SEARCH(HttpStatus.OK, "티켓 검색 성공"),
 	TICKET_DELETE(HttpStatus.OK, "티켓 삭제 성공"),
 	TICKET_STATUS_UPDATE(HttpStatus.OK, "티켓 상태 변경 성공"),
+	TICKET_PAYMENT_FOUND(HttpStatus.OK, "결제 정보 조회 성공"),
 	;
 
 	private final HttpStatus status;

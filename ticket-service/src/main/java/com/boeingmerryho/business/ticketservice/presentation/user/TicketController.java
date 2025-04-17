@@ -5,11 +5,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boeingmerryho.business.ticketservice.application.user.TicketService;
+import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketPaymentResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.presentation.TicketSuccessCode;
 import com.boeingmerryho.business.ticketservice.presentation.user.dto.mapper.TicketPresentationMapper;
@@ -65,6 +67,17 @@ public class TicketController {
 		return SuccessResponse.of(
 			TicketSuccessCode.TICKET_FOUND,
 			mapper.toTicketResponseDto(responseDto)
+		);
+	}
+
+	@GetMapping("/payments/me")
+	public ResponseEntity<?> getMyTicketPayments(@RequestAttribute("userId") Long userId) {
+		TicketPaymentResponseServiceDto responseDto = ticketService
+			.getTicketPaymentInfo(mapper.toTicketPaymentResponseServiceDto(userId));
+
+		return SuccessResponse.of(
+			TicketSuccessCode.TICKET_PAYMENT_FOUND,
+			mapper.toTicketPaymentResponseDto(responseDto)
 		);
 	}
 }

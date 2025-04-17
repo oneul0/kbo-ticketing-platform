@@ -6,6 +6,7 @@ public record TicketResponseServiceDto(
 	Long seatId,
 	Long userId,
 	String ticketNo,
+	Integer price,
 	String status
 ) {
 }

@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.ticketservice.application.user.dto.mapper.TicketApplicationMapper;
 import com.boeingmerryho.business.ticketservice.application.user.dto.request.TicketByIdRequestServiceDto;
+import com.boeingmerryho.business.ticketservice.application.user.dto.request.TicketPaymentRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.user.dto.request.TicketSearchRequestServiceDto;
+import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketPaymentResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.domain.Ticket;
 import com.boeingmerryho.business.ticketservice.domain.TicketSearchCriteria;
@@ -17,6 +19,7 @@ import com.boeingmerryho.business.ticketservice.domain.repository.TicketReposito
 import com.boeingmerryho.business.ticketservice.domain.service.CreateTicketService;
 import com.boeingmerryho.business.ticketservice.exception.ErrorCode;
 import com.boeingmerryho.business.ticketservice.exception.TicketException;
+import com.boeingmerryho.business.ticketservice.infrastructure.adapter.kafka.dto.response.SeatInfo;
 import com.boeingmerryho.business.ticketservice.infrastructure.adapter.kafka.dto.response.SeatListenerDto;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ public class TicketService {
 
 	private final TicketRepository ticketRepository;
 	private final CreateTicketService createTicketService;
+	private final TicketPaymentService ticketPaymentService;
 	private final TicketApplicationMapper mapper;
 
 	@Transactional(readOnly = true)
@@ -51,6 +55,14 @@ public class TicketService {
 		for (Ticket ticket : tickets) {
 			ticketRepository.save(ticket);
 		}
+
+		List<SeatInfo> seats = requestDto.seatsInfo();
+		ticketPaymentService.createPaymentForTickets(tickets, seats);
+	}
+
+	@Transactional(readOnly = true)
+	public TicketPaymentResponseServiceDto getTicketPaymentInfo(TicketPaymentRequestServiceDto requestDto) {
+		return ticketPaymentService.getTicketPaymentInfo(requestDto.userId());
 	}
 
 	private TicketSearchCriteria createTicketSearchCriteria(TicketSearchRequestServiceDto requestDto) {
