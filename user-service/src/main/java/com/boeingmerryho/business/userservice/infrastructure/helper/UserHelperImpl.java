@@ -129,7 +129,7 @@ public class UserHelperImpl implements UserHelper {
 	public UserTokenResult getUserTokenFromRedis(Long userId) {
 		String tokenKey = USER_TOKEN_PREFIX + userId;
 
-		if (!redisUtil.hsaKeyInRedis(tokenKey)) {
+		if (!redisUtil.hasKeyInRedis(tokenKey)) {
 			throw new GlobalException(ErrorCode.NOT_FOUND);
 		}
 
