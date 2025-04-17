@@ -22,7 +22,7 @@ public class StoreQueueAdminHelper {
 	}
 
 	public boolean isQueueAvailable(Long storeId) {
-		String key = "queue:availability:" + storeId;
+		String key = QUEUE_KEY_PREFIX + storeId;
 		return redisTemplate.hasKey(key) && "true".equals(redisTemplate.opsForValue().get(key));
 	}
 }
