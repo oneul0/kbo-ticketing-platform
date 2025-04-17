@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.infrastructure.config.web;
+package com.boeingmerryho.business.paymentservice.infrastructure.config.auth;
 
 import java.util.Map;
 import java.util.stream.Collectors;

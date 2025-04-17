@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.infrastructure.config.web;
+package com.boeingmerryho.business.paymentservice.infrastructure.config.auth;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
