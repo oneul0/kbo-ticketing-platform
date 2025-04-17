@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.boeingmerryho.business.ticketservice.application.user.dto.mapper.TicketApplicationMapper;
 import com.boeingmerryho.business.ticketservice.application.user.dto.request.TicketByIdRequestServiceDto;
+import com.boeingmerryho.business.ticketservice.application.user.dto.request.TicketPaymentRequestServiceDto;
 import com.boeingmerryho.business.ticketservice.application.user.dto.request.TicketSearchRequestServiceDto;
+import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketPaymentResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.domain.Ticket;
 import com.boeingmerryho.business.ticketservice.domain.TicketSearchCriteria;
@@ -56,6 +58,11 @@ public class TicketService {
 
 		List<SeatInfo> seats = requestDto.seatsInfo();
 		ticketPaymentService.createPaymentForTickets(tickets, seats);
+	}
+
+	@Transactional(readOnly = true)
+	public TicketPaymentResponseServiceDto getTicketPaymentInfo(TicketPaymentRequestServiceDto requestDto) {
+		return ticketPaymentService.getTicketPaymentInfo(requestDto.userId());
 	}
 
 	private TicketSearchCriteria createTicketSearchCriteria(TicketSearchRequestServiceDto requestDto) {

@@ -15,7 +15,11 @@ import com.boeingmerryho.business.ticketservice.application.feign.PaymentClient;
 import com.boeingmerryho.business.ticketservice.application.feign.dto.request.PaymentCreationRequestDto;
 import com.boeingmerryho.business.ticketservice.application.feign.dto.response.PaymentCreationResponseDto;
 import com.boeingmerryho.business.ticketservice.application.user.TicketPaymentService;
+import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketInfo;
+import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketPaymentResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.domain.Ticket;
+import com.boeingmerryho.business.ticketservice.exception.ErrorCode;
+import com.boeingmerryho.business.ticketservice.exception.TicketException;
 import com.boeingmerryho.business.ticketservice.infrastructure.adapter.kafka.dto.response.SeatInfo;
 
 @Service
@@ -53,6 +57,34 @@ public class TicketPaymentServiceImpl implements TicketPaymentService {
 		paymentInfoMap.put("ticketInfos", ticketInfoList);
 
 		redisTemplate.opsForHash().putAll(redisKey, paymentInfoMap); // TODO : TTL 설정하기(무통장입금일 경우 고려하기)
+	}
+
+	@Override
+	public TicketPaymentResponseServiceDto getTicketPaymentInfo(Long userId) {
+		String redisKey = "ticket:payment:" + userId;
+		Map<Object, Object> paymentInfoMap = redisTemplate.opsForHash().entries(redisKey);
+
+		if (paymentInfoMap.isEmpty()) {
+			throw new TicketException(ErrorCode.TICKET_PAYMENT_NOT_FOUND);
+		}
+
+		Object paymentIdObj = paymentInfoMap.get("paymentId");
+		Long paymentId;
+		if (paymentIdObj instanceof Number number) {
+			paymentId = number.longValue();
+		} else {
+			throw new TicketException(ErrorCode.TICKET_PAYMENT_INVALID_FIELD);
+		}
+
+		List<Map<String, Object>> ticketInfoList = (List<Map<String, Object>>)paymentInfoMap.get("ticketInfos");
+		List<TicketInfo> ticketInfos = ticketInfoList.stream()
+			.map(map -> new TicketInfo(
+				(String) map.get("ticketNo"),
+				(Integer) map.get("price")
+			))
+			.toList();
+
+		return new TicketPaymentResponseServiceDto(paymentId, ticketInfos);
 	}
 
 	private PaymentCreationRequestDto createRequestDto(List<Ticket> tickets, List<SeatInfo> seats) {
