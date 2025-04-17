@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.seatservice.config.redis;
+package com.boeingmerryho.business.seatservice.config.auth;
 
 import java.util.Map;
 import java.util.stream.Collectors;
