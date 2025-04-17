@@ -13,7 +13,7 @@ public interface RedisUtil {
 
 	void deleteFromRedisByKey(String tokenKey);
 
-	Boolean hsaKeyInRedis(String key);
+	Boolean hasKeyInRedis(String key);
 
 	Map<Object, Object> getMapEntriesFromRedis(String key);
 
