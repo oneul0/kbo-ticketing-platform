@@ -38,4 +38,9 @@ public class TicketRepositoryImpl implements TicketRepository {
 	public Optional<Ticket> findActiveTicketById(Long id) {
 		return ticketQueryRepository.findActiveTicketById(id);
 	}
+
+	@Override
+	public Optional<Ticket> findByTicketNo(String ticketNo) {
+		return ticketJpaRepository.findByTicketNo(ticketNo);
+	}
 }
