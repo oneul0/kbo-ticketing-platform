@@ -50,7 +50,7 @@ public class UserVerificationHelperImpl implements UserVerificationHelper {
 	@Override
 	public void checkDuplicatedVerificationRequest(String email) {
 		String key = VERIFICATION_PREFIX + email;
-		if (redisUtil.hsaKeyInRedis(key)) {
+		if (redisUtil.hasKeyInRedis(key)) {
 			throw new GlobalException(ErrorCode.VERIFICATION_ALREADY_SENT);
 		}
 	}
