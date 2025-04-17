@@ -26,4 +26,8 @@ public interface RedisUtil {
 	void blacklistToken(String accessToken);
 
 	void isEqualStoredRefreshToken(Long userId, String refreshToken);
+
+	void rollbackUserInfo(Long id);
+
+	void rollbackUserJwtToken(Long id);
 }
