@@ -129,7 +129,7 @@ public class UserHelperImpl implements UserHelper {
 	public UserTokenResult getUserTokenFromRedis(Long userId) {
 		String tokenKey = USER_TOKEN_PREFIX + userId;
 
-		if (!redisUtil.hsaKeyInRedis(tokenKey)) {
+		if (!redisUtil.hasKeyInRedis(tokenKey)) {
 			throw new GlobalException(ErrorCode.NOT_FOUND);
 		}
 
@@ -144,6 +144,13 @@ public class UserHelperImpl implements UserHelper {
 	public void removeUserMembershipInfoFromRedis(Long id) {
 		String membershipKey = MEMBERSHIP_INFO_PREFIX + id;
 		redisUtil.deleteFromRedisByKey(membershipKey);
+	}
+
+	@Override
+	public void validatePassword(String requestPassword, String storedPassword) {
+		if (!passwordEncoder.matches(requestPassword, storedPassword)) {
+			throw new GlobalException(ErrorCode.PASSWORD_NOT_MATCHED);
+		}
 	}
 
 }

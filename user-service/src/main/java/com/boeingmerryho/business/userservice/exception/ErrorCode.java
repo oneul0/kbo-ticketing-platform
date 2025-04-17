@@ -44,6 +44,7 @@ public enum ErrorCode implements BaseErrorCode {
 	MEMBERSHIP_FEIGN_REQUEST_FAIL("U-030", "Membership service feign요청에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
 	LOGIN_FAILED("U-031", "로그인에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+	PASSWORD_NOT_MATCHED("U-032", "비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
 	;
 
 	private final String errorCode;
