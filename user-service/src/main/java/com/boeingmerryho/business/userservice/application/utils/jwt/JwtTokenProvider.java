@@ -31,8 +31,10 @@ public class JwtTokenProvider {
 	@Value("${jwt.refresh-token-expiration}")
 	private long refreshTokenExpiration;
 
+	private final String BEARER_TOKEN_PREFIX = "Bearer ";
+
 	public String generateAccessToken(Long userId) {
-		return Jwts.builder()
+		return BEARER_TOKEN_PREFIX + Jwts.builder()
 			.setSubject(String.valueOf(userId))
 			.setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
 			.signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
@@ -40,7 +42,7 @@ public class JwtTokenProvider {
 	}
 
 	public String generateRefreshToken(Long userId) {
-		return Jwts.builder()
+		return BEARER_TOKEN_PREFIX + Jwts.builder()
 			.setSubject(String.valueOf(userId))
 			.setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
 			.signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
@@ -53,6 +55,9 @@ public class JwtTokenProvider {
 
 	public Claims parseJwtToken(String token) {
 		try {
+			if (token.startsWith("Bearer ")) {
+				token = token.substring(7);
+			}
 			return Jwts.parser()
 				.setSigningKey(Base64.getEncoder().encodeToString(secretKey.getBytes()))
 				.parseClaimsJws(token)
@@ -65,7 +70,7 @@ public class JwtTokenProvider {
 	public long calculateTtlMillis(Date expiration) {
 		long currentTimeMillis = System.currentTimeMillis();
 		long expirationTimeMillis = expiration.getTime();
-		return Math.max(0, expirationTimeMillis - currentTimeMillis); // 음수가 되지 않도록
+		return Math.max(0, expirationTimeMillis - currentTimeMillis);
 	}
 
 	public boolean validateRefreshToken(String token) {
