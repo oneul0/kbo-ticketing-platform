@@ -54,7 +54,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 	public Mono<Void> filter(ServerWebExchange exchange,
 		org.springframework.cloud.gateway.filter.GatewayFilterChain chain) {
 
-		log.info("JwtAuthFilter ");
+		log.info("JwtAuthFilter triggered");
 
 		ServerHttpRequest request = exchange.getRequest();
 		String path = request.getURI().getPath();
@@ -64,7 +64,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 		}
 
 		String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-
+		log.info("authHeader : {}", authHeader);
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			log.warn("JWT 토큰이 없습니다.");
 			throw new GlobalException(ErrorCode.JWT_NOT_FOUND);
