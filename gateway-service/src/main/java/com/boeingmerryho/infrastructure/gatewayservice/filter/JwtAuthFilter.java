@@ -72,17 +72,18 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
 		try {
 			String token = authHeader;
+
+			if (isTokenBlacklisted(token)) {
+				log.error("JWT가 블랙리스트에 존재합니다.");
+				throw new GlobalException(ErrorCode.JWT_BLACKLISTED);
+			}
+
 			if (authHeader.startsWith("Bearer ")) {
 				token = token.substring(7);
 			}
 
 			Claims claims = validateToken(token);
 			log.debug("JWT 검증 성공: {}", claims);
-
-			if (isTokenBlacklisted(token)) {
-				log.error("JWT가 블랙리스트에 존재합니다.");
-				throw new GlobalException(ErrorCode.JWT_BLACKLISTED);
-			}
 
 			ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
 				.header("X-User-Id", claims.getSubject())
@@ -98,6 +99,9 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 		} catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
 			log.error("잘못된 JWT: {}", e.getMessage());
 			throw new GlobalException(ErrorCode.WRONG_JWT);
+		} catch (GlobalException e) {
+			log.error("예외 발생: {}", e.getErrorCode());
+			throw e;
 		} catch (Exception e) {
 			log.error("JWT 검증 중 오류 발생: {}", e.getMessage());
 			throw new GlobalException(ErrorCode.JWT_VERIFIED_FAIL);
