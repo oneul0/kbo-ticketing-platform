@@ -83,4 +83,8 @@ public class Payment extends BaseEntity {
 	public boolean validateType(PaymentType type) {
 		return this.type == type;
 	}
+
+	public boolean validateUser(Long userId) {
+		return this.userId == userId;
+	}
 }
