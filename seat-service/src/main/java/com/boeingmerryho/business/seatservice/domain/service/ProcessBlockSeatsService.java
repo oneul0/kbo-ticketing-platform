@@ -51,6 +51,7 @@ public class ProcessBlockSeatsService {
 			match.get("home_team_id").toString(),
 			match.get("away_team_id").toString(),
 			match.get("match_day").toString(),
+			match.get("match_time").toString(),
 			match.get("stadium_id").toString()
 		);
 	}
