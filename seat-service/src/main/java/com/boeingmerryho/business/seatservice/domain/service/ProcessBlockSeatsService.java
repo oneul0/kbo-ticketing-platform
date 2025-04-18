@@ -120,7 +120,7 @@ public class ProcessBlockSeatsService {
 				seatBucketValue.put("createdAt", LocalDateTime.now().toString());
 				seatBucketValue.put("expiredAt", LocalDateTime.now().plusMinutes(9).toString());
 
-				seatBucketKey.set(seatBucketValue, Duration.ofMinutes(5));
+				seatBucketKey.set(seatBucketValue, Duration.ofMinutes(20));
 
 				ToTicketSeatDto seatInfo = parseSeatBucket(seatBucketKey.getName(), seatBucketValue);
 				seatInfos.add(seatInfo);
