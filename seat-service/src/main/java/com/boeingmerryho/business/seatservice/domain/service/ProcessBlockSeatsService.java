@@ -2,6 +2,7 @@ package com.boeingmerryho.business.seatservice.domain.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -44,6 +45,12 @@ public class ProcessBlockSeatsService {
 		if (!Objects.equals(match.get("match_day").toString(), serviceDto.date().toString())) {
 			log.error("Request Date : {} - Match Date : {}", serviceDto.date(), match.get("match_day"));
 			throw new GlobalException(MatchErrorCode.NOT_MATCH_DATE);
+		}
+
+		LocalTime matchTime = LocalTime.parse(match.get("match_time").toString());
+
+		if (LocalTime.now().isAfter(matchTime)) {
+			throw new GlobalException(SeatErrorCode.START_GAME_SEAT_NOT_PROCESS);
 		}
 
 		return new ToTicketMatchDto(
