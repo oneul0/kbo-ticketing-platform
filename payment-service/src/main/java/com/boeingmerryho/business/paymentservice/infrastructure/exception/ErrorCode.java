@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode implements BaseErrorCode {
+	UNAUTHORIZED("해당 권한이 없습니다.", HttpStatus.UNAUTHORIZED),
 	PAYMENT_NOT_FOUND("해당 결제를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 	PAYMENT_DETAIL_NOT_FOUND("해당 결제 내역을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 	PAYMENT_REFUND_REQUEST_FAIL("해당 건에 대한 환불 요청이 불가능합니다.", HttpStatus.BAD_REQUEST),
@@ -20,7 +21,7 @@ public enum ErrorCode implements BaseErrorCode {
 	PAYMENT_UNSUPPORTED("지원하지 않는 결제 방식입니다.", HttpStatus.BAD_REQUEST),
 	PAYMENT_INFO_NOT_FOUND("결제 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
 	PAYMENT_EXPIRED("결제가 만료되었습니다.", HttpStatus.BAD_REQUEST),
-	PAYMENT_PRICE_INVALID("결제 금액이 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+	PAYMENT_INVALID("결제 정보가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
 	MEMBERSHIP_SERVICE_UNAVAILABLE("멤버십 서비스 이용이 불가합니다.", HttpStatus.SERVICE_UNAVAILABLE);
 
 	private final String message;

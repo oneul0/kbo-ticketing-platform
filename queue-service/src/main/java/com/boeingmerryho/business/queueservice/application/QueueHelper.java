@@ -1,5 +1,6 @@
 package com.boeingmerryho.business.queueservice.application;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
@@ -11,11 +12,18 @@ import com.boeingmerryho.business.queueservice.application.dto.request.admin.Que
 import com.boeingmerryho.business.queueservice.domain.entity.Queue;
 import com.boeingmerryho.business.queueservice.domain.entity.QueueSearchCriteria;
 import com.boeingmerryho.business.queueservice.domain.model.QueueUserInfo;
+import com.boeingmerryho.business.queueservice.exception.ErrorCode;
 
 public interface QueueHelper {
 	public Boolean validateStoreIsActive(Long storeId);
 
 	public Long validateTicket(Date matchDate, Long ticketId);
+
+	String getOpsForValueInRedisWithErrorCode(String key, ErrorCode errorCode);
+
+	Boolean isExistsInRedisSet(String setKey, String elementsKey);
+
+	LocalDate parseDateToLocalDate(Date date);
 
 	public void joinUserInQueue(Long storeId, Long userId, Long ticketId);
 

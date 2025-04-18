@@ -11,10 +11,9 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
-import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
-import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
 
@@ -54,13 +53,15 @@ public interface PaymentApplicationMapper {
 	@Mapping(target = "discountType", source = "paymentDetail.payment.discountType")
 	PaymentApproveResponseServiceDto toPaymentApproveResponseServiceDto(PaymentDetail paymentDetail);
 
-	PaymentTicketRefundResponseServiceDto toPaymentTicketRefundResponseServiceDto(
+	PaymentRefundResponseServiceDto toPaymentKakaoRefundResponseServiceDto(
 		Long paymentId,
 		KakaoPayCancelResponse response);
 
-	PaymentMembershipRefundResponseServiceDto toPaymentMembershipRefundResponseServiceDto(
-		Long paymentId,
-		KakaoPayCancelResponse response);
+	@Mapping(target = "userId", source = "paymentDetail.payment.userId")
+	@Mapping(target = "paymentId", source = "paymentDetail.payment.id")
+	@Mapping(target = "price", source = "paymentDetail.payment.totalPrice")
+	@Mapping(target = "discountType", source = "paymentDetail.payment.discountType")
+	PaymentRefundResponseServiceDto toPaymentRefundResponseServiceDto(PaymentDetail paymentDetail);
 
 	@Mapping(target = "paymentId", source = "payment.id")
 	PaymentCreationResponseServiceDto toPaymentCreationResponseServiceDto(Payment payment);

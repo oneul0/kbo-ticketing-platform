@@ -1,6 +1,6 @@
 package com.boeingmerryho.business.paymentservice.application.dto.request;
 
-public record PaymentTicketRefundRequestServiceDto(
+public record PaymentRefundRequestServiceDto(
 	Long id
 ) {
 }

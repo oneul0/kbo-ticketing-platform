@@ -1,6 +1,6 @@
 package com.boeingmerryho.business.paymentservice.presentation.dto.response;
 
-public record PaymentMembershipRefundResponseDto(
+public record PaymentRefundResponseDto(
 	Long id,
 	Long userId,
 	Long paymentId,

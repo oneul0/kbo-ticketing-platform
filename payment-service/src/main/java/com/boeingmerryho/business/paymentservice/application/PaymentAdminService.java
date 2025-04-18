@@ -6,15 +6,13 @@ import com.boeingmerryho.business.paymentservice.application.dto.request.Payment
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailSearchRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentMembershipCancelRequestServiceDto;
-import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentMembershipRefundRequestServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentRefundRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentTicketCancelRequestServiceDto;
-import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentTicketRefundRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
-import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipRefundResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
-import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketRefundResponseServiceDto;
 
 public interface PaymentAdminService {
 	PaymentTicketCancelResponseServiceDto cancelTicketPayment(
@@ -29,11 +27,8 @@ public interface PaymentAdminService {
 	Page<PaymentDetailAdminResponseServiceDto> searchPaymentDetail(
 		PaymentDetailSearchRequestServiceDto requestServiceDto);
 
-	PaymentTicketRefundResponseServiceDto refundTicketPayment(
-		PaymentTicketRefundRequestServiceDto requestServiceDto);
-
-	PaymentMembershipRefundResponseServiceDto refundMembershipPayment(
-		PaymentMembershipRefundRequestServiceDto requestServiceDto);
+	PaymentRefundResponseServiceDto refundPayment(
+		PaymentRefundRequestServiceDto requestServiceDto);
 
 	PaymentApproveResponseServiceDto approvePayment(
 		PaymentApproveAdminRequestServiceDto paymentApproveAdminRequestServiceDto);

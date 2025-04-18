@@ -13,6 +13,8 @@ import com.boeingmerryho.business.paymentservice.application.PaymentStrategy;
 import com.boeingmerryho.business.paymentservice.application.dto.PaymentApplicationMapper;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayApproveRequest;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayApproveResponse;
+import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayCancelRequest;
+import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayCancelResponse;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayReadyRequest;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayReadyResponse;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.PaymentSession;
@@ -20,6 +22,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.request.Payment
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentReadyRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.domain.entity.KakaoPayInfo;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
@@ -32,8 +35,6 @@ import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
 import com.boeingmerryho.business.paymentservice.infrastructure.KafkaProducerHelper;
 import com.boeingmerryho.business.paymentservice.infrastructure.KakaoApiClient;
 import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
-import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
-import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
@@ -73,16 +74,6 @@ public class KakaoPayStrategy implements PaymentStrategy {
 		Payment payment,
 		PaymentReadyRequestServiceDto requestServiceDto
 	) {
-
-		Integer price = paySessionHelper.getPaymentPrice(payment.getId().toString())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_PRICE_INVALID));
-
-		int quantity = requestServiceDto.tickets() == null ? 1 : requestServiceDto.tickets().size();
-
-		if (requestServiceDto.price() != price * quantity) {
-			throw new PaymentException(ErrorCode.PAYMENT_PRICE_INVALID);
-		}
-
 		KakaoPayReadyRequest request = KakaoPayReadyRequest.builder()
 			.cid(cid)
 			.partnerOrderId(requestServiceDto.paymentId().toString())
@@ -131,7 +122,7 @@ public class KakaoPayStrategy implements PaymentStrategy {
 
 			paySessionHelper.savePaymentInfo(String.valueOf(requestServiceDto.paymentId()), session);
 		}
-		log.info("[Payment Ready] tid: {}, nextRedirectPcUrl: {}, createdAt: {}",
+		log.info("[Payment Ready Success] tid: {}, nextRedirectPcUrl: {}, createdAt: {}",
 			response.tid(),
 			response.nextRedirectPcUrl(),
 			response.createdAt()
@@ -200,7 +191,6 @@ public class KakaoPayStrategy implements PaymentStrategy {
 				);
 			}
 			payment.confirmPayment();
-
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 				@Override
 				public void afterCommit() {
@@ -218,9 +208,7 @@ public class KakaoPayStrategy implements PaymentStrategy {
 					}
 				}
 			});
-
 			return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
-
 		} catch (Exception e) {
 			if (payment.getType() == PaymentType.TICKET) {
 				List<String> tickets = paymentSession.tickets().stream()
@@ -239,7 +227,29 @@ public class KakaoPayStrategy implements PaymentStrategy {
 	}
 
 	@Override
+	public PaymentRefundResponseServiceDto refund(
+		PaymentDetail paymentDetail
+	) {
+		KakaoPayCancelRequest request = new KakaoPayCancelRequest(
+			paymentDetail.getKakaoPayInfo().getCid(),
+			paymentDetail.getKakaoPayInfo().getTid(),
+			paymentDetail.getDiscountPrice(),
+			0
+		);
+		KakaoPayCancelResponse response = kakaoApiClient.callCancel(request, secretKey, authPrefix);
+		log.info("[Payment Cancel Success] tid: {}, price: {}, createdAt: {}, approvedAt: {}",
+			response.tid(),
+			response.approvedCancelAmount().total(),
+			response.createdAt(),
+			response.approvedAt()
+		);
+		paymentDetail.getPayment().refundPayment();
+		return paymentApplicationMapper.toPaymentRefundResponseServiceDto(paymentDetail);
+	}
+
+	@Override
 	public PaymentMethod getSupportedMethod() {
 		return PaymentMethod.KAKAOPAY;
 	}
+
 }

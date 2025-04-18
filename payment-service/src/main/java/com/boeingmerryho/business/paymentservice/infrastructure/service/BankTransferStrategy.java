@@ -15,6 +15,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.request.Payment
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentReadyRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.domain.entity.AccountInfo;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
@@ -25,6 +26,8 @@ import com.boeingmerryho.business.paymentservice.domain.repository.PaymentReposi
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
 import com.boeingmerryho.business.paymentservice.infrastructure.KafkaProducerHelper;
+import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
+import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
@@ -82,14 +85,6 @@ public class BankTransferStrategy implements PaymentStrategy {
 		PaymentApproveAdminRequestServiceDto requestServiceDto
 	) {
 		try {
-			PaymentDetail paymentDetail = paymentDetailRepository.save(
-				PaymentDetail.builder()
-					.payment(payment)
-					.discountPrice(payment.getDiscountPrice())
-					.method(PaymentMethod.BANK_TRANSFER)
-					.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice())
-					.build()
-			);
 			if (payment.getType() == PaymentType.TICKET) {
 				List<Ticket> tickets = requestServiceDto.tickets();
 				for (int i = 0; i < tickets.size(); i++) {
@@ -130,6 +125,10 @@ public class BankTransferStrategy implements PaymentStrategy {
 					}
 				}
 			});
+			PaymentDetail paymentDetail = paymentDetailRepository.findPaymentDetailByPaymentId(
+					requestServiceDto.paymentId())
+				.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
+
 			return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
 		} catch (Exception e) {
 			if (payment.getType() == PaymentType.TICKET) {
@@ -146,6 +145,14 @@ public class BankTransferStrategy implements PaymentStrategy {
 			}
 			throw e;
 		}
+	}
+
+	@Override
+	public PaymentRefundResponseServiceDto refund(
+		PaymentDetail paymentDetail
+	) {
+		paymentDetail.getPayment().refundPayment();
+		return paymentApplicationMapper.toPaymentRefundResponseServiceDto(paymentDetail);
 	}
 
 	@Override

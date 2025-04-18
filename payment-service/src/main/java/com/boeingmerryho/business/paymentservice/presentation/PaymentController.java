@@ -43,10 +43,7 @@ public class PaymentController {
 	private final PaymentPresentationMapper paymentPresentationMapper;
 
 	@PostMapping("/pay")
-	@RequiredRoles({
-		UserRoleType.NORMAL,
-		UserRoleType.SENIOR
-	})
+	@RequiredRoles({UserRoleType.NORMAL, UserRoleType.SENIOR})
 	public ResponseEntity<SuccessResponse<PaymentReadyResponseDto>> pay(
 		@RequestAttribute Long userId,
 		@RequestBody @Valid PaymentReadyRequestDto requestDto
@@ -59,10 +56,7 @@ public class PaymentController {
 	}
 
 	@PostMapping("/approve")
-	@RequiredRoles({
-		UserRoleType.NORMAL,
-		UserRoleType.SENIOR
-	})
+	@RequiredRoles({UserRoleType.NORMAL, UserRoleType.SENIOR})
 	public ResponseEntity<SuccessResponse<PaymentApproveResponseDto>> approvePayment(
 		@RequestAttribute Long userId,
 		@RequestParam("pg_token") String pgToken,
@@ -76,10 +70,7 @@ public class PaymentController {
 	}
 
 	@PutMapping("/{id}/cancel/tickets")
-	@RequiredRoles({
-		UserRoleType.NORMAL,
-		UserRoleType.SENIOR
-	})
+	@RequiredRoles({UserRoleType.NORMAL, UserRoleType.SENIOR})
 	public ResponseEntity<SuccessResponse<PaymentTicketCancelResponseDto>> cancelTicketPayment(
 		@RequestAttribute Long userId,
 		@PathVariable Long id
@@ -92,10 +83,7 @@ public class PaymentController {
 	}
 
 	@PutMapping("/{id}/cancel/memberships")
-	@RequiredRoles({
-		UserRoleType.NORMAL,
-		UserRoleType.SENIOR
-	})
+	@RequiredRoles({UserRoleType.NORMAL, UserRoleType.SENIOR})
 	public ResponseEntity<SuccessResponse<PaymentMembershipCancelResponseDto>> cancelMembershipPayment(
 		@RequestAttribute Long userId,
 		@PathVariable Long id
@@ -108,10 +96,7 @@ public class PaymentController {
 	}
 
 	@GetMapping("/details/{id}")
-	@RequiredRoles({
-		UserRoleType.NORMAL,
-		UserRoleType.SENIOR
-	})
+	@RequiredRoles({UserRoleType.NORMAL, UserRoleType.SENIOR})
 	public ResponseEntity<SuccessResponse<PaymentDetailResponseDto>> getPaymentDetail(
 		@RequestAttribute Long userId,
 		@PathVariable Long id
@@ -124,10 +109,7 @@ public class PaymentController {
 	}
 
 	@GetMapping("/details")
-	@RequiredRoles({
-		UserRoleType.NORMAL,
-		UserRoleType.SENIOR
-	})
+	@RequiredRoles({UserRoleType.NORMAL, UserRoleType.SENIOR})
 	public ResponseEntity<SuccessResponse<Page<PaymentDetailResponseDto>>> searchPaymentDetail(
 		@RequestAttribute Long userId,
 		@RequestParam(value = "page", required = false, defaultValue = "1") int page,
