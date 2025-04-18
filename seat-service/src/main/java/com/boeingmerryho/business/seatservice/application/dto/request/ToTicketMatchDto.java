@@ -5,6 +5,7 @@ public record ToTicketMatchDto(
 	String homeTeamId,
 	String awayTeamId,
 	String matchDay,
+	String matchTime,
 	String stadiumId
 ) {
 }
