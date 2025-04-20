@@ -1,7 +1,7 @@
 package com.boeingmerryho.business.seatservice.application.scheduler;
 
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.boeingmerryho.business.seatservice.domain.service.AutoCleanCacheSeatsService;
 
@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 public class AutoCleanCacheSeatsScheduler {
 	private final AutoCleanCacheSeatsService autoCleanCacheSeatsService;
