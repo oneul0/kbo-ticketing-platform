@@ -1,5 +1,6 @@
 package com.boeingmerryho.business.seatservice.infrastructure.reader;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -26,7 +27,18 @@ public class MatchReaderImpl implements MatchReader {
 		}
 	}
 
+	@Override
+	public Map<String, Object> getByMatchDate(LocalDate matchDate) {
+		String sql = getByMatchDateQuery();
+
+		return jdbcTemplate.queryForMap(sql, matchDate);
+	}
+
 	private String getByMatchIdQuery() {
 		return "SELECT * FROM p_match WHERE id = ?";
+	}
+
+	private String getByMatchDateQuery() {
+		return "SELECT * FROM p_match WHERE match_day = ?";
 	}
 }
