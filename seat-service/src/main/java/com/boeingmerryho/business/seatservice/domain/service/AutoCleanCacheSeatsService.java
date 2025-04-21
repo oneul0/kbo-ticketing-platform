@@ -27,13 +27,13 @@ public class AutoCleanCacheSeatsService {
 
 		Map<String, Object> match = matchHelper.getByMatchDate(today);
 		if (match == null) {
-			log.info("날짜: {}, 경기가 존재하지 않습니다.", today);
+			log.error("날짜: {}, 경기가 존재하지 않습니다.", today);
 			return;
 		}
 
 		LocalTime matchStartTime = LocalTime.parse(match.get("match_time").toString());
 		if (LocalTime.now().isBefore(matchStartTime)) {
-			log.info("경기 시작 전이므로 좌석을 삭제할 수 없습니다.");
+			log.error("경기 시작 전이므로 좌석을 삭제할 수 없습니다.");
 			return;
 		}
 
