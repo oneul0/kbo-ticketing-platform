@@ -19,6 +19,7 @@ public class SeatCommonHelper {
 	private final SeatRepository seatRepository;
 
 	public final String seatPrefix = "seat:";
+	public final String seatKeyPrefix = "seatsKey:";
 
 	public Seat getSeatById(Long id) {
 		return seatRepository.findById(id)
@@ -45,7 +46,7 @@ public class SeatCommonHelper {
 
 	public String createCacheBlockKey(Integer blockId, LocalDate date) {
 		StringBuilder cacheBlockKey = new StringBuilder()
-			.append(seatPrefix)
+			.append(seatKeyPrefix)
 			.append(date)
 			.append(":")
 			.append(blockId);

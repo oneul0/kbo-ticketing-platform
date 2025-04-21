@@ -32,7 +32,7 @@ public class CreateCacheSeatsService {
 
 			RBucket<Map<String, String>> bucket = redissonClient.getBucket(cacheKey);
 			// TODO: 테스트 기간까지만 5분으로 설정
-			bucket.set(cacheValue, Duration.ofMinutes(5));
+			bucket.set(cacheValue, Duration.ofMinutes(20));
 
 			String blockKey = makeBlockKey(seat, date);
 			RList<String> blockSeats = redissonClient.getList(blockKey);
@@ -58,7 +58,7 @@ public class CreateCacheSeatsService {
 
 	private String makeBlockKey(Seat seat, LocalDate date) {
 		StringBuilder builder = new StringBuilder()
-			.append(seatCommonHelper.seatPrefix)
+			.append(seatCommonHelper.seatKeyPrefix)
 			.append(date)
 			.append(":")
 			.append(seat.getSeatBlock());
