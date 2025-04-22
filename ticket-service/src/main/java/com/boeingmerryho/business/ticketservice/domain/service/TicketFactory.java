@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CreateTicketService {
+public class TicketFactory {
 
 	public List<Ticket> createTickets(SeatListenerDto requestDto) {
 		MatchInfo matchInfo = requestDto.matchInfo();
