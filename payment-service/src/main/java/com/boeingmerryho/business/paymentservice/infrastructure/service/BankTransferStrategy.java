@@ -1,6 +1,5 @@
 package com.boeingmerryho.business.paymentservice.infrastructure.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -16,7 +15,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.request.Payment
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentRefundResponseServiceDto;
-import com.boeingmerryho.business.paymentservice.domain.entity.AccountInfo;
+import com.boeingmerryho.business.paymentservice.domain.PaymentFactory;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentMembership;
@@ -36,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BankTransferStrategy implements PaymentStrategy {
 
+	private final PaymentFactory paymentFactory;
 	private final PaymentRepository paymentRepository;
 	private final KafkaProducerHelper kafkaProducerHelper;
 	private final PaymentDetailRepository paymentDetailRepository;
@@ -47,32 +47,16 @@ public class BankTransferStrategy implements PaymentStrategy {
 		Payment payment,
 		PaymentReadyRequestServiceDto requestDto
 	) {
-		String accountNumber = "110-333-482102";
-		String accountBank = "SHINHAN";
-		LocalDateTime dueDate = LocalDateTime.now().plusDays(1);
-		String accountHolder = "BOEING_KBO_" + "USERNAME";
-		paymentDetailRepository.save(PaymentDetail.builder()
-			.payment(payment)
-			.discountPrice(payment.getDiscountPrice())
-			.method(getSupportedMethod())
-			.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice())
-			.accountInfo(
-				AccountInfo.builder()
-					.accountNumber(accountNumber)
-					.accountBank(accountBank)
-					.dueDate(dueDate)
-					.accountHolder(accountHolder)
-					.build()
-			)
-			.build()
-		);
+		PaymentDetail paymentDetail = paymentDetailRepository.save(paymentFactory.createDetail(
+			payment,
+			null,
+			null,
+			getSupportedMethod()
+		));
 		return paymentApplicationMapper.toPaymentReadyResponseServiceDto(
 			payment.getId(),
 			payment.getDiscountPrice(),
-			accountNumber,
-			accountBank,
-			dueDate,
-			accountHolder,
+			paymentDetail.getAccountInfo(),
 			null,
 			payment.getCreatedAt()
 		);
@@ -148,6 +132,7 @@ public class BankTransferStrategy implements PaymentStrategy {
 	}
 
 	@Override
+	@Transactional
 	public PaymentRefundResponseServiceDto refund(
 		PaymentDetail paymentDetail
 	) {

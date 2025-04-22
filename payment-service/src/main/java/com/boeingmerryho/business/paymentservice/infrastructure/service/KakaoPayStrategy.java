@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import com.boeingmerryho.business.paymentservice.application.KakaoPayRequestFactory;
+import com.boeingmerryho.business.paymentservice.application.PaymentSessionFactory;
 import com.boeingmerryho.business.paymentservice.application.PaymentStrategy;
 import com.boeingmerryho.business.paymentservice.application.dto.PaymentApplicationMapper;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.KakaoPayApproveRequest;
@@ -23,7 +25,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.request.Payment
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentRefundResponseServiceDto;
-import com.boeingmerryho.business.paymentservice.domain.entity.KakaoPayInfo;
+import com.boeingmerryho.business.paymentservice.domain.PaymentFactory;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentMembership;
@@ -54,17 +56,13 @@ public class KakaoPayStrategy implements PaymentStrategy {
 	@Value("${kakaopay.auth-prefix}")
 	String authPrefix;
 
-	@Value("${kakaopay.redirect-url}")
-	String redirectUrl;
-
-	private final String APPROVE_PATH = "/api/v1/payments/approve";
-	private final String CANCEL_PATH = "/api/v1/payments/cancel";
-	private final String FAIL_PATH = "/kakao/payments/ready/fail";
-
 	private final KakaoApiClient kakaoApiClient;
+	private final PaymentFactory paymentFactory;
 	private final PaySessionHelper paySessionHelper;
 	private final PaymentRepository paymentRepository;
 	private final KafkaProducerHelper kafkaProducerHelper;
+	private final PaymentSessionFactory paymentSessionFactory;
+	private final KakaoPayRequestFactory kakaoPayRequestFactory;
 	private final PaymentDetailRepository paymentDetailRepository;
 	private final PaymentApplicationMapper paymentApplicationMapper;
 
@@ -74,54 +72,22 @@ public class KakaoPayStrategy implements PaymentStrategy {
 		Payment payment,
 		PaymentReadyRequestServiceDto requestServiceDto
 	) {
-		KakaoPayReadyRequest request = KakaoPayReadyRequest.builder()
-			.cid(cid)
-			.partnerOrderId(requestServiceDto.paymentId().toString())
-			.partnerUserId(requestServiceDto.userId().toString())
-			.itemName(requestServiceDto.type())
-			.quantity(requestServiceDto.tickets() == null ? 1 : requestServiceDto.tickets().size())
-			.totalAmount(payment.getDiscountPrice())
-			.vatAmount(0)
-			.taxFreeAmount(0)
-			.approvalUrl(redirectUrl + APPROVE_PATH)
-			.cancelUrl(redirectUrl + CANCEL_PATH)
-			.failUrl(redirectUrl + FAIL_PATH)
-			.build();
-
-		KakaoPayReadyResponse response = kakaoApiClient.callReady(request, secretKey, authPrefix);
-
-		if (payment.getType() == PaymentType.TICKET) {
-			PaymentSession session = PaymentSession.builder()
-				.cid(cid)
-				.tid(response.tid())
-				.partnerOrderId(request.partnerOrderId())
-				.partnerUserId(request.partnerUserId())
-				.tickets(requestServiceDto.tickets())
-				.totalAmount(payment.getDiscountPrice())
-				.quantity(requestServiceDto.tickets().size())
-				.itemName(requestServiceDto.type())
-				.createdAt(response.createdAt().toString())
-				.method(requestServiceDto.method())
-				.build();
-
-			paySessionHelper.savePaymentInfo(String.valueOf(requestServiceDto.paymentId()), session);
-		}
-		if (payment.getType() == PaymentType.MEMBERSHIP) {
-			PaymentSession session = PaymentSession.builder()
-				.cid(cid)
-				.tid(response.tid())
-				.partnerOrderId(request.partnerOrderId())
-				.partnerUserId(request.partnerUserId())
-				.membershipId(requestServiceDto.membershipId())
-				.totalAmount(payment.getDiscountPrice())
-				.quantity(1)
-				.itemName(requestServiceDto.type())
-				.createdAt(response.createdAt().toString())
-				.method(requestServiceDto.method())
-				.build();
-
-			paySessionHelper.savePaymentInfo(String.valueOf(requestServiceDto.paymentId()), session);
-		}
+		KakaoPayReadyRequest request = kakaoPayRequestFactory.createReadyRequest(
+			payment,
+			requestServiceDto
+		);
+		KakaoPayReadyResponse response = kakaoApiClient.callReady(
+			request,
+			secretKey,
+			authPrefix
+		);
+		PaymentSession session = paymentSessionFactory.createSession(
+			payment,
+			request,
+			response,
+			requestServiceDto
+		);
+		paySessionHelper.savePaymentInfo(String.valueOf(requestServiceDto.paymentId()), session);
 		log.info("[Payment Ready Success] tid: {}, nextRedirectPcUrl: {}, createdAt: {}",
 			response.tid(),
 			response.nextRedirectPcUrl(),
@@ -130,9 +96,6 @@ public class KakaoPayStrategy implements PaymentStrategy {
 		return paymentApplicationMapper.toPaymentReadyResponseServiceDto(
 			payment.getId(),
 			payment.getDiscountPrice(),
-			null,
-			null,
-			null,
 			null,
 			response.nextRedirectPcUrl(),
 			payment.getCreatedAt()
@@ -147,27 +110,22 @@ public class KakaoPayStrategy implements PaymentStrategy {
 		PaymentApproveRequestServiceDto requestServiceDto
 	) {
 		try {
-			KakaoPayApproveRequest request = KakaoPayApproveRequest.builder()
-				.cid(paymentSession.cid())
-				.tid(paymentSession.tid())
-				.partnerOrderId(paymentSession.partnerOrderId())
-				.partnerUserId(paymentSession.partnerUserId())
-				.pgToken(requestServiceDto.pgToken())
-				.build();
-			KakaoPayApproveResponse response = kakaoApiClient.callApprove(request, secretKey, authPrefix);
+			KakaoPayApproveRequest request = kakaoPayRequestFactory.createApproveRequest(
+				paymentSession,
+				requestServiceDto
+			);
+			KakaoPayApproveResponse response = kakaoApiClient.callApprove(
+				request,
+				secretKey,
+				authPrefix
+			);
 			PaymentDetail paymentDetail = paymentDetailRepository.save(
-				PaymentDetail.builder()
-					.kakaoPayInfo(
-						KakaoPayInfo.builder()
-							.cid(paymentSession.cid())
-							.tid(paymentSession.tid())
-							.build()
-					)
-					.payment(payment)
-					.discountPrice(payment.getDiscountPrice() - response.amount().discount())
-					.method(getSupportedMethod())
-					.discountAmount(payment.getTotalPrice() - payment.getDiscountPrice() + response.amount().discount())
-					.build()
+				paymentFactory.createDetail(
+					payment,
+					paymentSession,
+					response,
+					getSupportedMethod()
+				)
 			);
 			if (payment.getType() == PaymentType.TICKET) {
 				List<Ticket> tickets = paymentSession.tickets();
@@ -191,6 +149,8 @@ public class KakaoPayStrategy implements PaymentStrategy {
 				);
 			}
 			payment.confirmPayment();
+			paySessionHelper.deletePaymentExpiredTime(String.valueOf(payment.getId()));
+
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 				@Override
 				public void afterCommit() {
@@ -227,16 +187,16 @@ public class KakaoPayStrategy implements PaymentStrategy {
 	}
 
 	@Override
+	@Transactional
 	public PaymentRefundResponseServiceDto refund(
 		PaymentDetail paymentDetail
 	) {
-		KakaoPayCancelRequest request = new KakaoPayCancelRequest(
-			paymentDetail.getKakaoPayInfo().getCid(),
-			paymentDetail.getKakaoPayInfo().getTid(),
-			paymentDetail.getDiscountPrice(),
-			0
+		KakaoPayCancelRequest request = kakaoPayRequestFactory.createCancelRequest(paymentDetail);
+		KakaoPayCancelResponse response = kakaoApiClient.callCancel(
+			request,
+			secretKey,
+			authPrefix
 		);
-		KakaoPayCancelResponse response = kakaoApiClient.callCancel(request, secretKey, authPrefix);
 		log.info("[Payment Cancel Success] tid: {}, price: {}, createdAt: {}, approvedAt: {}",
 			response.tid(),
 			response.approvedCancelAmount().total(),

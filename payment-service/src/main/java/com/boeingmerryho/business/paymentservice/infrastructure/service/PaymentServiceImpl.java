@@ -23,11 +23,10 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.domain.PaymentReader;
 import com.boeingmerryho.business.paymentservice.domain.context.PaymentDetailSearchContext;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
-import com.boeingmerryho.business.paymentservice.domain.repository.PaymentDetailRepository;
-import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
 import com.boeingmerryho.business.paymentservice.domain.type.DiscountType;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
@@ -43,11 +42,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
+	private final PaymentReader paymentReader;
 	private final PaySessionHelper paySessionHelper;
-	private final PaymentRepository paymentRepository;
 	private final PaymentStrategyFactory strategyFactory;
 	private final MembershipApiClient membershipApiClient;
-	private final PaymentDetailRepository paymentDetailRepository;
 	private final PaymentApplicationMapper paymentApplicationMapper;
 
 	@Override
@@ -56,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
 		PaymentReadyRequestServiceDto requestServiceDto
 	) {
 		assertInExpiredTimePayment(requestServiceDto.paymentId());
-		Payment payment = getPayment(requestServiceDto.paymentId());
+		Payment payment = paymentReader.getPayment(requestServiceDto.paymentId());
 		assertAvailablePayment(
 			payment,
 			requestServiceDto.userId(),
@@ -74,15 +72,13 @@ public class PaymentServiceImpl implements PaymentService {
 		PaymentApproveRequestServiceDto requestServiceDto
 	) {
 		PaymentSession paymentSession = getPaymentSession(requestServiceDto);
-		Payment payment = getPayment(requestServiceDto.paymentId());
+		Payment payment = paymentReader.getPayment(requestServiceDto.paymentId());
 		PaymentStrategy strategy = strategyFactory.getStrategy(paymentSession.method());
-		PaymentApproveResponseServiceDto responseServiceDto = strategy.approve(
+		return strategy.approve(
 			paymentSession,
 			payment,
 			requestServiceDto
 		);
-		paySessionHelper.deletePaymentExpiredTime(String.valueOf(payment.getId()));
-		return responseServiceDto;
 	}
 
 	@Override
@@ -90,7 +86,7 @@ public class PaymentServiceImpl implements PaymentService {
 	public PaymentTicketCancelResponseServiceDto cancelTicketPayment(
 		PaymentTicketCancelRequestServiceDto requestServiceDto
 	) {
-		Payment payment = getPayment(requestServiceDto.id());
+		Payment payment = paymentReader.getPayment(requestServiceDto.id());
 		assertCancellablePayment(
 			payment,
 			requestServiceDto.userId()
@@ -104,7 +100,7 @@ public class PaymentServiceImpl implements PaymentService {
 	public PaymentMembershipCancelResponseServiceDto cancelMembershipPayment(
 		PaymentMembershipCancelRequestServiceDto requestServiceDto
 	) {
-		Payment payment = getPayment(requestServiceDto.id());
+		Payment payment = paymentReader.getPayment(requestServiceDto.id());
 		assertCancellablePayment(
 			payment,
 			requestServiceDto.userId()
@@ -118,7 +114,7 @@ public class PaymentServiceImpl implements PaymentService {
 	public PaymentDetailResponseServiceDto getPaymentDetail(
 		PaymentDetailRequestServiceDto requestServiceDto
 	) {
-		PaymentDetail paymentDetail = getDetail(requestServiceDto.id());
+		PaymentDetail paymentDetail = paymentReader.getDetail(requestServiceDto.id());
 		return paymentApplicationMapper.toPaymentDetailResponseServiceDto(paymentDetail);
 	}
 
@@ -127,15 +123,9 @@ public class PaymentServiceImpl implements PaymentService {
 	public Page<PaymentDetailResponseServiceDto> searchPaymentDetail(
 		PaymentDetailSearchRequestServiceDto requestServiceDto
 	) {
-		Page<PaymentDetail> paymentDetails = paymentRepository.searchPaymentDetail(
-			createSearchContext(requestServiceDto)
-		);
+		PaymentDetailSearchContext searchContext = createSearchContext(requestServiceDto);
+		Page<PaymentDetail> paymentDetails = paymentReader.getPaymentDetails(searchContext);
 		return paymentDetails.map(paymentApplicationMapper::toPaymentDetailResponseServiceDto);
-	}
-
-	private Payment getPayment(Long paymentId) {
-		return paymentRepository.findById(paymentId)
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
 	}
 
 	private PaymentSession getPaymentSession(
@@ -143,11 +133,6 @@ public class PaymentServiceImpl implements PaymentService {
 	) {
 		return paySessionHelper.getPaymentInfo(String.valueOf(requestServiceDto.paymentId()))
 			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_INFO_NOT_FOUND));
-	}
-
-	private PaymentDetail getDetail(Long detailId) {
-		return paymentDetailRepository.findById(detailId)
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
 	}
 
 	private void assertInExpiredTimePayment(Long paymentId) {
@@ -179,18 +164,6 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 	}
 
-	private void calculateDiscountPrice(
-		PaymentReadyRequestServiceDto requestServiceDto,
-		Payment payment
-	) {
-		Double discount = membershipApiClient.getDiscount(requestServiceDto.userId())
-			.orElseThrow(() -> new PaymentException(ErrorCode.MEMBERSHIP_SERVICE_UNAVAILABLE));
-		payment.updateDiscountInfo(
-			discount,
-			DiscountType.from(requestServiceDto.discountType())
-		);
-	}
-
 	private void assertCancellablePayment(
 		Payment payment,
 		Long userId
@@ -204,6 +177,18 @@ public class PaymentServiceImpl implements PaymentService {
 		if (!payment.validateType(PaymentType.TICKET)) {
 			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
 		}
+	}
+
+	private void calculateDiscountPrice(
+		PaymentReadyRequestServiceDto requestServiceDto,
+		Payment payment
+	) {
+		Double discount = membershipApiClient.getDiscount(requestServiceDto.userId())
+			.orElseThrow(() -> new PaymentException(ErrorCode.MEMBERSHIP_SERVICE_UNAVAILABLE));
+		payment.updateDiscountInfo(
+			discount,
+			DiscountType.from(requestServiceDto.discountType())
+		);
 	}
 
 	private PaymentDetailSearchContext createSearchContext(

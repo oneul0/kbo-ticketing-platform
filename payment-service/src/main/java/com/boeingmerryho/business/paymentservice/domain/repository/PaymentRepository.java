@@ -17,12 +17,7 @@ public interface PaymentRepository {
 
 	Page<PaymentDetail> searchPaymentDetail(PaymentDetailSearchContext searchContext);
 
-	Optional<PaymentTicket> findByPaymentTicketId(Long id);
-
-	Optional<PaymentMembership> findByPaymentMembershipId(Long id);
-
 	PaymentTicket saveTicket(PaymentTicket paymentTicket);
 
 	PaymentMembership saveMembership(PaymentMembership paymentMembership);
-
 }

@@ -1,5 +1,7 @@
 package com.boeingmerryho.business.paymentservice.application;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.PaymentSession;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentApproveAdminRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentApproveRequestServiceDto;
@@ -16,11 +18,13 @@ import com.boeingmerryho.business.paymentservice.infrastructure.exception.Paymen
 public interface PaymentStrategy {
 	PaymentMethod getSupportedMethod();
 
+	@Transactional
 	PaymentReadyResponseServiceDto pay(
 		Payment payment,
 		PaymentReadyRequestServiceDto requestDto
 	);
 
+	@Transactional
 	default PaymentApproveResponseServiceDto approve(
 		PaymentSession paymentSession,
 		Payment payment,
@@ -28,12 +32,14 @@ public interface PaymentStrategy {
 		throw new PaymentException(ErrorCode.PAYMENT_UNSUPPORTED);
 	}
 
+	@Transactional
 	default PaymentApproveResponseServiceDto approve(
 		Payment payment,
 		PaymentApproveAdminRequestServiceDto requestDto) {
 		throw new PaymentException(ErrorCode.PAYMENT_UNSUPPORTED);
 	}
 
+	@Transactional
 	PaymentRefundResponseServiceDto refund(
 		PaymentDetail paymentDetail
 	);
