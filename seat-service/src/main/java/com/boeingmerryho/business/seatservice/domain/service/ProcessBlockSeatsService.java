@@ -1,6 +1,7 @@
 package com.boeingmerryho.business.seatservice.domain.service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -25,6 +26,7 @@ import com.boeingmerryho.business.seatservice.domain.ReservationStatus;
 import com.boeingmerryho.business.seatservice.exception.MatchErrorCode;
 import com.boeingmerryho.business.seatservice.exception.SeatErrorCode;
 import com.boeingmerryho.business.seatservice.infrastructure.helper.MatchHelper;
+import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatCommonHelper;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +40,9 @@ public class ProcessBlockSeatsService {
 	private final RedissonClient redissonClient;
 	private final KafkaTemplate<String, Object> kafkaTemplate;
 	private final SeatApplicationMapper seatApplicationMapper;
+	private final SeatCommonHelper seatCommonHelper;
 
-	public ToTicketMatchDto getMatchInfo(CacheSeatsProcessServiceRequestDto serviceDto) {
+	public ToTicketMatchDto getMatchInfo(CacheSeatsProcessServiceRequestDto serviceDto, LocalDate today) {
 		Map<String, Object> match = matchHelper.getByMatchId(serviceDto.matchId());
 
 		if (!Objects.equals(match.get("match_day").toString(), serviceDto.date().toString())) {
@@ -49,7 +52,7 @@ public class ProcessBlockSeatsService {
 
 		LocalTime matchTime = LocalTime.parse(match.get("match_time").toString());
 
-		if (LocalTime.now().isAfter(matchTime)) {
+		if (serviceDto.date().isEqual(today) && LocalTime.now().isAfter(matchTime)) {
 			throw new GlobalException(SeatErrorCode.START_GAME_SEAT_NOT_PROCESS);
 		}
 
@@ -65,14 +68,15 @@ public class ProcessBlockSeatsService {
 
 	public void getBlockSeats(
 		List<RLock> locks,
-		String cacheBlockKey,
 		RList<String> blockSeats,
 		List<String> requestSeats,
-		List<CacheSeatProcessServiceRequestDto> serviceRequestSeatInfos
+		CacheSeatsProcessServiceRequestDto serviceDto
 	) {
-		for (CacheSeatProcessServiceRequestDto requestSeat : serviceRequestSeatInfos) {
+		String cacheSeatKeyFront = createCacheSeatKeyFront(serviceDto.date(), serviceDto.blockId());
+
+		for (CacheSeatProcessServiceRequestDto requestSeat : serviceDto.serviceRequestSeatInfos()) {
 			String cacheSeatKey = createCacheSeatKey(
-				cacheBlockKey,
+				cacheSeatKeyFront,
 				requestSeat.column(),
 				requestSeat.row()
 			);
@@ -112,7 +116,7 @@ public class ProcessBlockSeatsService {
 
 				String requestSeatStatus = seatBucketValue.get("status");
 				if (!requestSeatStatus.equals(ReservationStatus.AVAILABLE.name())) {
-					throw new GlobalException(SeatErrorCode.FAILED_PROCESS_SEAT);
+					throw new GlobalException(SeatErrorCode.ALREADY_PROCESS_SEAT);
 				}
 
 				seatBucketValue.put("status", ReservationStatus.PROCESSING.name());
@@ -174,10 +178,20 @@ public class ProcessBlockSeatsService {
 		return cacheLockKey.toString();
 	}
 
-	private String createCacheSeatKey(String cacheBlockKey, Integer column, Integer row) {
-		StringBuilder cacheSeatKey = new StringBuilder()
-			.append(cacheBlockKey)
+	private String createCacheSeatKeyFront(LocalDate date, Integer blockId) {
+		StringBuilder keyFront = new StringBuilder()
+			.append(seatCommonHelper.seatPrefix)
+			.append(date)
 			.append(":")
+			.append(blockId)
+			.append(":");
+
+		return keyFront.toString();
+	}
+
+	private String createCacheSeatKey(String cacheSeatKeyFront, Integer column, Integer row) {
+		StringBuilder cacheSeatKey = new StringBuilder()
+			.append(cacheSeatKeyFront)
 			.append(column)
 			.append(":")
 			.append(row);
