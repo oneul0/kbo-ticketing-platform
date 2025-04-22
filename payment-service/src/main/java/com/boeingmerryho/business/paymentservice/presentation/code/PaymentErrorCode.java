@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.infrastructure.exception;
+package com.boeingmerryho.business.paymentservice.presentation.code;
 
 import org.springframework.http.HttpStatus;
 
@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ErrorCode implements BaseErrorCode {
+public enum PaymentErrorCode implements BaseErrorCode {
 	UNAUTHORIZED("해당 권한이 없습니다.", HttpStatus.UNAUTHORIZED),
 	PAYMENT_NOT_FOUND("해당 결제를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 	PAYMENT_DETAIL_NOT_FOUND("해당 결제 내역을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),

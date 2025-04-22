@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.infrastructure;
+package com.boeingmerryho.business.paymentservice.infrastructure.helper;
 
 import java.util.List;
 
@@ -47,6 +47,21 @@ public class KafkaProducerHelper {
 		ticketKafkaProducer.publishTicketPayment(new TicketPaymentEvent(
 			FAILURE_PREFIX,
 			tickets
+		));
+	}
+
+	public void publishTicketRefundSuccess(List<String> tickets) {
+		ticketKafkaProducer.publishTicketRefund(new TicketPaymentEvent(
+			SUCCESS_PREFIX,
+			tickets
+		));
+	}
+
+	public void publishMembershipRefundSuccess(Long userId, Long membershipId) {
+		membershipKafkaProducer.publishMembershipRefund(new MembershipPaymentEvent(
+			SUCCESS_PREFIX,
+			userId,
+			membershipId
 		));
 	}
 }
