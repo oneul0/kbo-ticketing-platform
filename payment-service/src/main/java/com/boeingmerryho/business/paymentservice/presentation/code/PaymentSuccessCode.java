@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.presentation;
+package com.boeingmerryho.business.paymentservice.presentation.code;
 
 import org.springframework.http.HttpStatus;
 

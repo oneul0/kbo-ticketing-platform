@@ -1,10 +1,10 @@
-package com.boeingmerryho.business.paymentservice.presentation;
+package com.boeingmerryho.business.paymentservice.presentation.controller;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.boeingmerryho.business.paymentservice.application.PaymentFeignService;
+import com.boeingmerryho.business.paymentservice.application.service.PaymentFeignService;
 import com.boeingmerryho.business.paymentservice.presentation.dto.PaymentPresentationMapper;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.PaymentCreationRequestDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentCreationResponseDto;

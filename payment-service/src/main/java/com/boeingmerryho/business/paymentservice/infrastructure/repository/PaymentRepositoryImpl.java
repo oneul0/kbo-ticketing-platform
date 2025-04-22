@@ -1,5 +1,6 @@
 package com.boeingmerryho.business.paymentservice.infrastructure.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -38,16 +39,6 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 	}
 
 	@Override
-	public Optional<PaymentTicket> findByPaymentTicketId(Long id) {
-		return paymentTicketJpaRepository.findById(id);
-	}
-
-	@Override
-	public Optional<PaymentMembership> findByPaymentMembershipId(Long id) {
-		return paymentMembershipJpaRepository.findById(id);
-	}
-
-	@Override
 	public PaymentTicket saveTicket(PaymentTicket paymentTicket) {
 		return paymentTicketJpaRepository.save(paymentTicket);
 	}
@@ -55,6 +46,16 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 	@Override
 	public PaymentMembership saveMembership(PaymentMembership paymentMembership) {
 		return paymentMembershipJpaRepository.save(paymentMembership);
+	}
+
+	@Override
+	public List<PaymentTicket> findPaymentTicketByPaymentId(Long id) {
+		return paymentTicketJpaRepository.findByPaymentId(id);
+	}
+
+	@Override
+	public Optional<PaymentMembership> findPaymentMembershipByPaymentId(Long id) {
+		return paymentMembershipJpaRepository.findByPaymentId(id);
 	}
 
 }
