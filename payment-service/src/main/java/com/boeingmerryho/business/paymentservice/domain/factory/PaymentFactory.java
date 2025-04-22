@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.domain;
+package com.boeingmerryho.business.paymentservice.domain.factory;
 
 import java.time.LocalDateTime;
 

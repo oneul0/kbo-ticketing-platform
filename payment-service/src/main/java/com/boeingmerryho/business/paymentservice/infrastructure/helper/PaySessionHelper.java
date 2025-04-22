@@ -1,12 +1,12 @@
-package com.boeingmerryho.business.paymentservice.infrastructure;
+package com.boeingmerryho.business.paymentservice.infrastructure.helper;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.boeingmerryho.business.paymentservice.application.PaySessionService;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.PaymentSession;
+import com.boeingmerryho.business.paymentservice.application.service.PaySessionService;
 
 import lombok.RequiredArgsConstructor;
 

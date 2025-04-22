@@ -4,9 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.boeingmerryho.business.paymentservice.application.PaymentAdminService;
-import com.boeingmerryho.business.paymentservice.application.PaymentStrategy;
-import com.boeingmerryho.business.paymentservice.application.PaymentStrategyFactory;
 import com.boeingmerryho.business.paymentservice.application.dto.PaymentApplicationMapper;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentApproveAdminRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentDetailRequestServiceDto;
@@ -19,15 +16,18 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
-import com.boeingmerryho.business.paymentservice.domain.PaymentReader;
+import com.boeingmerryho.business.paymentservice.application.factory.PaymentStrategyFactory;
+import com.boeingmerryho.business.paymentservice.application.service.PaymentAdminService;
+import com.boeingmerryho.business.paymentservice.application.strategy.PaymentStrategy;
 import com.boeingmerryho.business.paymentservice.domain.context.PaymentDetailSearchContext;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
+import com.boeingmerryho.business.paymentservice.domain.helper.PaymentReader;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
-import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
+import com.boeingmerryho.business.paymentservice.presentation.code.PaymentErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -108,10 +108,10 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 		Payment payment
 	) {
 		if (!payment.validateStatus(PaymentStatus.CONFIRMED)) {
-			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
+			throw new PaymentException(PaymentErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
 		}
 		if (!payment.validateType(PaymentType.TICKET)) {
-			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
+			throw new PaymentException(PaymentErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
 		}
 	}
 
@@ -119,10 +119,10 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
 		Payment payment
 	) {
 		if (payment.validateStatus(PaymentStatus.REFUNDED)) {
-			throw new PaymentException(ErrorCode.PAYMENT_ALREADY_REFUNDED);
+			throw new PaymentException(PaymentErrorCode.PAYMENT_ALREADY_REFUNDED);
 		}
 		if (!payment.validateStatus(PaymentStatus.REFUND_REQUESTED)) {
-			throw new PaymentException(ErrorCode.PAYMENT_REFUND_UNAVAILABLE);
+			throw new PaymentException(PaymentErrorCode.PAYMENT_REFUND_UNAVAILABLE);
 		}
 	}
 

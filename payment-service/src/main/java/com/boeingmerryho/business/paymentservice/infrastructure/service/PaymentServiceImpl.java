@@ -7,9 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.boeingmerryho.business.paymentservice.application.PaymentService;
-import com.boeingmerryho.business.paymentservice.application.PaymentStrategy;
-import com.boeingmerryho.business.paymentservice.application.PaymentStrategyFactory;
 import com.boeingmerryho.business.paymentservice.application.dto.PaymentApplicationMapper;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.PaymentSession;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentApproveRequestServiceDto;
@@ -23,17 +20,20 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentMembershipCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
-import com.boeingmerryho.business.paymentservice.domain.PaymentReader;
+import com.boeingmerryho.business.paymentservice.application.factory.PaymentStrategyFactory;
+import com.boeingmerryho.business.paymentservice.application.service.PaymentService;
+import com.boeingmerryho.business.paymentservice.application.strategy.PaymentStrategy;
 import com.boeingmerryho.business.paymentservice.domain.context.PaymentDetailSearchContext;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
+import com.boeingmerryho.business.paymentservice.domain.helper.PaymentReader;
 import com.boeingmerryho.business.paymentservice.domain.type.DiscountType;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentStatus;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
-import com.boeingmerryho.business.paymentservice.infrastructure.MembershipApiClient;
-import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
-import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
+import com.boeingmerryho.business.paymentservice.infrastructure.helper.MembershipApiClient;
+import com.boeingmerryho.business.paymentservice.infrastructure.helper.PaySessionHelper;
+import com.boeingmerryho.business.paymentservice.presentation.code.PaymentErrorCode;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
@@ -132,15 +132,15 @@ public class PaymentServiceImpl implements PaymentService {
 		PaymentApproveRequestServiceDto requestServiceDto
 	) {
 		return paySessionHelper.getPaymentInfo(String.valueOf(requestServiceDto.paymentId()))
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_INFO_NOT_FOUND));
+			.orElseThrow(() -> new PaymentException(PaymentErrorCode.PAYMENT_INFO_NOT_FOUND));
 	}
 
 	private void assertInExpiredTimePayment(Long paymentId) {
 		LocalDateTime expiredTime = paySessionHelper.getPaymentExpiredTime(paymentId.toString())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
+			.orElseThrow(() -> new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND));
 		if (!LocalDateTime.now().isBefore(expiredTime)) {
 			paySessionHelper.deletePaymentExpiredTime(paymentId.toString());
-			throw new PaymentException(ErrorCode.PAYMENT_EXPIRED);
+			throw new PaymentException(PaymentErrorCode.PAYMENT_EXPIRED);
 		}
 	}
 
@@ -151,16 +151,16 @@ public class PaymentServiceImpl implements PaymentService {
 		List<Ticket> tickets
 	) {
 		if (!payment.validateUser(userId)) {
-			throw new PaymentException(ErrorCode.UNAUTHORIZED);
+			throw new PaymentException(PaymentErrorCode.UNAUTHORIZED);
 		}
 		if (!payment.validateStatus(PaymentStatus.PENDING)) {
-			throw new PaymentException(ErrorCode.PAYMENT_INVALID);
+			throw new PaymentException(PaymentErrorCode.PAYMENT_INVALID);
 		}
 		int price = paySessionHelper.getPaymentPrice(payment.getId().toString())
-			.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_INVALID));
+			.orElseThrow(() -> new PaymentException(PaymentErrorCode.PAYMENT_INVALID));
 		int quantity = tickets == null ? 1 : tickets.size();
 		if (inputPrice != price * quantity) {
-			throw new PaymentException(ErrorCode.PAYMENT_INVALID);
+			throw new PaymentException(PaymentErrorCode.PAYMENT_INVALID);
 		}
 	}
 
@@ -169,13 +169,13 @@ public class PaymentServiceImpl implements PaymentService {
 		Long userId
 	) {
 		if (!payment.validateUser(userId)) {
-			throw new PaymentException(ErrorCode.UNAUTHORIZED);
+			throw new PaymentException(PaymentErrorCode.UNAUTHORIZED);
 		}
 		if (!payment.validateStatus(PaymentStatus.CONFIRMED)) {
-			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
+			throw new PaymentException(PaymentErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
 		}
 		if (!payment.validateType(PaymentType.TICKET)) {
-			throw new PaymentException(ErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
+			throw new PaymentException(PaymentErrorCode.PAYMENT_REFUND_REQUEST_FAIL);
 		}
 	}
 
@@ -184,7 +184,7 @@ public class PaymentServiceImpl implements PaymentService {
 		Payment payment
 	) {
 		Double discount = membershipApiClient.getDiscount(requestServiceDto.userId())
-			.orElseThrow(() -> new PaymentException(ErrorCode.MEMBERSHIP_SERVICE_UNAVAILABLE));
+			.orElseThrow(() -> new PaymentException(PaymentErrorCode.MEMBERSHIP_SERVICE_UNAVAILABLE));
 		payment.updateDiscountInfo(
 			discount,
 			DiscountType.from(requestServiceDto.discountType())

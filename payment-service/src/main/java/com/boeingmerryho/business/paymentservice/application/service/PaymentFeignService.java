@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.application;
+package com.boeingmerryho.business.paymentservice.application.service;
 
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.application;
+package com.boeingmerryho.business.paymentservice.application.factory;
 
 import java.util.List;
 import java.util.Map;
@@ -8,9 +8,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.boeingmerryho.business.paymentservice.application.strategy.PaymentStrategy;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
-import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
+import com.boeingmerryho.business.paymentservice.presentation.code.PaymentErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ public class PaymentStrategyFactory {
 	public PaymentStrategy getStrategy(PaymentMethod method) {
 		PaymentStrategy strategy = strategyMap.get(method);
 		if (strategy == null) {
-			throw new PaymentException(ErrorCode.PAYMENT_UNSUPPORTED);
+			throw new PaymentException(PaymentErrorCode.PAYMENT_UNSUPPORTED);
 		}
 		return strategy;
 	}

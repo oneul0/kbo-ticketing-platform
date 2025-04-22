@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.paymentservice.infrastructure;
+package com.boeingmerryho.business.paymentservice.infrastructure.helper;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;

@@ -3,14 +3,14 @@ package com.boeingmerryho.business.paymentservice.infrastructure.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.boeingmerryho.business.paymentservice.application.PaymentFeignService;
 import com.boeingmerryho.business.paymentservice.application.dto.PaymentApplicationMapper;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentCreationRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentCreationResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.application.service.PaymentFeignService;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
-import com.boeingmerryho.business.paymentservice.infrastructure.PaySessionHelper;
+import com.boeingmerryho.business.paymentservice.infrastructure.helper.PaySessionHelper;
 
 import lombok.RequiredArgsConstructor;
 

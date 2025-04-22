@@ -7,8 +7,8 @@ import java.util.Optional;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.boeingmerryho.business.paymentservice.application.PaySessionService;
 import com.boeingmerryho.business.paymentservice.application.dto.kakao.PaymentSession;
+import com.boeingmerryho.business.paymentservice.application.service.PaySessionService;
 
 import lombok.RequiredArgsConstructor;
 

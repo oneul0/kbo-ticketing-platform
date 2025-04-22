@@ -8,25 +8,25 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import com.boeingmerryho.business.paymentservice.application.PaymentStrategy;
 import com.boeingmerryho.business.paymentservice.application.dto.PaymentApplicationMapper;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentApproveAdminRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.request.PaymentReadyRequestServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentRefundResponseServiceDto;
-import com.boeingmerryho.business.paymentservice.domain.PaymentFactory;
+import com.boeingmerryho.business.paymentservice.application.strategy.PaymentStrategy;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentMembership;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentTicket;
+import com.boeingmerryho.business.paymentservice.domain.factory.PaymentFactory;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentDetailRepository;
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
-import com.boeingmerryho.business.paymentservice.infrastructure.KafkaProducerHelper;
-import com.boeingmerryho.business.paymentservice.infrastructure.exception.ErrorCode;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
+import com.boeingmerryho.business.paymentservice.infrastructure.helper.KafkaProducerHelper;
+import com.boeingmerryho.business.paymentservice.presentation.code.PaymentErrorCode;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
@@ -111,7 +111,7 @@ public class BankTransferStrategy implements PaymentStrategy {
 			});
 			PaymentDetail paymentDetail = paymentDetailRepository.findPaymentDetailByPaymentId(
 					requestServiceDto.paymentId())
-				.orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
+				.orElseThrow(() -> new PaymentException(PaymentErrorCode.PAYMENT_DETAIL_NOT_FOUND));
 
 			return paymentApplicationMapper.toPaymentApproveResponseServiceDto(paymentDetail);
 		} catch (Exception e) {
