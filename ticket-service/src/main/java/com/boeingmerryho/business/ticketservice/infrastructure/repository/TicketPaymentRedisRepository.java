@@ -12,7 +12,7 @@ import com.boeingmerryho.business.ticketservice.domain.repository.TicketPaymentR
 public class TicketPaymentRedisRepository implements TicketPaymentRepository {
 
 	private static final String TICKET_PAYMENT_KEY_PREFIX = "ticket:payment:";
-	
+
 	private final RedisTemplate<String, Object> redisTemplate;
 
 	public TicketPaymentRedisRepository(@Qualifier("ticketRedisTemplate") RedisTemplate<String, Object> redisTemplate) {

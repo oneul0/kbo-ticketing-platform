@@ -3,7 +3,7 @@ package com.boeingmerryho.business.ticketservice.infrastructure.adapter.kafka;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import com.boeingmerryho.business.ticketservice.application.user.TicketEventService;
+import com.boeingmerryho.business.ticketservice.application.user.TicketPaymentEventService;
 import com.boeingmerryho.business.ticketservice.infrastructure.adapter.kafka.dto.response.PaymentListenerDto;
 
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentEventConsumer {
 
-	private final TicketEventService ticketEventService;
+	private final TicketPaymentEventService ticketEventService;
 
 	@KafkaListener(
 		topics = "ticket-payment-process",
