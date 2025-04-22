@@ -26,4 +26,14 @@ public class MembershipKafkaProducer {
 		);
 	}
 
+	public void publishMembershipRefund(MembershipPaymentEvent successDto) {
+		kafkaTemplate.send("payment-membership-refund-process", successDto).thenAccept(
+			result -> {
+				RecordMetadata meta = result.getRecordMetadata();
+				log.info("[Kafka Producing Success] - topic: {}, offset: {}, partition: {}",
+					meta.topic(), meta.offset(), meta.partition());
+			}
+		);
+	}
+
 }

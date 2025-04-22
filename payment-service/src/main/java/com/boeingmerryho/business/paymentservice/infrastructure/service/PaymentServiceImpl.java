@@ -22,7 +22,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.factory.PaymentStrategyFactory;
 import com.boeingmerryho.business.paymentservice.application.service.PaymentService;
-import com.boeingmerryho.business.paymentservice.application.strategy.PaymentStrategy;
+import com.boeingmerryho.business.paymentservice.application.service.PaymentStrategy;
 import com.boeingmerryho.business.paymentservice.domain.context.PaymentDetailSearchContext;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;

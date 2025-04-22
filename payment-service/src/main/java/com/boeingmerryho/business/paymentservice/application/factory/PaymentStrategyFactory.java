@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.boeingmerryho.business.paymentservice.application.strategy.PaymentStrategy;
+import com.boeingmerryho.business.paymentservice.application.service.PaymentStrategy;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
 import com.boeingmerryho.business.paymentservice.presentation.code.PaymentErrorCode;

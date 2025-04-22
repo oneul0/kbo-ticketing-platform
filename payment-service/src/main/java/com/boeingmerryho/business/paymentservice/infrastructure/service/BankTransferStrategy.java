@@ -14,7 +14,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.request.Payment
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentApproveResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentRefundResponseServiceDto;
-import com.boeingmerryho.business.paymentservice.application.strategy.PaymentStrategy;
+import com.boeingmerryho.business.paymentservice.application.service.PaymentStrategy;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentMembership;
@@ -137,6 +137,28 @@ public class BankTransferStrategy implements PaymentStrategy {
 		PaymentDetail paymentDetail
 	) {
 		paymentDetail.getPayment().refundPayment();
+
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCommit() {
+				if (paymentDetail.getPayment().getType() == PaymentType.TICKET) {
+					List<String> tickets = paymentRepository.findPaymentTicketByPaymentId(
+						paymentDetail.getPayment().getId()
+					).stream().map(PaymentTicket::getTicketNo).toList();
+					kafkaProducerHelper.publishTicketRefundSuccess(tickets);
+				}
+				if (paymentDetail.getPayment().getType() == PaymentType.MEMBERSHIP) {
+					PaymentMembership paymentMembership = paymentRepository.findPaymentMembershipByPaymentId(
+						paymentDetail.getPayment().getId()
+					).orElseThrow(() -> new PaymentException(PaymentErrorCode.PAYMENT_MEMBERSHIP_NOT_FOUND));
+
+					kafkaProducerHelper.publishMembershipRefundSuccess(
+						paymentDetail.getPayment().getUserId(),
+						paymentMembership.getMembershipId()
+					);
+				}
+			}
+		});
 		return paymentApplicationMapper.toPaymentRefundResponseServiceDto(paymentDetail);
 	}
 

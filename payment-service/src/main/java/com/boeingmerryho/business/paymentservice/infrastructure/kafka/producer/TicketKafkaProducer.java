@@ -25,4 +25,14 @@ public class TicketKafkaProducer {
 			}
 		);
 	}
+
+	public void publishTicketRefund(TicketPaymentEvent successDto) {
+		kafkaTemplate.send("ticket-payment-refund-process", successDto).thenAccept(
+			result -> {
+				RecordMetadata meta = result.getRecordMetadata();
+				log.info("[Kafka Producing Success] - topic: {}, offset: {}, partition: {}",
+					meta.topic(), meta.offset(), meta.partition());
+			}
+		);
+	}
 }

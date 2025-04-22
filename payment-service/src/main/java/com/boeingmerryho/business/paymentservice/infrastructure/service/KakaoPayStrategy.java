@@ -24,7 +24,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.factory.KakaoPayRequestFactory;
 import com.boeingmerryho.business.paymentservice.application.factory.PaymentSessionFactory;
-import com.boeingmerryho.business.paymentservice.application.strategy.PaymentStrategy;
+import com.boeingmerryho.business.paymentservice.application.service.PaymentStrategy;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentMembership;
@@ -34,9 +34,11 @@ import com.boeingmerryho.business.paymentservice.domain.repository.PaymentDetail
 import com.boeingmerryho.business.paymentservice.domain.repository.PaymentRepository;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentMethod;
 import com.boeingmerryho.business.paymentservice.domain.type.PaymentType;
+import com.boeingmerryho.business.paymentservice.infrastructure.exception.PaymentException;
 import com.boeingmerryho.business.paymentservice.infrastructure.helper.KafkaProducerHelper;
 import com.boeingmerryho.business.paymentservice.infrastructure.helper.KakaoApiClient;
 import com.boeingmerryho.business.paymentservice.infrastructure.helper.PaySessionHelper;
+import com.boeingmerryho.business.paymentservice.presentation.code.PaymentErrorCode;
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
@@ -204,6 +206,29 @@ public class KakaoPayStrategy implements PaymentStrategy {
 			response.approvedAt()
 		);
 		paymentDetail.getPayment().refundPayment();
+
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCommit() {
+				if (paymentDetail.getPayment().getType() == PaymentType.TICKET) {
+					List<String> tickets = paymentRepository.findPaymentTicketByPaymentId(
+						paymentDetail.getPayment().getId()
+					).stream().map(PaymentTicket::getTicketNo).toList();
+					kafkaProducerHelper.publishTicketRefundSuccess(tickets);
+				}
+				if (paymentDetail.getPayment().getType() == PaymentType.MEMBERSHIP) {
+					PaymentMembership paymentMembership = paymentRepository.findPaymentMembershipByPaymentId(
+						paymentDetail.getPayment().getId()
+					).orElseThrow(() -> new PaymentException(PaymentErrorCode.PAYMENT_MEMBERSHIP_NOT_FOUND));
+
+					kafkaProducerHelper.publishMembershipRefundSuccess(
+						paymentDetail.getPayment().getUserId(),
+						paymentMembership.getMembershipId()
+					);
+				}
+			}
+		});
+
 		return paymentApplicationMapper.toPaymentRefundResponseServiceDto(paymentDetail);
 	}
 

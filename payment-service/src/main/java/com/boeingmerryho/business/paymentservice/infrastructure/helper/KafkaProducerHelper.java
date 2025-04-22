@@ -49,4 +49,19 @@ public class KafkaProducerHelper {
 			tickets
 		));
 	}
+
+	public void publishTicketRefundSuccess(List<String> tickets) {
+		ticketKafkaProducer.publishTicketRefund(new TicketPaymentEvent(
+			SUCCESS_PREFIX,
+			tickets
+		));
+	}
+
+	public void publishMembershipRefundSuccess(Long userId, Long membershipId) {
+		membershipKafkaProducer.publishMembershipPayment(new MembershipPaymentEvent(
+			SUCCESS_PREFIX,
+			userId,
+			membershipId
+		));
+	}
 }

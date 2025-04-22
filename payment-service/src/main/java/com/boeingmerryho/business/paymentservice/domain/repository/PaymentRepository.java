@@ -1,5 +1,6 @@
 package com.boeingmerryho.business.paymentservice.domain.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -20,4 +21,8 @@ public interface PaymentRepository {
 	PaymentTicket saveTicket(PaymentTicket paymentTicket);
 
 	PaymentMembership saveMembership(PaymentMembership paymentMembership);
+
+	List<PaymentTicket> findPaymentTicketByPaymentId(Long id);
+
+	Optional<PaymentMembership> findPaymentMembershipByPaymentId(Long id);
 }
