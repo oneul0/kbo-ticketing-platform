@@ -11,7 +11,11 @@ public enum SeatErrorCode implements BaseErrorCode {
 	FAILED_GET_LOCK(HttpStatus.BAD_REQUEST, "SEAT_004", "락 획득에 실패하였습니다."),
 	FAILED_PROCESS_SEAT(HttpStatus.BAD_REQUEST, "SEAT_005", "좌석 선점에 실패하였습니다."),
 	INVALID_ACCESS(HttpStatus.BAD_REQUEST, "SEAT_006", "잘못된 접근입니다."),
-	START_GAME_SEAT_NOT_PROCESS(HttpStatus.BAD_REQUEST, "SEAT_007", "게임이 시작된 후 선점이 불가능합니다.");
+	START_GAME_SEAT_NOT_PROCESS(HttpStatus.BAD_REQUEST, "SEAT_007", "게임이 시작된 후 선점이 불가능합니다."),
+	NOT_ACCESS_BEFORE_TODAY(HttpStatus.BAD_REQUEST, "SEAT_008", "오늘보다 이전 날짜를 선택할 수 없습니다."),
+	NOT_OVER_1_WEEK(HttpStatus.BAD_REQUEST, "SEAT_009", "요청 날짜를 1주일 이상 넘길 수 없습니다."),
+	NOT_OPEN_RESERVATION(HttpStatus.BAD_REQUEST, "SEAT_010", "아직 오픈되지 않은 예약입니다."),
+	ALREADY_PROCESS_SEAT(HttpStatus.BAD_REQUEST, "SEAT_011", "이미 선점된 좌석입니다.");
 
 	private final HttpStatus status;
 	private final String errorCode;
