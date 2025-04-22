@@ -46,6 +46,8 @@ dependencies {
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.projectlombok:lombok'
 
     // 데이터베이스 관련
     runtimeOnly 'com.h2database:h2'
