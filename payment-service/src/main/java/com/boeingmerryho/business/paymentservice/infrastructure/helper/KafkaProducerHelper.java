@@ -58,7 +58,7 @@ public class KafkaProducerHelper {
 	}
 
 	public void publishMembershipRefundSuccess(Long userId, Long membershipId) {
-		membershipKafkaProducer.publishMembershipPayment(new MembershipPaymentEvent(
+		membershipKafkaProducer.publishMembershipRefund(new MembershipPaymentEvent(
 			SUCCESS_PREFIX,
 			userId,
 			membershipId
