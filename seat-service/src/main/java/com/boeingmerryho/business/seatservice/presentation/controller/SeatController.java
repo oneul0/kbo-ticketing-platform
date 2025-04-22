@@ -39,12 +39,13 @@ public class SeatController {
 	)
 	@GetMapping("/blocks/{blockId}")
 	public SuccessResponse<CacheBlockResponseDto> getBlockSeats(
+		@RequestAttribute Long userId,
 		@PathVariable Integer blockId,
 		@RequestParam("date") LocalDate date
 	) {
 		CacheBlockServiceRequestDto serviceDto = seatPresentationMapper.toCacheBlockServiceRequestDto(blockId, date);
 
-		CacheBlockServiceResponseDto cacheBlockServiceResponseDto = seatService.getBlockSeats(serviceDto);
+		CacheBlockServiceResponseDto cacheBlockServiceResponseDto = seatService.getBlockSeats(userId, serviceDto);
 		CacheBlockResponseDto response = seatPresentationMapper.toCacheBlockResponseDto(cacheBlockServiceResponseDto);
 		return SuccessResponse.of(SeatSuccessCode.OK_BLOCK, response).getBody();
 	}
