@@ -18,51 +18,41 @@ import com.boeingmerryho.business.ticketservice.application.user.TicketPaymentSe
 import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketInfo;
 import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketPaymentResponseServiceDto;
 import com.boeingmerryho.business.ticketservice.domain.Ticket;
+import com.boeingmerryho.business.ticketservice.domain.repository.TicketPaymentRepository;
 import com.boeingmerryho.business.ticketservice.exception.ErrorCode;
 import com.boeingmerryho.business.ticketservice.exception.TicketException;
 import com.boeingmerryho.business.ticketservice.infrastructure.adapter.kafka.dto.response.SeatInfo;
 
+import feign.FeignException;
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class TicketPaymentServiceImpl implements TicketPaymentService {
 
 	private final PaymentClient paymentClient;
-	private final RedisTemplate<String, Object> redisTemplate;
-
-	public TicketPaymentServiceImpl(
-		PaymentClient paymentClient,
-		@Qualifier("ticketRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
-		this.paymentClient = paymentClient;
-		this.redisTemplate = redisTemplate;
-	}
+	private final TicketPaymentRepository ticketPaymentRepository;
 
 	@Override
 	@Transactional
 	public void createPaymentForTickets(List<Ticket> tickets, List<SeatInfo> seats) {
-		String userId = tickets.get(0).getUserId().toString();
+		Long userId = tickets.get(0).getUserId();
+		PaymentCreationRequestDto requestDto = createRequestDto(tickets, seats);
 
-		// TODO : 에러 처리
-		PaymentCreationResponseDto responseDto = paymentClient.createPayment(createRequestDto(tickets, seats));
-
-		String redisKey = "ticket:payment:" + userId;
-		Map<String, Object> paymentInfoMap = new HashMap<>();
-		paymentInfoMap.put("paymentId", responseDto.paymentId());
-
-		List<Map<String, Object>> ticketInfoList = new ArrayList<>();
-		for (Ticket ticket : tickets) {
-			Map<String, Object> ticketInfo = new HashMap<>();
-			ticketInfo.put("ticketNo", ticket.getTicketNo());
-			ticketInfo.put("price", ticket.getPrice());
-			ticketInfoList.add(ticketInfo);
+		PaymentCreationResponseDto responseDto;
+		try {
+			responseDto = paymentClient.createPayment(requestDto);
+		} catch (FeignException e) {
+			throw new TicketException(ErrorCode.TICKET_PAYMENT_FEIGN_ERROR);
 		}
-		paymentInfoMap.put("ticketInfos", ticketInfoList);
 
-		redisTemplate.opsForHash().putAll(redisKey, paymentInfoMap); // TODO : TTL 설정하기(무통장입금일 경우 고려하기)
+		Map<String, Object> paymentInfo = buildPaymentInfo(responseDto, tickets);
+		ticketPaymentRepository.savePaymentInfo(userId, paymentInfo);
 	}
 
 	@Override
 	public TicketPaymentResponseServiceDto getTicketPaymentInfo(Long userId) {
-		String redisKey = "ticket:payment:" + userId;
-		Map<Object, Object> paymentInfoMap = redisTemplate.opsForHash().entries(redisKey);
+		Map<Object, Object> paymentInfoMap = ticketPaymentRepository.getPaymentInfo(userId);
 
 		if (paymentInfoMap.isEmpty()) {
 			throw new TicketException(ErrorCode.TICKET_PAYMENT_NOT_FOUND);
@@ -79,8 +69,8 @@ public class TicketPaymentServiceImpl implements TicketPaymentService {
 		List<Map<String, Object>> ticketInfoList = (List<Map<String, Object>>)paymentInfoMap.get("ticketInfos");
 		List<TicketInfo> ticketInfos = ticketInfoList.stream()
 			.map(map -> new TicketInfo(
-				(String) map.get("ticketNo"),
-				(Integer) map.get("price")
+				(String)map.get("ticketNo"),
+				(Integer)map.get("price")
 			))
 			.toList();
 
@@ -94,6 +84,21 @@ public class TicketPaymentServiceImpl implements TicketPaymentService {
 			tickets.size(),
 			"TICKET",
 			LocalDateTime.parse(seats.get(0).expiredAt())
-			);
+		);
+	}
+
+	private Map<String, Object> buildPaymentInfo(PaymentCreationResponseDto responseDto, List<Ticket> tickets) {
+		Map<String, Object> paymentInfoMap = new HashMap<>();
+		paymentInfoMap.put("paymentId", responseDto.paymentId());
+
+		List<Map<String, Object>> ticketInfoList = tickets.stream().map(ticket -> {
+			Map<String, Object> map = new HashMap<>();
+			map.put("ticketNo", ticket.getTicketNo());
+			map.put("price", ticket.getPrice());
+			return map;
+		}).toList();
+
+		paymentInfoMap.put("ticketInfos", ticketInfoList);
+		return paymentInfoMap;
 	}
 }
