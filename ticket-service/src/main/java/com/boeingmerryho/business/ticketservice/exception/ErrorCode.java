@@ -12,6 +12,9 @@ public enum ErrorCode implements BaseErrorCode {
 	INVALID_TICKET_STATUS(HttpStatus.BAD_REQUEST, "T-002", "유효하지 않은 티켓 상태입니다."),
 	TICKET_PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "T-003", "결제 정보를 찾을 수 없습니다."),
 	TICKET_PAYMENT_INVALID_FIELD(HttpStatus.BAD_REQUEST, "T-004", "결제 정보가 유효하지 않습니다."),
+	TICKET_PAYMENT_FEIGN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "T-005", "결제 서비스 연결에 실패했습니다."),
+	INVALID_USER_ID(HttpStatus.BAD_REQUEST, "T-006", "유효하지 않은 사용자 ID 입니다."),
+	TICKET_LIST_EMPTY(HttpStatus.BAD_REQUEST, "T-007", "티켓 리스트가 비어있습니다."),
 	;
 
 	private final HttpStatus status;
