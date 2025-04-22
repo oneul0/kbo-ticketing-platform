@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
@@ -46,7 +47,7 @@ public class QueueServiceConcurrencyTest {
 	@Container
 	private static final GenericContainer<?> redis = new GenericContainer<>("redis:6.2")
 		.withExposedPorts(6379)
-		.withCommand("redis-server --port 6379 --requirepass boeingmerryho")
+		.withCommand("redis-server --port 6379 --requirepass testpass")
 		.withStartupTimeout(Duration.ofSeconds(60))
 		.withReuse(false)
 		.withNetworkAliases("redis-test");
@@ -56,9 +57,9 @@ public class QueueServiceConcurrencyTest {
 		registry.add("spring.data.redis.store-queue.host", redis::getHost);
 		registry.add("spring.data.redis.store-queue.port", () -> redis.getMappedPort(6379));
 		registry.add("spring.data.redis.store-queue.username", () -> "default");
-		registry.add("spring.data.redis.store-queue.password", () -> "boeingmerryho");
+		registry.add("spring.data.redis.store-queue.password", () -> "testpass");
 		registry.add("spring.redisson.address", () -> "redis://" + redis.getHost() + ":" + redis.getMappedPort(6379));
-		registry.add("spring.redisson.password", () -> "boeingmerryho");
+		registry.add("spring.redisson.password", () -> "testpass");
 	}
 
 	@Autowired
