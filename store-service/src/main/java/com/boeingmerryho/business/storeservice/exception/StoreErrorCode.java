@@ -12,6 +12,7 @@ public enum StoreErrorCode implements BaseErrorCode {
 	NO_UPDATE_FIELDS_PROVIDED(HttpStatus.BAD_REQUEST, "STORE_004", "필드 값이 유효하지 않습니다."),
 	ALREADY_CLOSED(HttpStatus.BAD_REQUEST, "STORE_005", "이미 마감되었습니다."),
 	ALREADY_OPENED(HttpStatus.BAD_REQUEST, "STORE_006", "이미 오픈되었습니다."),
+	INVALID_STATUS(HttpStatus.BAD_REQUEST, "STORE_007", "잘못된 상태값입니다."),
 	;
 
 	private final HttpStatus status;
