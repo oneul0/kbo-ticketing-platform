@@ -16,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
@@ -66,7 +65,7 @@ public class QueueServiceConcurrencyTest {
 	private QueueService service;
 
 	@MockitoBean
-	private QueueHelper helper;
+	private QueueRedisHelper redisHelper;
 
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplateForStoreQueueRedis;
@@ -106,15 +105,15 @@ public class QueueServiceConcurrencyTest {
 				redisTemplateForStoreQueueRedis.opsForValue().get("ticket:user:" + i));
 		}
 
-		reset(helper);
-		when(helper.validateStoreIsActive(1L)).thenReturn(true);
+		reset(redisHelper);
+		when(redisHelper.validateStoreIsActive(1L)).thenReturn(true);
 		for (int i = 1; i <= 10; i++) {
-			when(helper.validateTicket(any(), eq((long)i))).thenReturn((long)i);
+			when(redisHelper.validateTicket(any(), eq((long)i))).thenReturn((long)i);
 		}
-		doNothing().when(helper).joinUserInQueue(eq(1L), anyLong(), anyLong());
+		doNothing().when(redisHelper).joinUserInQueue(eq(1L), anyLong(), anyLong());
 		for (int i = 0; i < 10; i++) {
 			final Long userId = (long)i + 1;
-			when(helper.getUserQueuePosition(1L, userId)).thenReturn(i + 1);
+			when(redisHelper.getUserQueuePosition(1L, userId)).thenReturn(i + 1);
 		}
 
 		reset(queueApplicationMapper);
@@ -199,9 +198,9 @@ public class QueueServiceConcurrencyTest {
 			redisTemplateForStoreQueueRedis.opsForValue().increment("waitlist:1:seq");
 			log.info("Processing joinUserInQueue for userId: {}", invokedUserId);
 			return null;
-		}).when(helper).joinUserInQueue(eq(1L), eq(1L), eq(1L));
+		}).when(redisHelper).joinUserInQueue(eq(1L), eq(1L), eq(1L));
 
-		when(helper.getUserQueuePosition(1L, 1L)).thenReturn(1);
+		when(redisHelper.getUserQueuePosition(1L, 1L)).thenReturn(1);
 
 		when(queueApplicationMapper.toQueueJoinResponseDto(1L, 1L, 1))
 			.thenReturn(new QueueJoinResponseDto(1L, 1L, 1));
