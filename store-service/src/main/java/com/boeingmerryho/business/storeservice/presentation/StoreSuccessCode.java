@@ -14,6 +14,7 @@ public enum StoreSuccessCode implements SuccessCode {
 	QUEUE_ENABLED("줄서기 가능 상태로 전환되었습니다.", HttpStatus.OK),
 	QUEUE_DISABLED("줄서기 불가능 상태로 전환되었습니다.", HttpStatus.OK),
 	DELETE_STORE("매장이 삭제되었습니다.", HttpStatus.OK),
+	CHANGE_STORE_STATUS("매장 상태가 변경되었습니다.", HttpStatus.OK),
 	;
 
 	private final String message;

@@ -12,6 +12,8 @@ import com.boeingmerryho.business.storeservice.application.dto.response.StoreCre
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreDetailAdminResponseServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreSearchAdminResponseServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreUpdateResponseServiceDto;
+import com.boeingmerryho.business.storeservice.application.service.command.StoreCommandFactory;
+import com.boeingmerryho.business.storeservice.application.service.command.StoreCommandType;
 import com.boeingmerryho.business.storeservice.domain.entity.Store;
 import com.boeingmerryho.business.storeservice.infrastructure.helper.StoreAdminHelper;
 import com.boeingmerryho.business.storeservice.infrastructure.helper.StoreQueueAdminHelper;
@@ -26,6 +28,7 @@ public class StoreAdminService {
 	private final StoreValidator validator;
 	private final StoreApplicationMapper mapper;
 	private final StoreAdminHelper storeAdminHelper;
+	private final StoreCommandFactory storeCommandFactory;
 	private final StoreQueueAdminHelper storeQueueAdminHelper;
 
 	@Transactional
@@ -60,15 +63,10 @@ public class StoreAdminService {
 	}
 
 	@Transactional
-	public StoreUpdateResponseServiceDto openStore(Long id) {
-		Store opened = storeAdminHelper.updateStoreOpen(id);
-		return mapper.toStoreUpdateResponseServiceDto(opened);
-	}
-
-	@Transactional
-	public StoreUpdateResponseServiceDto closeStore(Long id) {
-		Store closed = storeAdminHelper.updateStoreClose(id);
-		return mapper.toStoreUpdateResponseServiceDto(closed);
+	public StoreUpdateResponseServiceDto changeStoreStatus(Long id, StoreCommandType type) {
+		storeCommandFactory.getCommand(type).execute(id);
+		Store store = storeAdminHelper.getAnyStoreById(id);
+		return mapper.toStoreUpdateResponseServiceDto(store);
 	}
 
 	public void enableQueue(Long id) {
