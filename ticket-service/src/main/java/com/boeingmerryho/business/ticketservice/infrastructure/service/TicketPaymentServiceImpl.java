@@ -1,19 +1,17 @@
 package com.boeingmerryho.business.ticketservice.infrastructure.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.boeingmerryho.business.ticketservice.application.feign.PaymentClient;
-import com.boeingmerryho.business.ticketservice.application.feign.dto.request.PaymentCreationRequestDto;
-import com.boeingmerryho.business.ticketservice.application.feign.dto.response.PaymentCreationResponseDto;
+import com.boeingmerryho.business.ticketservice.infrastructure.service.feign.PaymentClient;
+import com.boeingmerryho.business.ticketservice.infrastructure.service.feign.dto.request.PaymentCreationRequestDto;
+import com.boeingmerryho.business.ticketservice.infrastructure.service.feign.dto.response.PaymentCreationResponseDto;
 import com.boeingmerryho.business.ticketservice.application.user.TicketPaymentService;
 import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketInfo;
 import com.boeingmerryho.business.ticketservice.application.user.dto.response.TicketPaymentResponseServiceDto;
@@ -23,9 +21,11 @@ import com.boeingmerryho.business.ticketservice.exception.ErrorCode;
 import com.boeingmerryho.business.ticketservice.exception.TicketException;
 import com.boeingmerryho.business.ticketservice.infrastructure.adapter.kafka.dto.response.SeatInfo;
 
-import feign.FeignException;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TicketPaymentServiceImpl implements TicketPaymentService {
@@ -34,17 +34,13 @@ public class TicketPaymentServiceImpl implements TicketPaymentService {
 	private final TicketPaymentRepository ticketPaymentRepository;
 
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Retry(name = "paymentRetry", fallbackMethod = "fallbackCreatePayment")
 	public void createPaymentForTickets(List<Ticket> tickets, List<SeatInfo> seats) {
 		Long userId = tickets.get(0).getUserId();
 		PaymentCreationRequestDto requestDto = createRequestDto(tickets, seats);
 
-		PaymentCreationResponseDto responseDto;
-		try {
-			responseDto = paymentClient.createPayment(requestDto);
-		} catch (FeignException e) {
-			throw new TicketException(ErrorCode.TICKET_PAYMENT_FEIGN_ERROR);
-		}
+		PaymentCreationResponseDto responseDto = paymentClient.createPayment(requestDto);
 
 		Map<String, Object> paymentInfo = buildPaymentInfo(responseDto, tickets);
 		ticketPaymentRepository.savePaymentInfo(userId, paymentInfo);
@@ -100,5 +96,10 @@ public class TicketPaymentServiceImpl implements TicketPaymentService {
 
 		paymentInfoMap.put("ticketInfos", ticketInfoList);
 		return paymentInfoMap;
+	}
+
+	public void fallbackCreatePayment(List<Ticket> tickets, List<SeatInfo> seats, Throwable t) {
+		log.error("결제 서비스 호출 실패 - fallback 수행");
+		ticketPaymentRepository.saveFailedPayment(tickets);
 	}
 }

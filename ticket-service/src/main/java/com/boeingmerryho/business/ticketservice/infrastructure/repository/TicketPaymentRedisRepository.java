@@ -1,12 +1,14 @@
 package com.boeingmerryho.business.ticketservice.infrastructure.repository;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.boeingmerryho.business.ticketservice.domain.Ticket;
 import com.boeingmerryho.business.ticketservice.domain.repository.TicketPaymentRepository;
 
 @Repository
@@ -14,6 +16,7 @@ public class TicketPaymentRedisRepository implements TicketPaymentRepository {
 
 	private static final int EXPIRE_MINUTES = 8;
 	private static final String TICKET_PAYMENT_KEY_PREFIX = "ticket:payment:";
+	private static final String TICKET_PAYMENT_DLQ_KEY = "ticket:dlq:payment";
 
 	private final RedisTemplate<String, Object> redisTemplate;
 
@@ -38,5 +41,12 @@ public class TicketPaymentRedisRepository implements TicketPaymentRepository {
 	public void deletePaymentInfo(Long userId) {
 		String redisKey = TICKET_PAYMENT_KEY_PREFIX + userId;
 		redisTemplate.delete(redisKey);
+	}
+
+	@Override
+	public void saveFailedPayment(List<Ticket> tickets) {
+		for (Ticket ticket : tickets) {
+			redisTemplate.opsForHash().put(TICKET_PAYMENT_DLQ_KEY, String.valueOf(ticket.getId()), ticket.getTicketNo());
+		}
 	}
 }

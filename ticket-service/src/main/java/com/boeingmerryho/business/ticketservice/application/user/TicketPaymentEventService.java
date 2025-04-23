@@ -4,14 +4,14 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.boeingmerryho.business.ticketservice.application.feign.QueueClient;
-import com.boeingmerryho.business.ticketservice.application.feign.dto.request.IssuedTicketDto;
+import com.boeingmerryho.business.ticketservice.infrastructure.service.feign.QueueClient;
+import com.boeingmerryho.business.ticketservice.infrastructure.service.feign.dto.request.IssuedTicketDto;
 import com.boeingmerryho.business.ticketservice.domain.TicketPaymentResult;
-import com.boeingmerryho.business.ticketservice.domain.TicketStatus;
 import com.boeingmerryho.business.ticketservice.domain.repository.TicketPaymentRepository;
 import com.boeingmerryho.business.ticketservice.domain.repository.TicketRepository;
 import com.boeingmerryho.business.ticketservice.domain.service.TicketStatusUpdateService;
@@ -27,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TicketPaymentEventService {
 
-	private static final String SUCCESS_EVENT = "success";
 	private static final String SEAT_SUCCESS_TOPIC = "seat-succeed";
 	private static final String SEAT_FAIL_TOPIC = "seat-failed";
 
@@ -39,24 +38,18 @@ public class TicketPaymentEventService {
 
 	@Transactional
 	public void handlePaymentEvent(PaymentListenerDto requestDto) {
-		if (requestDto.tickets().isEmpty()) {
-			throw new TicketException(ErrorCode.TICKET_LIST_EMPTY);
-		}
-
-		boolean isSuccess = requestDto.event().equals(SUCCESS_EVENT);
-		TicketStatus status = isSuccess ? TicketStatus.CONFIRMED : TicketStatus.CANCELLED;
-		String topic = isSuccess ? SEAT_SUCCESS_TOPIC : SEAT_FAIL_TOPIC;
+		validateTicketIsNotEmpty(requestDto.tickets());
 
 		TicketPaymentResult ticketPaymentResult = ticketStatusUpdateService
-			.updateStatusByPaymentResult(status, requestDto.tickets());
+			.updateStatusByPaymentResult(requestDto.getPaymentStatus(), requestDto.tickets());
 
 		// Redis 에 저장된 결제정보 삭제
 		ticketPaymentRepository.deletePaymentInfo(ticketPaymentResult.userId());
 
-		String matchDate = createMatchDate(requestDto.tickets().get(0));
-		seatKafkaProducer.send(topic, new SeatListDto(matchDate, ticketPaymentResult.seatIds()));
+		seatKafkaProducer.send(requestDto.isSuccess() ? SEAT_SUCCESS_TOPIC : SEAT_FAIL_TOPIC,
+			new SeatListDto(requestDto.getMatchDate(), ticketPaymentResult.seatIds()));
 
-		if (isSuccess) {
+		if (requestDto.isSuccess()) {
 			queueClient.sendIssuedTicket(new IssuedTicketDto(
 				getTicketIdByTicketNo(requestDto.tickets().get(0)),
 				ticketPaymentResult.userId(),
@@ -65,15 +58,16 @@ public class TicketPaymentEventService {
 		}
 	}
 
+	private static void validateTicketIsNotEmpty(List<String> tickets) {
+		if (tickets.isEmpty()) {
+			throw new TicketException(ErrorCode.TICKET_LIST_EMPTY);
+		}
+	}
+
 	private Long getTicketIdByTicketNo(String ticketNo) {
 		return ticketRepository.findByTicketNo(ticketNo)
 			.orElseThrow(() -> new TicketException(ErrorCode.TICKET_NOT_FOUND))
 			.getId();
-	}
-
-	private String createMatchDate(String ticketNo) {
-		return LocalDate.parse(ticketNo.substring(0, 8), DateTimeFormatter.ofPattern("yyyyMMdd"))
-			.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 	}
 
 	private Date toDateFormat(String ticketNo) {

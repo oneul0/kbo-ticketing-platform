@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.boeingmerryho.business.ticketservice.domain.PaymentStatus;
 import com.boeingmerryho.business.ticketservice.domain.Ticket;
 import com.boeingmerryho.business.ticketservice.domain.TicketPaymentResult;
 import com.boeingmerryho.business.ticketservice.domain.TicketStatus;
@@ -20,15 +21,17 @@ public class TicketStatusUpdateService {
 
 	private final TicketRepository ticketRepository;
 
-	public TicketPaymentResult updateStatusByPaymentResult(TicketStatus status, List<String> tickets) {
+	public TicketPaymentResult updateStatusByPaymentResult(PaymentStatus paymentStatus, List<String> tickets) {
 		Long userId = null;
 		List<String> seatIds = new ArrayList<>();
+
+		TicketStatus ticketStatus = paymentStatus == PaymentStatus.SUCCESS ? TicketStatus.CONFIRMED : TicketStatus.CANCELLED;
 
 		for (String ticketNo : tickets) {
 			Ticket ticket = ticketRepository.findByTicketNo(ticketNo)
 				.orElseThrow(() -> new TicketException(ErrorCode.TICKET_NOT_FOUND));
 
-			ticket.updateStatus(status.name());
+			ticket.updateStatus(ticketStatus.name());
 
 			// userId가 처음 설정되는 경우
 			if (userId == null) {
