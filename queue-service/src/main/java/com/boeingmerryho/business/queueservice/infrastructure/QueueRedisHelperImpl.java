@@ -9,20 +9,13 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
-import com.boeingmerryho.business.queueservice.application.QueueHelper;
-import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminSearchHistoryServiceDto;
-import com.boeingmerryho.business.queueservice.domain.entity.Queue;
-import com.boeingmerryho.business.queueservice.domain.entity.QueueSearchCriteria;
+import com.boeingmerryho.business.queueservice.application.QueueRedisHelper;
 import com.boeingmerryho.business.queueservice.domain.model.QueueUserInfo;
-import com.boeingmerryho.business.queueservice.domain.repository.CustomQueueRepository;
-import com.boeingmerryho.business.queueservice.domain.repository.QueueRepository;
 import com.boeingmerryho.business.queueservice.exception.ErrorCode;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
@@ -30,9 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class QueueHelperImpl implements QueueHelper {
+public class QueueRedisHelperImpl implements QueueRedisHelper {
 
-	//todo: value로 주입받기
 	private static final String TICKET_INFO_PREFIX = "queue:ticket:";
 	private static final String STORE_AVAILABILITY_CHECK_PREFIX = "queue:availability:";
 	private static final String WAITLIST_INFO_PREFIX = "queue:waitlist:store:";
@@ -42,17 +34,10 @@ public class QueueHelperImpl implements QueueHelper {
 
 	private final RedisTemplate<String, Object> redisTemplateForStoreQueueRedis;
 
-	private final QueueRepository queueRepository;
-	private final CustomQueueRepository customQueueRepository;
-
-	public QueueHelperImpl(
-		@Qualifier("redisTemplateForStoreQueueRedis") RedisTemplate<String, Object> redisTemplateForStoreQueueRedis,
-		QueueRepository queueRepository,
-		CustomQueueRepository customQueueRepository
+	public QueueRedisHelperImpl(
+		@Qualifier("redisTemplateForStoreQueueRedis") RedisTemplate<String, Object> redisTemplateForStoreQueueRedis
 	) {
 		this.redisTemplateForStoreQueueRedis = redisTemplateForStoreQueueRedis;
-		this.queueRepository = queueRepository;
-		this.customQueueRepository = customQueueRepository;
 	}
 
 	@Override
@@ -154,11 +139,6 @@ public class QueueHelperImpl implements QueueHelper {
 		return removedCount != null && removedCount > 0;
 	}
 
-	@Override
-	public Queue saveQueueInfo(Queue queue) {
-		return queueRepository.save(queue);
-	}
-
 	private void setExpireIfAbsent(String key, Duration ttl) {
 		Long expire = redisTemplateForStoreQueueRedis.getExpire(key);
 		if (expire == null || expire == -1) {
@@ -213,34 +193,4 @@ public class QueueHelperImpl implements QueueHelper {
 		return redisTemplateForStoreQueueRedis.opsForZSet().size(redisKey);
 	}
 
-	@Override
-	public QueueSearchCriteria getQueueSearchCriteria(QueueAdminSearchHistoryServiceDto requestDto) {
-		QueueSearchCriteria criteria = QueueSearchCriteria.builder()
-			.storeId(requestDto.storeId())
-			.userId(requestDto.userId())
-			.status(requestDto.status())
-			.cancelReason(requestDto.cancelReason())
-			.startDate(requestDto.startDate())
-			.endDate(requestDto.endDate())
-			.build();
-
-		return criteria;
-	}
-
-	@Override
-	public Page<Queue> searchHistoryByDynamicQuery(QueueSearchCriteria criteria, Pageable pageable) {
-		return customQueueRepository.findDynamicQuery(criteria, pageable);
-	}
-
-	@Override
-	public Queue findQueueHistoryById(Long id) {
-		return queueRepository.findAllById(id)
-			.orElseThrow(() -> new GlobalException(ErrorCode.QUEUE_HISTORY_NOT_FOUND));
-	}
-
-	@Override
-	public void deleteQueueHistoryById(Long id, Long userId) {
-		Queue queue = findQueueHistoryById(id);
-		queue.softDelete(userId);
-	}
 }
