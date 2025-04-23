@@ -14,6 +14,7 @@ import com.boeingmerryho.business.paymentservice.application.dto.response.Paymen
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentReadyResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentRefundResponseServiceDto;
 import com.boeingmerryho.business.paymentservice.application.dto.response.PaymentTicketCancelResponseServiceDto;
+import com.boeingmerryho.business.paymentservice.domain.entity.AccountInfo;
 import com.boeingmerryho.business.paymentservice.domain.entity.Payment;
 import com.boeingmerryho.business.paymentservice.domain.entity.PaymentDetail;
 
@@ -36,13 +37,14 @@ public interface PaymentApplicationMapper {
 
 	PaymentMembershipCancelResponseServiceDto toPaymentMembershipCancelResponseServiceDto(Long id);
 
+	@Mapping(target = "accountNumber", source = "accountInfo.accountNumber")
+	@Mapping(target = "accountBank", source = "accountInfo.accountBank")
+	@Mapping(target = "dueDate", source = "accountInfo.dueDate")
+	@Mapping(target = "accountHolder", source = "accountInfo.accountHolder")
 	PaymentReadyResponseServiceDto toPaymentReadyResponseServiceDto(
 		Long paymentId,
 		Integer price,
-		String accountNumber,
-		String accountBank,
-		LocalDateTime dueDate,
-		String accountHolder,
+		AccountInfo accountInfo,
 		String nextRedirectPcUrl,
 		LocalDateTime createdAt
 	);

@@ -21,6 +21,9 @@ public class RedisConfig {
 	@Value("${spring.data.redis.host}")
 	private String host;
 
+	@Value("${spring.data.redis.username}")
+	private String username;
+
 	@Value("${spring.data.redis.port}")
 	private int port;
 
@@ -39,7 +42,7 @@ public class RedisConfig {
 	@Bean
 	public RedisConnectionFactory redisConnectionFactory() {
 		RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
-		config.setUsername("default");
+		config.setUsername(username);
 		config.setPassword(password);
 		return new LettuceConnectionFactory(config);
 	}
@@ -53,7 +56,7 @@ public class RedisConfig {
 	@Bean
 	public RedisConnectionFactory redisConnectionGlobalFactory() {
 		RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(globalHost, globalPort);
-		config.setUsername("default");
+		config.setUsername(username);
 		config.setPassword(globalPassword);
 		return new LettuceConnectionFactory(config);
 	}
