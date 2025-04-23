@@ -18,6 +18,7 @@ import com.boeingmerryho.business.storeservice.application.dto.response.StoreDet
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreSearchAdminResponseServiceDto;
 import com.boeingmerryho.business.storeservice.application.dto.response.StoreUpdateResponseServiceDto;
 import com.boeingmerryho.business.storeservice.application.service.StoreAdminService;
+import com.boeingmerryho.business.storeservice.application.service.command.StoreCommandType;
 import com.boeingmerryho.business.storeservice.presentation.StoreSuccessCode;
 import com.boeingmerryho.business.storeservice.presentation.dto.mapper.StorePresentationMapper;
 import com.boeingmerryho.business.storeservice.presentation.dto.request.StoreCreateRequestDto;
@@ -97,24 +98,16 @@ public class StoreAdminController {
 		return SuccessResponse.of(StoreSuccessCode.UPDATED_STORE, responseDto);
 	}
 
-	@PutMapping("/{id}/open")
+	@PutMapping("/{id}/status")
 	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
-	public ResponseEntity<SuccessResponse<StoreUpdateResponseDto>> openStore(
-		@PathVariable Long id
+	public ResponseEntity<SuccessResponse<StoreUpdateResponseDto>> changeStoreStatus(
+		@PathVariable Long id,
+		@RequestParam(value = "status") String type
 	) {
-		StoreUpdateResponseServiceDto responseDtoService = storeAdminService.openStore(id);
+		StoreCommandType commandType = StoreCommandType.from(type);
+		StoreUpdateResponseServiceDto responseDtoService = storeAdminService.changeStoreStatus(id, commandType);
 		StoreUpdateResponseDto responseDto = mapper.toStoreUpdateResponseDto(responseDtoService);
-		return SuccessResponse.of(StoreSuccessCode.OPEN_STORE, responseDto);
-	}
-
-	@PutMapping("/{id}/close")
-	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
-	public ResponseEntity<SuccessResponse<StoreUpdateResponseDto>> closeStore(
-		@PathVariable Long id
-	) {
-		StoreUpdateResponseServiceDto responseDtoService = storeAdminService.closeStore(id);
-		StoreUpdateResponseDto responseDto = mapper.toStoreUpdateResponseDto(responseDtoService);
-		return SuccessResponse.of(StoreSuccessCode.CLOSE_STORE, responseDto);
+		return SuccessResponse.of(StoreSuccessCode.CHANGE_STORE_STATUS, responseDto);
 	}
 
 	@PutMapping("/{id}/queue/enable")
