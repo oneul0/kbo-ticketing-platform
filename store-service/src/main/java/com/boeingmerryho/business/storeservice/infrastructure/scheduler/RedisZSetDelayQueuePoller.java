@@ -41,3 +41,4 @@ public class RedisZSetDelayQueuePoller {
 		}
 	}
 }
+// TODO 특정 날짜의 특정 가게 정보 prefix 를 키로 둔 time 값을 저장
