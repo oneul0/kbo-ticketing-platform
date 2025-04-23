@@ -6,7 +6,8 @@ import java.util.Objects;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Service;
 
-import com.boeingmerryho.business.queueservice.application.QueueHelper;
+import com.boeingmerryho.business.queueservice.application.QueuePersistenceHelper;
+import com.boeingmerryho.business.queueservice.application.QueueRedisHelper;
 import com.boeingmerryho.business.queueservice.application.dto.mapper.QueueApplicationMapper;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueCancelServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueJoinServiceDto;
@@ -29,7 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 public class QueueService {
 
 	private final QueueApplicationMapper queueApplicationMapper;
-	private final QueueHelper helper;
+	private final QueueRedisHelper redisHelper;
+	private final QueuePersistenceHelper persistenceHelper;
 
 	@Description("대기열에 등록하는 메서드")
 	@DistributedLock(key = "#dto.storeId")
@@ -39,19 +41,19 @@ public class QueueService {
 		Long ticketId = dto.ticketId();
 		Date matchDate = new Date();
 
-		if (!helper.validateStoreIsActive(storeId)) {
+		if (!redisHelper.validateStoreIsActive(storeId)) {
 			throw new GlobalException(ErrorCode.STORE_IS_NOT_ACTIVATED);
 		}
 
-		Long ticketUserId = helper.validateTicket(matchDate, ticketId);
+		Long ticketUserId = redisHelper.validateTicket(matchDate, ticketId);
 		log.info("ticketUserId : {}", ticketUserId);
 		if (!Objects.equals(userId, ticketUserId)) {
 			throw new GlobalException(ErrorCode.USER_IS_NOT_MATCHED);
 		}
 
-		helper.joinUserInQueue(storeId, userId, ticketId);
+		redisHelper.joinUserInQueue(storeId, userId, ticketId);
 
-		Integer rank = helper.getUserQueuePosition(storeId, userId);
+		Integer rank = redisHelper.getUserQueuePosition(storeId, userId);
 
 		return queueApplicationMapper.toQueueJoinResponseDto(storeId, userId, rank);
 	}
@@ -61,7 +63,7 @@ public class QueueService {
 		Long storeId = serviceDto.storeId();
 		Long userId = serviceDto.userId();
 
-		Integer rank = helper.getUserQueuePosition(storeId, userId);
+		Integer rank = redisHelper.getUserQueuePosition(storeId, userId);
 
 		if (rank == null) {
 			throw new GlobalException(ErrorCode.WAITLIST_NOT_EXIST);
@@ -75,9 +77,9 @@ public class QueueService {
 		Long storeId = serviceDto.storeId();
 		Long userId = serviceDto.userId();
 
-		Integer sequence = helper.getUserSequencePosition(storeId, userId);
+		Integer sequence = redisHelper.getUserSequencePosition(storeId, userId);
 
-		boolean removed = helper.removeUserFromQueue(storeId, userId);
+		boolean removed = redisHelper.removeUserFromQueue(storeId, userId);
 
 		if (!removed) {
 			throw new GlobalException(ErrorCode.CAN_NOT_REMOVE_QUEUE);
@@ -85,7 +87,7 @@ public class QueueService {
 
 		Queue canceledQueue = Queue.cancelQueue(storeId, userId, sequence, CancelReason.USER_CANCEL);
 
-		Queue cancelledUser = helper.saveQueueInfo(canceledQueue);
+		Queue cancelledUser = persistenceHelper.saveQueueInfo(canceledQueue);
 
 		return queueApplicationMapper.toQueueCancelResponseDto(cancelledUser.getStoreId(), cancelledUser.getUserId());
 	}

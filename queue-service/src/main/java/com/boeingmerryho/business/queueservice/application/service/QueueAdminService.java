@@ -12,7 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
-import com.boeingmerryho.business.queueservice.application.QueueHelper;
+import com.boeingmerryho.business.queueservice.application.QueuePersistenceHelper;
+import com.boeingmerryho.business.queueservice.application.QueueRedisHelper;
 import com.boeingmerryho.business.queueservice.application.dto.mapper.QueueApplicationMapper;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminCallUserServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteHistoryServiceDto;
@@ -40,16 +41,17 @@ import lombok.extern.slf4j.Slf4j;
 public class QueueAdminService {
 
 	private final QueueApplicationMapper queueApplicationMapper;
-	private final QueueHelper helper;
+	private final QueueRedisHelper redisHelper;
+	private final QueuePersistenceHelper persistenceHelper;
 
 	@Description("대기열에서 사용자 강제 삭제 메서드")
 	public QueueAdminDeleteUserResponseDto deleteUserFromQueue(QueueAdminDeleteUserServiceDto dto) {
 		Long storeId = dto.storeId();
 		Long userId = dto.userId();
 
-		Integer sequence = helper.getUserSequencePosition(storeId, userId);
+		Integer sequence = redisHelper.getUserSequencePosition(storeId, userId);
 
-		boolean removed = helper.removeUserFromQueue(storeId, userId);
+		boolean removed = redisHelper.removeUserFromQueue(storeId, userId);
 
 		if (!removed) {
 			throw new GlobalException(ErrorCode.CAN_NOT_REMOVE_QUEUE);
@@ -57,7 +59,7 @@ public class QueueAdminService {
 
 		Queue canceledQueue = Queue.cancelQueue(storeId, userId, sequence, CancelReason.ILLEGAL_USED); //todo: 삭제 이유 세분화
 
-		Queue cancelledUser = helper.saveQueueInfo(canceledQueue);
+		Queue cancelledUser = persistenceHelper.saveQueueInfo(canceledQueue);
 
 		return queueApplicationMapper.toQueueAdminDeleteUserResponseDto(cancelledUser.getStoreId(),
 			cancelledUser.getUserId());
@@ -66,19 +68,19 @@ public class QueueAdminService {
 	@Description("대기열의 다음 사용자 호출 메서드")
 	public QueueAdminCallUserResponseDto callNextUserFromQueue(QueueAdminCallUserServiceDto dto) {
 		Long storeId = dto.storeId();
-		QueueUserInfo userInfo = helper.getNextUserInQueue(storeId);
+		QueueUserInfo userInfo = redisHelper.getNextUserInQueue(storeId);
 
 		if (userInfo == null) {
 			throw new GlobalException(ErrorCode.WAITLIST_EMPTY);
 		}
 
-		Integer sequence = helper.getUserSequencePosition(storeId, userInfo.userId());
+		Integer sequence = redisHelper.getUserSequencePosition(storeId, userInfo.userId());
 
-		helper.removeUserFromQueue(storeId, userInfo.userId());
+		redisHelper.removeUserFromQueue(storeId, userInfo.userId());
 
 		Queue canceledQueue = Queue.confirmQueue(storeId, userInfo.userId(), sequence);
 
-		Queue cancelledUser = helper.saveQueueInfo(canceledQueue);
+		Queue cancelledUser = persistenceHelper.saveQueueInfo(canceledQueue);
 
 		return queueApplicationMapper.toQueueAdminCallUserResponseDto(
 			storeId,
@@ -93,9 +95,9 @@ public class QueueAdminService {
 		int page = dto.pageable().getPageNumber();
 		int size = dto.pageable().getPageSize();
 
-		String redisKey = helper.getWaitlistInfoPrefix(storeId);
+		String redisKey = redisHelper.getWaitlistInfoPrefix(storeId);
 
-		Set<ZSetOperations.TypedTuple<String>> queueEntries = helper.getUserQueueRange(storeId, page, size);
+		Set<ZSetOperations.TypedTuple<String>> queueEntries = redisHelper.getUserQueueRange(storeId, page, size);
 
 		if (queueEntries == null || queueEntries.isEmpty()) {
 			return Page.empty();
@@ -109,16 +111,16 @@ public class QueueAdminService {
 			})
 			.collect(Collectors.toList());
 
-		Long totalSize = helper.getTotalQueueSize(redisKey);
+		Long totalSize = redisHelper.getTotalQueueSize(redisKey);
 
 		return new PageImpl<>(result, PageRequest.of(page, size), totalSize);
 	}
 
 	@Description("가게의 대기열 정보 기록을 가져오는 메서드")
 	public Page<QueueAdminSearchHistoryResponseDto> getQueueHistory(QueueAdminSearchHistoryServiceDto requestDto) {
-		QueueSearchCriteria criteria = helper.getQueueSearchCriteria(requestDto);
+		QueueSearchCriteria criteria = persistenceHelper.getQueueSearchCriteria(requestDto);
 
-		Page<Queue> queuePage = helper.searchHistoryByDynamicQuery(criteria, requestDto.pageable());
+		Page<Queue> queuePage = persistenceHelper.searchHistoryByDynamicQuery(criteria, requestDto.pageable());
 
 		List<QueueAdminSearchHistoryResponseDto> content = queuePage.getContent().stream()
 			.map(queueApplicationMapper::toQueueAdminSearchHistoryResponseDto)
@@ -130,7 +132,7 @@ public class QueueAdminService {
 
 	@Description("가게의 대기열 정보 기록을 삭제하는 메서드")
 	public Long deleteQueueHistory(QueueAdminDeleteHistoryServiceDto serviceDto) {
-		helper.deleteQueueHistoryById(serviceDto.id(), serviceDto.userId());
+		persistenceHelper.deleteQueueHistoryById(serviceDto.id(), serviceDto.userId());
 		return serviceDto.id();
 	}
 
@@ -138,7 +140,7 @@ public class QueueAdminService {
 	public Long updateQueueHistory(QueueAdminUpdateHistoryServiceDto serviceDto) {
 		Long queueId = serviceDto.id();
 
-		Queue queue = helper.findQueueHistoryById(queueId);
+		Queue queue = persistenceHelper.findQueueHistoryById(queueId);
 
 		if (serviceDto.status() != null) {
 			queue.updateStatus(serviceDto.status());
@@ -147,7 +149,7 @@ public class QueueAdminService {
 			queue.updateCancelReason(serviceDto.cancelReason());
 		}
 
-		helper.saveQueueInfo(queue);
+		persistenceHelper.saveQueueInfo(queue);
 		return queue.getId();
 	}
 }
