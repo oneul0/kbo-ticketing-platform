@@ -44,6 +44,11 @@ public class MembershipHelper {
 						throw new GlobalException(SeatErrorCode.NOT_OPEN_RESERVATION);
 					}
 
+				case SENIOR:
+					if (now.isBefore(LocalTime.of(14, 0))) {
+						throw new GlobalException(SeatErrorCode.NOT_OPEN_RESERVATION);
+					}
+
 				case GOLD:
 					if (now.isBefore(LocalTime.of(12, 0))) {
 						throw new GlobalException(SeatErrorCode.NOT_OPEN_RESERVATION);

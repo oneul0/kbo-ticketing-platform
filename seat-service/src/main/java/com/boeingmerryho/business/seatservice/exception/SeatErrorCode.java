@@ -15,7 +15,8 @@ public enum SeatErrorCode implements BaseErrorCode {
 	NOT_ACCESS_BEFORE_TODAY(HttpStatus.BAD_REQUEST, "SEAT_008", "오늘보다 이전 날짜를 선택할 수 없습니다."),
 	NOT_OVER_1_WEEK(HttpStatus.BAD_REQUEST, "SEAT_009", "요청 날짜를 1주일 이상 넘길 수 없습니다."),
 	NOT_OPEN_RESERVATION(HttpStatus.BAD_REQUEST, "SEAT_010", "아직 오픈되지 않은 예약입니다."),
-	ALREADY_PROCESS_SEAT(HttpStatus.BAD_REQUEST, "SEAT_011", "이미 선점된 좌석입니다.");
+	ALREADY_PROCESS_SEAT(HttpStatus.BAD_REQUEST, "SEAT_011", "이미 선점된 좌석입니다."),
+	PROCESS_ONLY_SENIOR(HttpStatus.UNAUTHORIZED, "SEAT_012", "시니어 전용 좌석이므로 권한이 존재하지 않습니다.");
 
 	private final HttpStatus status;
 	private final String errorCode;
