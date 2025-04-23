@@ -62,6 +62,7 @@ class AdminTicketServiceTest {
 			ticket.getSeatId(),
 			ticket.getUserId(),
 			ticket.getTicketNo(),
+			ticket.getPrice(),
 			status.name(),
 			ticket.getIsDeleted()
 		);
