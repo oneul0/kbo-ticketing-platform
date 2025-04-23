@@ -22,6 +22,8 @@ public enum ErrorCode implements BaseErrorCode {
 
 	QUEUE_HISTORY_NOT_FOUND("Q-009", "대기열 기록이 없습니다.", HttpStatus.BAD_REQUEST),
 	TICKET_NOT_FOUND("Q-010", "요청한 티켓을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+
+	USER_ALREADY_IN_QUEUE("Q-011", "대기열에 이미 사용자가 존재합니다.", HttpStatus.BAD_REQUEST),
 	;
 
 	private final String errorCode;
