@@ -59,9 +59,9 @@ public class QueueService {
 	}
 
 	@Description("가게 대기열에서 본인 순서를 조회하는 메서드")
-	public QueueUserRankResponseDto getRank(QueueUserSequenceServiceDto serviceDto) {
-		Long storeId = serviceDto.storeId();
-		Long userId = serviceDto.userId();
+	public QueueUserRankResponseDto getRank(QueueUserSequenceServiceDto dto) {
+		Long storeId = dto.storeId();
+		Long userId = dto.userId();
 
 		Integer rank = redisHelper.getUserQueuePosition(storeId, userId);
 
@@ -73,9 +73,10 @@ public class QueueService {
 	}
 
 	@Description("본인을 가게 대기열에서 삭제하는 메서드")
-	public QueueCancelResponseDto cancelQueue(QueueCancelServiceDto serviceDto) {
-		Long storeId = serviceDto.storeId();
-		Long userId = serviceDto.userId();
+	@DistributedLock(key = "#dto.storeId")
+	public QueueCancelResponseDto cancelQueue(QueueCancelServiceDto dto) {
+		Long storeId = dto.storeId();
+		Long userId = dto.userId();
 
 		Integer sequence = redisHelper.getUserSequencePosition(storeId, userId);
 

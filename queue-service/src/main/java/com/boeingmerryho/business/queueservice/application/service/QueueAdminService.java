@@ -20,6 +20,7 @@ import com.boeingmerryho.business.queueservice.application.dto.request.admin.Que
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminDeleteUserServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminSearchHistoryServiceDto;
 import com.boeingmerryho.business.queueservice.application.dto.request.admin.QueueAdminUpdateHistoryServiceDto;
+import com.boeingmerryho.business.queueservice.config.aop.DistributedLock;
 import com.boeingmerryho.business.queueservice.domain.entity.Queue;
 import com.boeingmerryho.business.queueservice.domain.entity.QueueSearchCriteria;
 import com.boeingmerryho.business.queueservice.domain.model.CancelReason;
@@ -45,6 +46,7 @@ public class QueueAdminService {
 	private final QueuePersistenceHelper persistenceHelper;
 
 	@Description("대기열에서 사용자 강제 삭제 메서드")
+	@DistributedLock(key = "#dto.storeId")
 	public QueueAdminDeleteUserResponseDto deleteUserFromQueue(QueueAdminDeleteUserServiceDto dto) {
 		Long storeId = dto.storeId();
 		Long userId = dto.userId();
@@ -66,6 +68,7 @@ public class QueueAdminService {
 	}
 
 	@Description("대기열의 다음 사용자 호출 메서드")
+	@DistributedLock(key = "#dto.storeId")
 	public QueueAdminCallUserResponseDto callNextUserFromQueue(QueueAdminCallUserServiceDto dto) {
 		Long storeId = dto.storeId();
 		QueueUserInfo userInfo = redisHelper.getNextUserInQueue(storeId);
