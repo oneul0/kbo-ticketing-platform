@@ -30,7 +30,6 @@ public class MembershipRedisHelper {
 			end
 			redis.call("DECR", KEYS[1])
 			redis.call("SET", KEYS[2], ARGV[2])
-			redis.call("EXPIRE", KEYS[1], ARGV[3])
 			redis.call("EXPIRE", KEYS[2], ARGV[3])
 			return 1
 		""";
