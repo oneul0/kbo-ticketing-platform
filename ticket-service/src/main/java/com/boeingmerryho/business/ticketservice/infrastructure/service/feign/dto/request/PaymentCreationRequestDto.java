@@ -1,4 +1,4 @@
-package com.boeingmerryho.business.ticketservice.application.feign.dto.request;
+package com.boeingmerryho.business.ticketservice.infrastructure.service.feign.dto.request;
 
 import java.time.LocalDateTime;
 
