@@ -46,7 +46,7 @@ public class QueueService {
 		}
 
 		Long ticketUserId = redisHelper.validateTicket(matchDate, ticketId);
-		log.info("ticketUserId : {}", ticketUserId);
+		log.debug("ticketUserId : {}", ticketUserId);
 		if (!Objects.equals(userId, ticketUserId)) {
 			throw new GlobalException(ErrorCode.USER_IS_NOT_MATCHED);
 		}

@@ -87,7 +87,7 @@ public class QueueAdminService {
 
 		return queueApplicationMapper.toQueueAdminCallUserResponseDto(
 			storeId,
-			userInfo.userId(),
+			cancelledUser.getUserId(),
 			userInfo.rank()
 		);
 	}
