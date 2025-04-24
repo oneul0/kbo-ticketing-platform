@@ -50,6 +50,7 @@ public class CreateCacheSeatsService {
 		values.put("userId", null);
 		values.put("status", ReservationStatus.AVAILABLE.name());
 		values.put("price", seat.getPrice().toString());
+		values.put("isSenior", seat.getIsSenior().toString());
 		values.put("createdAt", null);
 		values.put("expiredAt", null);
 
