@@ -1,0 +1,182 @@
+services:
+  config-server:
+    build:
+      context: ./config-service
+      dockerfile: Dockerfile
+    image: config-service:latest
+    container_name: config-service
+    ports:
+      - "8888:8888"
+    networks:
+      - kbo-network
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --spider -q http://localhost:8888/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+  eureka-server:
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    build:
+      context: ./eureka-service
+      dockerfile: Dockerfile
+    image: eureka-service:latest
+    container_name: eureka-service
+    ports:
+      - "8761:8761"
+    networks:
+      - kbo-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --spider -q http://localhost:8761/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    image: gateway-service:latest
+    container_name: gateway-service
+    ports:
+      - "8000:8000"
+    networks:
+      - kbo-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --spider -q http://localhost:8000/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    image: user-service:latest
+    container_name: user-service
+    networks:
+      - kbo-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+
+  membership-service:
+    build:
+      context: ./membership-service
+      dockerfile: Dockerfile
+    image: membership-service:latest
+    container_name: membership-service
+    networks:
+      - kbo-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+
+  seat-service:
+    build:
+      context: ./seat-service
+      dockerfile: Dockerfile
+    image: seat-service:latest
+    container_name: seat-service
+    networks:
+      - kbo-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    image: payment-service:latest
+    container_name: payment-service
+    networks:
+      - kbo-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+
+  ticket-service:
+    build:
+      context: ./ticket-service
+      dockerfile: Dockerfile
+    image: ticket-service:latest
+    container_name: ticket-service
+    networks:
+      - kbo-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+
+  store-service:
+    build:
+      context: ./store-service
+      dockerfile: Dockerfile
+    image: store-service:latest
+    container_name: store-service
+    networks:
+      - kbo-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+
+  queue-service:
+    build:
+      context: ./queue-service
+      dockerfile: Dockerfile
+    image: queue-service:latest
+    container_name: queue-service
+    networks:
+      - kbo-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+
+networks:
+  kbo-network:
+    driver: bridge
