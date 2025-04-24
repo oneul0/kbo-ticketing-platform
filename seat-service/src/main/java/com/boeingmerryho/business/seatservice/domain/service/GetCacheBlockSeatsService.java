@@ -1,11 +1,13 @@
 package com.boeingmerryho.business.seatservice.domain.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.redisson.api.RBucket;
-import org.redisson.api.RList;
+import org.redisson.api.RBatch;
+import org.redisson.api.RFuture;
+import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +27,9 @@ public class GetCacheBlockSeatsService {
 	private final SeatCommonHelper seatCommonHelper;
 	private final SeatApplicationMapper seatApplicationMapper;
 
-	public RList<String> getBlocks(CacheBlockServiceRequestDto request) {
+	public RSet<String> getBlocks(CacheBlockServiceRequestDto request) {
 		String cacheBlockKey = seatCommonHelper.createCacheBlockKey(request.blockId(), request.date());
-		RList<String> blockSeats = redissonClient.getList(cacheBlockKey);
+		RSet<String> blockSeats = redissonClient.getSet(cacheBlockKey);
 		if (!blockSeats.isExists()) {
 			throw new GlobalException(SeatErrorCode.NOT_FOUND_BLOCK);
 		}
@@ -35,23 +37,34 @@ public class GetCacheBlockSeatsService {
 		return blockSeats;
 	}
 
-	public List<CacheSeatServiceResponseDto> getBlockSeats(RList<String> blockSeats) {
+	public List<CacheSeatServiceResponseDto> getBlockSeats(RSet<String> blockSeats) {
 		List<CacheSeatServiceResponseDto> seats = new ArrayList<>();
 
+		RBatch batch = redissonClient.createBatch();
+		Map<String, RFuture<Map<String, String>>> futureMap = new HashMap<>();
+
 		for (String blockSeat : blockSeats) {
-			RBucket<Map<String, String>> seatBucketKey = redissonClient.getBucket(blockSeat);
-			Map<String, String> seatBucketValue = seatBucketKey.get();
+			RFuture<Map<String, String>> future = batch.<Map<String, String>>getBucket(blockSeat).getAsync();
+			futureMap.put(blockSeat, future);
+		}
+
+		batch.execute();
+
+		for (Map.Entry<String, RFuture<Map<String, String>>> entry : futureMap.entrySet()) {
+			String blockSeat = entry.getKey();
+			Map<String, String> seatBucketValue;
+			try {
+				seatBucketValue = entry.getValue().get();
+			} catch (Exception e) {
+				throw new GlobalException(SeatErrorCode.NOT_FOUND_BLOCK);
+			}
 
 			if (seatBucketValue == null) {
 				throw new GlobalException(SeatErrorCode.NOT_FOUND_SEAT);
 			}
 
 			String status = seatBucketValue.get("status");
-
-			CacheSeatServiceResponseDto seat = seatApplicationMapper.toCacheSeatServiceResponseDto(
-				blockSeat,
-				status
-			);
+			CacheSeatServiceResponseDto seat = seatApplicationMapper.toCacheSeatServiceResponseDto(blockSeat, status);
 
 			seats.add(seat);
 		}
