@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.redisson.api.RBucket;
 import org.redisson.api.RList;
 import org.redisson.api.RLock;
+import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -44,14 +45,14 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class SeatService {
+	private final RedissonClient redissonClient;
 	private final SeatCommonHelper seatCommonHelper;
 	private final MembershipHelper membershipHelper;
+	private final KafkaTemplate<String, Object> kafkaTemplate;
+	private final RedisTemplate<String, String> redisTemplate;
 	private final SeatApplicationMapper seatApplicationMapper;
 	private final ProcessBlockSeatsService processBlockSeatsService;
 	private final GetCacheBlockSeatsService getCacheBlockSeatsService;
-	private final RedisTemplate<String, String> redisTemplate;
-	private final RedissonClient redissonClient;
-	private final KafkaTemplate<String, Object> kafkaTemplate;
 
 	@Transactional(readOnly = true)
 	public CacheBlockServiceResponseDto getBlockSeats(Long userId, CacheBlockServiceRequestDto request) {
@@ -59,7 +60,7 @@ public class SeatService {
 
 		membershipHelper.checkMembership(today, request.date(), userId);
 
-		RList<String> blockSeats = getCacheBlockSeatsService.getBlocks(request);
+		RSet<String> blockSeats = getCacheBlockSeatsService.getBlocks(request);
 		List<CacheSeatServiceResponseDto> seats = getCacheBlockSeatsService.getBlockSeats(blockSeats);
 
 		return seatApplicationMapper.toCacheBlockServiceResponseDto(request.blockId(), seats);
