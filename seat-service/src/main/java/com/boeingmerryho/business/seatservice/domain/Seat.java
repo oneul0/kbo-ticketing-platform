@@ -71,6 +71,11 @@ public class Seat {
 	)
 	private Boolean isActive;
 
+	@Column(
+		nullable = false
+	)
+	private Boolean isSenior;
+
 	@OneToMany(mappedBy = "seat", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<SeatReservation> seatReservations = new ArrayList<>();
 
