@@ -2,12 +2,12 @@ package com.boeingmerryho.business.seatservice.domain.service;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.redisson.api.RBucket;
-import org.redisson.api.RList;
+import org.redisson.api.RBatch;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,21 +26,42 @@ public class CreateCacheSeatsService {
 
 	@Transactional
 	public void createSeatBucket(List<Seat> seats, LocalDate date) {
+		final int batchSize = 1000;
+		int operationCount = 0;
+
+		RBatch batch = redissonClient.createBatch();
+		Map<String, List<String>> blockSeatKeysMap = new HashMap<>();
+
 		for (Seat seat : seats) {
 			String cacheKey = seatCommonHelper.makeCacheKey(seat, date);
 			Map<String, String> cacheValue = makeCacheValue(seat);
 
-			RBucket<Map<String, String>> bucket = redissonClient.getBucket(cacheKey);
-			// TODO: 테스트 기간까지만 5분으로 설정
-			bucket.set(cacheValue, Duration.ofMinutes(20));
+			batch.getBucket(cacheKey).setAsync(cacheValue, Duration.ofMinutes(20));
 
 			String blockKey = makeBlockKey(seat, date);
-			RList<String> blockSeats = redissonClient.getList(blockKey);
+			blockSeatKeysMap.computeIfAbsent(blockKey, k -> new ArrayList<>()).add(cacheKey);
 
-			if (!blockSeats.contains(cacheKey)) {
-				blockSeats.add(cacheKey);
+			operationCount++;
+
+			if (operationCount % batchSize == 0) {
+				executeBatch(batch, blockSeatKeysMap);
+
+				batch = redissonClient.createBatch();
+				blockSeatKeysMap.clear();
 			}
 		}
+
+		if (!blockSeatKeysMap.isEmpty()) {
+			executeBatch(batch, blockSeatKeysMap);
+		}
+	}
+
+	private void executeBatch(RBatch batch, Map<String, List<String>> blockSeatKeysMap) {
+		for (Map.Entry<String, List<String>> entry : blockSeatKeysMap.entrySet()) {
+			batch.getSet(entry.getKey()).addAllAsync(entry.getValue());
+		}
+
+		batch.execute();
 	}
 
 	private Map<String, String> makeCacheValue(Seat seat) {
