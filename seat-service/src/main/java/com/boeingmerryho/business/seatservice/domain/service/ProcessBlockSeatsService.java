@@ -4,26 +4,28 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.redisson.api.RBucket;
-import org.redisson.api.RList;
 import org.redisson.api.RLock;
+import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.boeingmerryho.business.seatservice.application.dto.mapper.SeatApplicationMapper;
 import com.boeingmerryho.business.seatservice.application.dto.request.CacheSeatProcessServiceRequestDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.CacheSeatsProcessServiceRequestDto;
-import com.boeingmerryho.business.seatservice.application.dto.request.ToTicketDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.ToTicketMatchDto;
 import com.boeingmerryho.business.seatservice.application.dto.request.ToTicketSeatDto;
+import com.boeingmerryho.business.seatservice.domain.Membership;
 import com.boeingmerryho.business.seatservice.domain.ReservationStatus;
 import com.boeingmerryho.business.seatservice.exception.MatchErrorCode;
+import com.boeingmerryho.business.seatservice.exception.MembershipErrorCode;
 import com.boeingmerryho.business.seatservice.exception.SeatErrorCode;
 import com.boeingmerryho.business.seatservice.infrastructure.helper.MatchHelper;
 import com.boeingmerryho.business.seatservice.infrastructure.helper.SeatCommonHelper;
@@ -38,9 +40,12 @@ import lombok.extern.slf4j.Slf4j;
 public class ProcessBlockSeatsService {
 	private final MatchHelper matchHelper;
 	private final RedissonClient redissonClient;
-	private final KafkaTemplate<String, Object> kafkaTemplate;
-	private final SeatApplicationMapper seatApplicationMapper;
 	private final SeatCommonHelper seatCommonHelper;
+	private final SeatApplicationMapper seatApplicationMapper;
+	private final RedisTemplate<String, String> redisTemplate;
+
+	private static final long LOCK_TIMEOUT = 10;
+	private static final long LOCK_WAIT_TIME = 3;
 
 	public ToTicketMatchDto getMatchInfo(CacheSeatsProcessServiceRequestDto serviceDto, LocalDate today) {
 		Map<String, Object> match = matchHelper.getByMatchId(serviceDto.matchId());
@@ -68,7 +73,7 @@ public class ProcessBlockSeatsService {
 
 	public void getBlockSeats(
 		List<RLock> locks,
-		RList<String> blockSeats,
+		RSet<String> blockSeats,
 		List<String> requestSeats,
 		CacheSeatsProcessServiceRequestDto serviceDto
 	) {
@@ -91,63 +96,115 @@ public class ProcessBlockSeatsService {
 		}
 	}
 
-	public void processBlockSeats(
+	public void validateSeatReservation(Long userId, CacheSeatsProcessServiceRequestDto request, LocalDate today) {
+		if (request.serviceRequestSeatInfos().size() > 4) {
+			throw new GlobalException(SeatErrorCode.NOT_EXCEED_4_SEAT);
+		}
+
+		if (request.date().isBefore(today)) {
+			throw new GlobalException(SeatErrorCode.NOT_ACCESS_BEFORE_TODAY);
+		}
+
+		long daysBetween = ChronoUnit.DAYS.between(today, request.date());
+		if (Math.abs(daysBetween) > 7) {
+			throw new GlobalException(SeatErrorCode.NOT_OVER_1_WEEK);
+		}
+
+		String membershipKey = createMembershipKey(userId);
+		log.info("membershipKey: {}", membershipKey);
+		String membership = getMembership(membershipKey);
+		log.info("{}", membership);
+
+		if (request.date().isEqual(today.plusDays(7))) {
+			checkReservationTime(membership);
+		}
+	}
+
+	public void checkReservationTime(String membership) {
+		LocalTime now = LocalTime.now();
+
+		Membership memberType;
+		try {
+			memberType = Membership.valueOf(membership.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			throw new GlobalException(MembershipErrorCode.INVALID_MEMBERSHIP);
+		}
+
+		LocalTime reservationOpenTime = switch (memberType) {
+			case NORMAL, SENIOR -> (LocalTime.of(14, 0));
+			case GOLD, VIP -> (LocalTime.of(12, 0));
+			case SVIP -> (LocalTime.of(11, 0));
+		};
+
+		if (now.isBefore(reservationOpenTime)) {
+			throw new GlobalException(SeatErrorCode.NOT_OPEN_RESERVATION);
+		}
+	}
+
+	public void processSeatLocksAndUpdate(
 		Long userId,
-		ToTicketMatchDto matchInfo,
 		List<RLock> locks,
 		List<String> requestSeats,
 		List<ToTicketSeatDto> seatInfos
 	) {
 		try {
-			for (RLock lock : locks) {
-				if (!lock.tryLock(3, 10, TimeUnit.SECONDS)) {
-					log.error("⛔️ 락 획득 실패");
-					throw new GlobalException(SeatErrorCode.FAILED_GET_LOCK);
-				}
-			}
+			acquireLocks(locks);
 
 			for (String requestSeat : requestSeats) {
 				RBucket<Map<String, String>> seatBucketKey = redissonClient.getBucket(requestSeat);
 				Map<String, String> seatBucketValue = seatBucketKey.get();
 
-				if (seatBucketValue == null) {
+				if (
+					seatBucketValue == null || !seatBucketValue.get("status").equals(ReservationStatus.AVAILABLE.name())
+				) {
 					throw new GlobalException(SeatErrorCode.NOT_FOUND_SEAT);
 				}
 
-				String requestSeatStatus = seatBucketValue.get("status");
-				if (!requestSeatStatus.equals(ReservationStatus.AVAILABLE.name())) {
-					throw new GlobalException(SeatErrorCode.ALREADY_PROCESS_SEAT);
-				}
-
-				seatBucketValue.put("status", ReservationStatus.PROCESSING.name());
-				seatBucketValue.put("userId", String.valueOf(userId));
-				seatBucketValue.put("createdAt", LocalDateTime.now().toString());
-				seatBucketValue.put("expiredAt", LocalDateTime.now().plusMinutes(9).toString());
-
-				seatBucketKey.set(seatBucketValue, Duration.ofMinutes(20));
+				updateSeatStatus(userId, seatBucketValue, seatBucketKey);
 
 				ToTicketSeatDto seatInfo = parseSeatBucket(seatBucketKey.getName(), seatBucketValue);
 				seatInfos.add(seatInfo);
-
-				log.info("좌석: {}, 선점 완료", seatBucketKey.getName());
 			}
 
-			ToTicketDto ticketDto = seatApplicationMapper.toTicketDto(matchInfo, seatInfos);
-
-			kafkaTemplate.send("ticket-created", ticketDto);
 		} catch (Exception e) {
 			throw new GlobalException(SeatErrorCode.FAILED_PROCESS_SEAT);
 		} finally {
-			for (RLock lock : locks) {
-				if (lock.isHeldByCurrentThread()) {
-					lock.unlock();
-				}
+			releaseLocks(locks);
+		}
+	}
+
+	private void acquireLocks(List<RLock> locks) throws InterruptedException {
+		for (RLock lock : locks) {
+			if (!lock.tryLock(LOCK_WAIT_TIME, LOCK_TIMEOUT, TimeUnit.SECONDS)) {
+				log.error("⛔️ 락 획득 실패");
+				throw new GlobalException(SeatErrorCode.FAILED_GET_LOCK);
 			}
 		}
 	}
 
-	public RList<String> getBlockSeats(String cacheBlockKey) {
-		RList<String> blockSeats = redissonClient.getList(cacheBlockKey);
+	private void releaseLocks(List<RLock> locks) {
+		for (RLock lock : locks) {
+			if (lock.isHeldByCurrentThread()) {
+				lock.unlock();
+			}
+		}
+	}
+
+	private void updateSeatStatus(
+		Long userId,
+		Map<String, String> seatBucketValue,
+		RBucket<Map<String, String>> seatBucketKey
+	) {
+		seatBucketValue.put("status", ReservationStatus.PROCESSING.name());
+		seatBucketValue.put("userId", String.valueOf(userId));
+		seatBucketValue.put("createdAt", LocalDateTime.now().toString());
+		seatBucketValue.put("expiredAt", LocalDateTime.now().plusMinutes(9).toString());
+
+		seatBucketKey.set(seatBucketValue, Duration.ofMinutes(20));
+	}
+
+	public RSet<String> getBlocks(String cacheBlockKey) {
+		RSet<String> blockSeats = redissonClient.getSet(cacheBlockKey);
 		if (!blockSeats.isExists()) {
 			throw new GlobalException(SeatErrorCode.NOT_FOUND_BLOCK);
 		}
@@ -155,19 +212,19 @@ public class ProcessBlockSeatsService {
 		return blockSeats;
 	}
 
-	private ToTicketSeatDto parseSeatBucket(String seatBucketKey, Map<String, String> seatBucketValue) {
-		String[] parts = seatBucketKey.split(":");
+	private String createMembershipKey(Long userId) {
+		return String.format("user:membership:info:%d", userId);
+	}
 
-		return seatApplicationMapper.toTicketSeatDto(
-			seatBucketValue.get("id"),
-			seatBucketValue.get("userId"),
-			parts[2],
-			parts[3],
-			parts[4],
-			seatBucketValue.get("price"),
-			seatBucketValue.get("createdAt"),
-			seatBucketValue.get("expiredAt")
-		);
+	private String getMembership(String membershipKey) {
+		Map<Object, Object> membershipInfo = redisTemplate.opsForHash().entries(membershipKey);
+		Object name = membershipInfo.get("name");
+
+		if (name == null) {
+			throw new GlobalException(MembershipErrorCode.NOT_FOUND_MEMBERSHIP);
+		}
+
+		return name.toString();
 	}
 
 	private String createLockKey(String cacheSeatKey) {
@@ -190,12 +247,21 @@ public class ProcessBlockSeatsService {
 	}
 
 	private String createCacheSeatKey(String cacheSeatKeyFront, Integer column, Integer row) {
-		StringBuilder cacheSeatKey = new StringBuilder()
-			.append(cacheSeatKeyFront)
-			.append(column)
-			.append(":")
-			.append(row);
+		return String.format("%s%d:%d", cacheSeatKeyFront, column, row);
+	}
 
-		return cacheSeatKey.toString();
+	private ToTicketSeatDto parseSeatBucket(String seatBucketKey, Map<String, String> seatBucketValue) {
+		String[] parts = seatBucketKey.split(":");
+
+		return seatApplicationMapper.toTicketSeatDto(
+			seatBucketValue.get("id"),
+			seatBucketValue.get("userId"),
+			parts[2],
+			parts[3],
+			parts[4],
+			seatBucketValue.get("price"),
+			seatBucketValue.get("createdAt"),
+			seatBucketValue.get("expiredAt")
+		);
 	}
 }

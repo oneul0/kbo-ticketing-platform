@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ListenerService {
+public class KafkaListenerService {
 	private final SeatFailedService seatFailedService;
 	private final SeatListenerHelper seatListenerHelper;
 	private final SeatSucceedService seatSucceedService;
