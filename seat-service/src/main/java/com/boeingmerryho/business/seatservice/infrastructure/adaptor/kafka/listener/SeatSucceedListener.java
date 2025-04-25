@@ -3,7 +3,7 @@ package com.boeingmerryho.business.seatservice.infrastructure.adaptor.kafka.list
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import com.boeingmerryho.business.seatservice.application.service.ListenerService;
+import com.boeingmerryho.business.seatservice.application.service.KafkaListenerService;
 import com.boeingmerryho.business.seatservice.presentation.dto.response.SeatListenerResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
@@ -14,12 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class SeatSucceedListener {
-	private final ListenerService listenerService;
+	private final KafkaListenerService kafkaListenerService;
 
 	@KafkaListener(topics = "seat-succeed", groupId = "seat-ticket")
 	public void seatSucceedConsume(SeatListenerResponseDto response) {
 		try {
-			listenerService.seatSucceed(response);
+			kafkaListenerService.seatSucceed(response);
 		} catch (GlobalException e) {
 			log.warn("GlobalException - {}", e.getMessage());
 		}
