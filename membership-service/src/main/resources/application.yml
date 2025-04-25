@@ -3,6 +3,6 @@ spring:
     import: "optional:configserver:http://localhost:8888/"
     name: membership-service
   profiles:
-    active: dev
+    active: prod
   application:
     name: membership-service
