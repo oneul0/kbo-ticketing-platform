@@ -6,9 +6,14 @@ import io.github.boeingmerryho.commonlibrary.exception.BaseErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * JWT 에러 코드
+ * 형식 : GW-0**
+ * */
+
 @Getter
 @RequiredArgsConstructor
-public enum ErrorCode implements BaseErrorCode {
+public enum JwtErrorCode implements BaseErrorCode {
 
 	JWT_NOT_FOUND("GW-001", "JWT 토큰이 필요합니다.", HttpStatus.UNAUTHORIZED),
 	JWT_BLACKLISTED("GW-002", "JWT가 블랙리스트에 존재합니다.", HttpStatus.UNAUTHORIZED),

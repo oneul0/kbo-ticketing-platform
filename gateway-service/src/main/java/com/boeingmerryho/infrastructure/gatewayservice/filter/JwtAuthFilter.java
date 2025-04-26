@@ -15,7 +15,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
-import com.boeingmerryho.infrastructure.gatewayservice.exception.ErrorCode;
+import com.boeingmerryho.infrastructure.gatewayservice.exception.JwtErrorCode;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import io.jsonwebtoken.Claims;
@@ -54,57 +54,50 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 	public Mono<Void> filter(ServerWebExchange exchange,
 		org.springframework.cloud.gateway.filter.GatewayFilterChain chain) {
 
-		log.info("JwtAuthFilter triggered");
-
 		ServerHttpRequest request = exchange.getRequest();
 		String path = request.getURI().getPath();
 
 		if (EXCLUDED_PATHS.stream().anyMatch(path::startsWith)) {
+			log.debug("JWT 검증 제외 경로: {}", path);
 			return chain.filter(exchange);
 		}
 
 		String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 		log.info("authHeader : {}", authHeader);
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			log.warn("JWT 토큰이 없습니다.");
-			throw new GlobalException(ErrorCode.JWT_NOT_FOUND);
+			log.warn("JWT 토큰 없음, path: {}", path);
+			throw new GlobalException(JwtErrorCode.JWT_NOT_FOUND);
 		}
 
 		try {
-			String token = authHeader;
+			String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
 
 			if (isTokenBlacklisted(token)) {
-				log.error("JWT가 블랙리스트에 존재합니다.");
-				throw new GlobalException(ErrorCode.JWT_BLACKLISTED);
-			}
-
-			if (authHeader.startsWith("Bearer ")) {
-				token = token.substring(7);
+				log.error("JWT 블랙리스트, path: {}, token: {}", path, maskToken(token));
+				throw new GlobalException(JwtErrorCode.JWT_BLACKLISTED);
 			}
 
 			Claims claims = validateToken(token);
-			log.debug("JWT 검증 성공: {}", claims);
+			log.info("JWT 검증 성공, userId: {}, path: {}", claims.getSubject(), path);
 
 			ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
 				.header("X-User-Id", claims.getSubject())
 				.build();
 
-			log.info("user id is set up : {}", modifiedRequest.getHeaders().getFirst("X-User-Id"));
-
 			return chain.filter(exchange.mutate().request(modifiedRequest).build());
 
 		} catch (ExpiredJwtException e) {
-			log.error("JWT 만료됨: {}", e.getMessage());
-			throw new GlobalException(ErrorCode.JWT_EXPIRED);
+			log.error("JWT 만료, path: {}, error: {}", path, e.getMessage());
+			throw new GlobalException(JwtErrorCode.JWT_EXPIRED);
 		} catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
-			log.error("잘못된 JWT: {}", e.getMessage());
-			throw new GlobalException(ErrorCode.WRONG_JWT);
+			log.error("잘못된 JWT, path: {}, error: {}", path, e.getMessage());
+			throw new GlobalException(JwtErrorCode.WRONG_JWT);
 		} catch (GlobalException e) {
-			log.error("예외 발생: {}", e.getErrorCode());
+			log.error("JWT 예외, path: {}, errorCode: {}", path, e.getErrorCode());
 			throw e;
 		} catch (Exception e) {
-			log.error("JWT 검증 중 오류 발생: {}", e.getMessage());
-			throw new GlobalException(ErrorCode.JWT_VERIFIED_FAIL);
+			log.error("JWT 검증 실패, path: {}, error: {}", path, e.getMessage());
+			throw new GlobalException(JwtErrorCode.JWT_VERIFIED_FAIL);
 		}
 	}
 
@@ -118,6 +111,10 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 	private boolean isTokenBlacklisted(String token) {
 		String blacklistKey = "blacklist:" + token;
 		return redisTemplate.hasKey(blacklistKey);
+	}
+
+	private String maskToken(String token) {
+		return token.length() > 10 ? token.substring(0, 5) + "..." + token.substring(token.length() - 5) : token;
 	}
 
 	@Override
