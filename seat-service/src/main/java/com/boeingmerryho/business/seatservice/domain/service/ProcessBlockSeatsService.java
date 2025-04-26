@@ -1,6 +1,5 @@
 package com.boeingmerryho.business.seatservice.domain.service;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -200,7 +199,7 @@ public class ProcessBlockSeatsService {
 		seatBucketValue.put("createdAt", LocalDateTime.now().toString());
 		seatBucketValue.put("expiredAt", LocalDateTime.now().plusMinutes(9).toString());
 
-		seatBucketKey.set(seatBucketValue, Duration.ofMinutes(20));
+		seatBucketKey.set(seatBucketValue);
 	}
 
 	public RSet<String> getBlocks(String cacheBlockKey) {

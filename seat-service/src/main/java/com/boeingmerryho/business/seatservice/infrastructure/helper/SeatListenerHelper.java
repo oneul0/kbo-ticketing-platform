@@ -2,7 +2,7 @@ package com.boeingmerryho.business.seatservice.infrastructure.helper;
 
 import java.time.LocalDate;
 
-import org.redisson.api.RList;
+import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
@@ -40,9 +40,9 @@ public class SeatListenerHelper {
 		return seatCommonHelper.getSeatById(id);
 	}
 
-	public RList<String> getCacheBlocks(Seat seat, LocalDate date) {
+	public RSet<String> getCacheBlocks(Seat seat, LocalDate date) {
 		String cacheBlockKey = seatCommonHelper.createCacheBlockKey(seat.getSeatBlock(), date);
 
-		return redissonClient.getList(cacheBlockKey);
+		return redissonClient.getSet(cacheBlockKey);
 	}
 }
