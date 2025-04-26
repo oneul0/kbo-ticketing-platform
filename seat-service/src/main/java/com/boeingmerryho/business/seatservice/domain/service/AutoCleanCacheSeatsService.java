@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Map;
 
-import org.redisson.api.RList;
+import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +42,7 @@ public class AutoCleanCacheSeatsService {
 		);
 
 		for (String blockKey : blockKeys) {
-			RList<String> seatKeys = redissonClient.getList(blockKey);
+			RSet<String> seatKeys = redissonClient.getSet(blockKey);
 
 			for (String seatKey : seatKeys) {
 				redissonClient.getBucket(seatKey).delete();
