@@ -1,0 +1,120 @@
+<configuration debug="false">
+
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <springProperty scope="context" name="SPRING_PROFILES_ACTIVE" source="spring.profiles.active" defaultValue="dev"/>
+
+    <property name="LOG_PATH" value="./user-service/logs"/>
+    <property name="LOG_FILE" value="${LOG_PATH}/user-service.log"/>
+    <property name="PATTERN"
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] %clr([%-5level]){colorByLevel} [%thread] %clr(%logger){magenta} : %msg | uri=%X{uri} method=%X{method} ip=%X{ip} userAgent=%X{userAgent} requestId=%X{requestId}%n"/>
+
+    <!-- 콘솔 출력용 JSON 포맷 -->
+    <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <jsonGeneratorDecorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
+                <defaultMask>****</defaultMask>
+                <path>password</path>
+                <path>email</path>
+                <path>Authorization</path>
+            </jsonGeneratorDecorator>
+            <fieldNames>
+                <timestamp>timestamp</timestamp>
+                <message>message</message>
+                <level>level</level>
+                <logger>logger</logger>
+                <thread>thread</thread>
+            </fieldNames>
+            <includeMdc>true</includeMdc>
+            <customFields>{"service":"user-service","env":"${SPRING_PROFILES_ACTIVE}"}</customFields>
+        </encoder>
+    </appender>
+
+    <!-- 일반 파일 로깅 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/user-service.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 요청(request) 전용 파일 로깅 -->
+    <appender name="REQUEST_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/user-service-request.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/user-service-request.%d{yyyyMMdd}.log</fileNamePattern>
+            <maxHistory>14</maxHistory>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"log_type":"request","service":"user-service","env":"${SPRING_PROFILES_ACTIVE}"}
+            </customFields>
+            <includeMdc>true</includeMdc>
+        </encoder>
+    </appender>
+
+    <!-- 의심스러운 행동(suspicious) 전용 파일 로깅 -->
+    <appender name="SUSPICIOUS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/user-service-suspicious.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/user-service-suspicious.%d{yyyyMMdd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"log_type":"suspicious","service":"user-service","env":"${SPRING_PROFILES_ACTIVE}"}
+            </customFields>
+            <includeMdc>true</includeMdc>
+        </encoder>
+    </appender>
+
+    <!-- 비동기 설정 -->
+    <appender name="ASYNC_JSON" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="JSON"/>
+        <queueSize>500</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="FILE"/>
+        <queueSize>500</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <appender name="ASYNC_REQUEST_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="REQUEST_FILE"/>
+        <queueSize>500</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <appender name="ASYNC_SUSPICIOUS_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SUSPICIOUS_FILE"/>
+        <queueSize>500</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <!-- 기본 root 로그 설정 -->
+    <root level="INFO">
+        <appender-ref ref="ASYNC_JSON"/>
+        <appender-ref ref="ASYNC_FILE"/>
+    </root>
+
+    <!-- 사용자 서비스 전체 패키지 디버깅 로거 -->
+    <logger name="com.boeingmerryho.business.userservice" level="DEBUG" additivity="false">
+        <appender-ref ref="ASYNC_JSON"/>
+        <appender-ref ref="ASYNC_FILE"/>
+    </logger>
+
+    <!-- 요청(request)용 로거 -->
+    <logger name="requestLogger" level="INFO" additivity="false">
+        <appender-ref ref="ASYNC_REQUEST_FILE"/>
+    </logger>
+
+    <!-- 의심(suspicious) 행동용 로거 -->
+    <logger name="suspiciousLogger" level="WARN" additivity="false">
+        <appender-ref ref="ASYNC_SUSPICIOUS_FILE"/>
+    </logger>
+
+</configuration>
