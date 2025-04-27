@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +37,8 @@ public class UserHelperImpl implements UserHelper {
 	private final UserRepository userRepository;
 
 	private final PasswordEncoder passwordEncoder;
+
+	private static final Logger suspiciousLogger = LoggerFactory.getLogger("suspiciousLogger");
 
 	@Override
 	public User findUserById(Long id) {
@@ -149,6 +153,7 @@ public class UserHelperImpl implements UserHelper {
 	@Override
 	public void validatePassword(String requestPassword, String storedPassword) {
 		if (!passwordEncoder.matches(requestPassword, storedPassword)) {
+			suspiciousLogger.warn("Password mismatch while login attempt");
 			throw new GlobalException(ErrorCode.PASSWORD_NOT_MATCHED);
 		}
 	}
