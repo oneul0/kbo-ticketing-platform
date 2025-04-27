@@ -1,13 +1,12 @@
 package com.boeingmerryho.business.seatservice.domain.service;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import org.redisson.api.RBucket;
-import org.redisson.api.RList;
+import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +34,7 @@ public class SeatSucceedService {
 	public void succeed(List<String> seatIds, LocalDate date) {
 		for (String seatId : seatIds) {
 			Seat seat = seatListenerHelper.getSeat(seatId);
-			RList<String> blockSeats = seatListenerHelper.getCacheBlocks(seat, date);
+			RSet<String> blockSeats = seatListenerHelper.getCacheBlocks(seat, date);
 
 			String cacheSeatKey = seatCommonHelper.makeCacheKey(seat, date);
 
@@ -47,7 +46,7 @@ public class SeatSucceedService {
 
 				seatBucketValue.put("status", ReservationStatus.COMPLETED.name());
 
-				seatBucketKey.set(seatBucketValue, Duration.ofMinutes(5));
+				seatBucketKey.set(seatBucketValue);
 				log.info("좌석: {}, 선점 완료", seatBucketKey.getName());
 
 				Long userId = seatListenerHelper.parseUserId(seatBucketValue.get("userId"));

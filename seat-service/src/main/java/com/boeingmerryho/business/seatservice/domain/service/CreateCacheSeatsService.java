@@ -1,6 +1,5 @@
 package com.boeingmerryho.business.seatservice.domain.service;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +35,7 @@ public class CreateCacheSeatsService {
 			String cacheKey = seatCommonHelper.makeCacheKey(seat, date);
 			Map<String, String> cacheValue = makeCacheValue(seat);
 
-			batch.getBucket(cacheKey).setAsync(cacheValue, Duration.ofMinutes(20));
+			batch.getBucket(cacheKey).setAsync(cacheValue);
 
 			String blockKey = makeBlockKey(seat, date);
 			blockSeatKeysMap.computeIfAbsent(blockKey, k -> new ArrayList<>()).add(cacheKey);
