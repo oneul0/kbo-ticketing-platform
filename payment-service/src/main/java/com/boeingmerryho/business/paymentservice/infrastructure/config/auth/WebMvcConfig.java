@@ -20,17 +20,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(new UserCheckInterceptor(userInfoProvider))
 			.excludePathPatterns(
-				"/payment-service/**",
-				"/payment/**",
-				"/error/**"
+				"/error/**",
+				"/actuator/**"
 			);
 
 		registry.addInterceptor(new AdminCheckInterceptor(userInfoProvider))
 			.excludePathPatterns(
 				"/api/**",
-				"/payment-service/**",
-				"/payment/**",
-				"/error/**"
+				"/error/**",
+				"/actuator/**"
 			);
 	}
 }
