@@ -11,6 +11,8 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -19,7 +21,10 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class GlobalGatewayFilter implements GlobalFilter, Ordered {
+
+	private final MeterRegistry meterRegistry;
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -30,7 +35,21 @@ public class GlobalGatewayFilter implements GlobalFilter, Ordered {
 		}
 		String userAgent = exchange.getRequest().getHeaders().getFirst("User-Agent");
 		String method = exchange.getRequest().getMethod().name();
-		String uri = exchange.getRequest().getURI().toString();
+		String uri = exchange.getRequest().getURI().getPath();
+
+		var requestCounter = meterRegistry.counter(
+			"gateway_requests_total",
+			"path", uri,
+			"method", method
+		);
+
+		var requestTimer = meterRegistry.timer(
+			"gateway_request_duration",
+			"path", uri,
+			"method", method
+		);
+
+		requestCounter.increment();
 
 		MDC.put("requestId", requestId);
 		MDC.put("ip", clientIp);
@@ -74,6 +93,9 @@ public class GlobalGatewayFilter implements GlobalFilter, Ordered {
 				MDC.put("status", status);
 
 				log.info("Request completed");
+
+				requestTimer.record(duration, java.util.concurrent.TimeUnit.MILLISECONDS);
+
 				MDC.clear();
 			}));
 	}

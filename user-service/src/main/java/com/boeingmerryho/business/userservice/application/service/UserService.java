@@ -35,6 +35,7 @@ import com.boeingmerryho.business.userservice.presentation.dto.response.other.Us
 import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserVerificationResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
+import io.micrometer.core.annotation.Counted;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,6 +53,7 @@ public class UserService {
 	private final EmailService emailService;
 
 	@Transactional
+	@Counted(value = "user.register", description = "회원가입 요청 횟수")
 	public Long registerUser(UserRegisterRequestServiceDto dto) {
 		userHelper.validateRegisterRequest(dto);
 
@@ -69,6 +71,8 @@ public class UserService {
 	public UserLoginResponseDto loginUser(UserLoginRequestServiceDto dto) {
 		User user = userHelper.findUserByEmail(dto.email());
 
+		userHelper.countLoginAttempt(user.getId());
+
 		userHelper.validatePassword(dto.password(), user.getPassword());
 
 		try {
@@ -84,6 +88,7 @@ public class UserService {
 
 			return userApplicationMapper.toUserLoginResponseDto(serviceDto);
 		} catch (Exception e) {
+			userHelper.countLoginFailure(user.getId());
 			redisUtil.rollbackUserInfo(user.getId());
 			redisUtil.rollbackUserJwtToken(user.getId());
 
@@ -135,6 +140,7 @@ public class UserService {
 	}
 
 	@Transactional
+	@Counted(value = "user.withdraw", description = "회원탈퇴 요청 횟수")
 	public Long withdrawUser(UserWithdrawRequestServiceDto dto) {
 		User user = userHelper.findUserById(dto.id());
 		user.softDelete(user.getId());
