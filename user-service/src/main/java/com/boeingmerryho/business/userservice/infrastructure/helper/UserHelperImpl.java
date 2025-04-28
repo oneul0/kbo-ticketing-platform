@@ -19,7 +19,9 @@ import com.boeingmerryho.business.userservice.exception.ErrorCode;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class UserHelperImpl implements UserHelper {
@@ -149,6 +151,7 @@ public class UserHelperImpl implements UserHelper {
 	@Override
 	public void validatePassword(String requestPassword, String storedPassword) {
 		if (!passwordEncoder.matches(requestPassword, storedPassword)) {
+			log.warn("Password mismatch while login attempt");
 			throw new GlobalException(ErrorCode.PASSWORD_NOT_MATCHED);
 		}
 	}

@@ -25,6 +25,7 @@ import com.boeingmerryho.business.seatservice.presentation.dto.request.CacheSeat
 import com.boeingmerryho.business.seatservice.presentation.dto.response.CacheBlockResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -38,6 +39,7 @@ public class SeatController {
 		"블록 별 좌석 조회하기"
 	)
 	@GetMapping("/blocks/{blockId}")
+	@Timed(value = "get_seat_block", description = "블록 별 좌석 조회 요청 시간 측정")
 	public SuccessResponse<CacheBlockResponseDto> getBlockSeats(
 		@RequestAttribute Long userId,
 		@PathVariable Integer blockId,
@@ -54,6 +56,7 @@ public class SeatController {
 		"좌석 선점하기"
 	)
 	@PostMapping("/blocks/{blockId}")
+	@Timed(value = "process_seat", description = "좌석 선점하기 요청 시간 측정")
 	public ResponseEntity<SuccessResponse<Void>> processBlockSeats(
 		@RequestAttribute Long userId,
 		@PathVariable Integer blockId,

@@ -1,0 +1,67 @@
+<configuration debug="false">
+    <include resource="com/google/cloud/spring/logging/logback-appender.xml"/>
+
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
+    <springProperty scope="context" name="SPRING_PROFILES_ACTIVE" source="spring.profiles.active" defaultValue="dev"/>
+
+    <property name="PATTERN"
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [gateway-service] %clr([%-5level]){colorByLevel} [%thread] %clr(%logger){magenta} : %msg\n"/>
+
+    <appender name="ASYNC_JSON" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="JSON"/>
+        <queueSize>500</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <appender name="GCP_LOGGING" class="com.google.cloud.logging.logback.LoggingAppender">
+        <log>Gateway-Service</log>
+        <flushLevel>INFO</flushLevel>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <jsonGeneratorDecorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
+                <defaultMask>****</defaultMask>
+                <path>password</path>
+                <path>email</path>
+                <path>Authorization</path>
+            </jsonGeneratorDecorator>
+            <fieldNames>
+                <timestamp>timestamp</timestamp>
+                <message>message</message>
+                <level>level</level>
+                <logger>logger</logger>
+                <thread>thread</thread>
+            </fieldNames>
+            <includeMdc>true</includeMdc>
+            <mdcKeys>uri,method,ip,userAgent,requestId</mdcKeys>
+            <customFields>{"service":"gateway-service","env":"${SPRING_PROFILES_ACTIVE}"}</customFields>
+        </encoder>
+    </appender>
+
+    <logger name="com.boeingmerryho.infrastructure.gatewayservice" level="INFO" additivity="true">
+        <appender-ref ref="ASYNC_JSON"/>
+    </logger>
+
+    <springProfile name="dev">
+        <property name="LOG_PATH" value="./gateway-service/logs/${SPRING_PROFILES_ACTIVE}"/>
+
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${PATTERN}</pattern>
+                <charset>utf8</charset>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="GCP_LOGGING"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+        <property name="LOG_PATH" value="./gateway-service/logs/${SPRING_PROFILES_ACTIVE}"/>
+
+        <root level="INFO">
+            <appender-ref ref="GCP_LOGGING"/>
+        </root>
+    </springProfile>
+</configuration>

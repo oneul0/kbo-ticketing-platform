@@ -37,6 +37,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // spring starter
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -66,6 +67,16 @@ dependencies {
     // map struct
     implementation "org.mapstruct:mapstruct:1.5.5.Final"
     annotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
+
+    // GCP Logging
+    implementation 'com.google.cloud:spring-cloud-gcp-logging:6.1.0'
+    implementation 'com.google.cloud:spring-cloud-gcp-starter:6.1.0'
+
+    // metric
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // test
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
