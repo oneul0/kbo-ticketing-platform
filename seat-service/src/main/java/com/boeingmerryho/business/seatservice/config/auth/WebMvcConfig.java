@@ -18,13 +18,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addInterceptor(new UserCheckInterceptor(userInfoProvider))
 			.excludePathPatterns(
 				"/admin/**",
-				"/error/**"
+				"/error/**",
+				"/actuator/**"
 			);
 
 		registry.addInterceptor(new AdminCheckInterceptor(userInfoProvider))
 			.excludePathPatterns(
 				"/api/**",
-				"/error/**"
+				"/error/**",
+				"/actuator/**"
 			);
 	}
 }

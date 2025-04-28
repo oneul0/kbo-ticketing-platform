@@ -6,7 +6,7 @@
     <springProperty scope="context" name="SPRING_PROFILES_ACTIVE" source="spring.profiles.active" defaultValue="dev"/>
 
     <property name="PATTERN"
-              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [user-service] %clr([%-5level]){colorByLevel} [%thread] %clr(%logger){magenta} : %msg\n"/>
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [queue-service] %clr([%-5level]){colorByLevel} [%thread] %clr(%logger){magenta} : %msg\n"/>
 
     <appender name="ASYNC_JSON" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="JSON"/>
@@ -15,7 +15,7 @@
     </appender>
 
     <appender name="GCP_LOGGING" class="com.google.cloud.logging.logback.LoggingAppender">
-        <log>User-Service</log>
+        <log>Queue-Service</log>
         <flushLevel>INFO</flushLevel>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <jsonGeneratorDecorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
@@ -33,16 +33,16 @@
             </fieldNames>
             <includeMdc>true</includeMdc>
             <mdcKeys>uri,method,ip,userAgent,requestId</mdcKeys>
-            <customFields>{"service":"user-service","env":"${SPRING_PROFILES_ACTIVE}"}</customFields>
+            <customFields>{"service":"queue-service","env":"${SPRING_PROFILES_ACTIVE}"}</customFields>
         </encoder>
     </appender>
 
-    <logger name="com.boeingmerryho.business.userservice" level="INFO" additivity="true">
+    <logger name="com.boeingmerryho.business.queueservice" level="INFO" additivity="true">
         <appender-ref ref="ASYNC_JSON"/>
     </logger>
 
     <springProfile name="dev">
-        <property name="LOG_PATH" value="./user-service/logs/${SPRING_PROFILES_ACTIVE}"/>
+        <property name="LOG_PATH" value="./queue-service/logs/${SPRING_PROFILES_ACTIVE}"/>
 
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
@@ -58,7 +58,7 @@
     </springProfile>
 
     <springProfile name="prod">
-        <property name="LOG_PATH" value="./user-service/logs/${SPRING_PROFILES_ACTIVE}"/>
+        <property name="LOG_PATH" value="./queue-service/logs/${SPRING_PROFILES_ACTIVE}"/>
 
         <root level="INFO">
             <appender-ref ref="GCP_LOGGING"/>
