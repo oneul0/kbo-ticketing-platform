@@ -66,6 +66,10 @@ dependencies {
     // Kafka
     implementation 'org.springframework.kafka:spring-kafka'
 
+    // GCP Logging
+    implementation 'com.google.cloud:spring-cloud-gcp-logging:6.1.0'
+    implementation 'com.google.cloud:spring-cloud-gcp-starter:6.1.0'
+
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
