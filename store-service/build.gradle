@@ -30,8 +30,10 @@ ext {
 
 dependencies {
     // Spring Boot starter
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // Spring cloud
@@ -62,9 +64,13 @@ dependencies {
 
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'io.lettuce:lettuce-core'
 
     // Kafka
     implementation 'org.springframework.kafka:spring-kafka'
+
+    // metric
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
     // GCP Logging
     implementation 'com.google.cloud:spring-cloud-gcp-logging:6.1.0'
