@@ -67,6 +67,10 @@ dependencies {
     implementation "org.mapstruct:mapstruct:1.5.5.Final"
     annotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
 
+    // GCP Logging
+    implementation 'com.google.cloud:spring-cloud-gcp-logging:6.1.0'
+    implementation 'com.google.cloud:spring-cloud-gcp-starter:6.1.0'
+
     // test
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
