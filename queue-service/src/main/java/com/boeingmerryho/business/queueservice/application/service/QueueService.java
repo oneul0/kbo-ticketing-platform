@@ -16,11 +16,15 @@ import com.boeingmerryho.business.queueservice.config.aop.DistributedLock;
 import com.boeingmerryho.business.queueservice.domain.entity.Queue;
 import com.boeingmerryho.business.queueservice.domain.model.CancelReason;
 import com.boeingmerryho.business.queueservice.exception.ErrorCode;
+import com.boeingmerryho.business.queueservice.infrastructure.QueueMetricsHelperImpl;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueCancelResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueUserRankResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,10 +36,15 @@ public class QueueService {
 	private final QueueApplicationMapper queueApplicationMapper;
 	private final QueueRedisHelper redisHelper;
 	private final QueuePersistenceHelper persistenceHelper;
+	private final QueueMetricsHelperImpl queueMetricsHelper;
 
 	@Description("대기열에 등록하는 메서드")
 	@DistributedLock(key = "#dto.storeId")
+	@Counted(value = "queue.request.count", description = "줄서기 요청 수")
 	public QueueJoinResponseDto joinQueue(QueueJoinServiceDto dto) throws InterruptedException {
+
+		Timer.Sample joinTimer = Timer.start(Metrics.globalRegistry);
+
 		Long storeId = dto.storeId();
 		Long userId = dto.userId();
 		Long ticketId = dto.ticketId();
@@ -54,7 +63,10 @@ public class QueueService {
 		redisHelper.joinUserInQueue(storeId, userId, ticketId);
 
 		Integer rank = redisHelper.getUserQueuePosition(storeId, userId);
+		queueMetricsHelper.incrementWaitingUsers();
+		queueMetricsHelper.countQueueRequest();
 
+		joinTimer.stop(Metrics.globalRegistry.timer("queue.wait.time"));
 		return queueApplicationMapper.toQueueJoinResponseDto(storeId, userId, rank);
 	}
 
@@ -90,6 +102,7 @@ public class QueueService {
 
 		Queue cancelledUser = persistenceHelper.saveQueueInfo(canceledQueue);
 
+		queueMetricsHelper.decrementWaitingUsers();
 		return queueApplicationMapper.toQueueCancelResponseDto(cancelledUser.getStoreId(), cancelledUser.getUserId());
 	}
 }
