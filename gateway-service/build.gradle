@@ -45,6 +45,13 @@ dependencies {
     implementation 'io.github.boeingmerryho:common-library:1.1.2'
 
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
+
+    // GCP Logging
+    implementation 'com.google.cloud:spring-cloud-gcp-logging:6.1.0'
+    implementation 'com.google.cloud:spring-cloud-gcp-starter:6.1.0'
+
+    // gRPC Netty
+    implementation("io.grpc:grpc-netty:1.71.0")
 }
 
 dependencyManagement {
