@@ -95,6 +95,7 @@ public class KakaoPayStrategy implements PaymentStrategy {
 			response.nextRedirectPcUrl(),
 			response.createdAt()
 		);
+
 		return paymentApplicationMapper.toPaymentReadyResponseServiceDto(
 			payment.getId(),
 			payment.getDiscountPrice(),
@@ -153,6 +154,12 @@ public class KakaoPayStrategy implements PaymentStrategy {
 			payment.confirmPayment();
 			paySessionHelper.deletePaymentExpiredTime(String.valueOf(payment.getId()));
 
+			log.info("[Payment Approve Success] paymentId: {}, userId: {}, approvedAt: {}",
+				payment.getId(),
+				payment.getUserId(),
+				response.createdAt()
+			);
+
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 				@Override
 				public void afterCommit() {
@@ -199,13 +206,13 @@ public class KakaoPayStrategy implements PaymentStrategy {
 			secretKey,
 			authPrefix
 		);
-		log.info("[Payment Cancel Success] tid: {}, price: {}, createdAt: {}, approvedAt: {}",
-			response.tid(),
-			response.approvedCancelAmount().total(),
-			response.createdAt(),
+		paymentDetail.getPayment().refundPayment();
+
+		log.info("[Payment Cancel Success] paymentId: {}, paymentDetailId: {}, canceledAt: {}",
+			paymentDetail.getPayment().getId(),
+			paymentDetail.getId(),
 			response.approvedAt()
 		);
-		paymentDetail.getPayment().refundPayment();
 
 		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 			@Override
