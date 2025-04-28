@@ -28,6 +28,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 			.excludePathPatterns(
 				"/api/**",
 				"/error/**",
+				"/actuator/**",
 
 				"/admin/v1/users/register",
 				"/admin/v1/users/check",
@@ -38,7 +39,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 			.excludePathPatterns(
 				"/admin/**",
 				"/error/**",
-
+				"/actuator/**",
+				
 				"/api/v1/users/register",
 				"/api/v1/users/check",
 				"/api/v1/users/login"

@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
-    <include resource="com/google/cloud/spring/logging/logback-appender.xml"/>
+    <include resource="com/google/cloud/spring/logging/logback-appender.xml" />
 
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
     <property name="PATTERN"
-              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [store-service] %clr([%-5level]){colorByLevel} [%thread] %clr(%logger){magenta} : %msg%n"/>
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [ticket-service] %clr([%-5level]){colorByLevel} [%thread] %clr(%logger){magenta} : %msg%n"/>
 
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
         <pattern>${PATTERN}</pattern>
         <charset>utf8</charset>
     </encoder>
 
+    <!-- springProfile: dev -->
     <springProfile name="dev">
+        <!-- Google Cloud Logging Appender -->
+        <appender name="GCP_LOGGING" class="com.google.cloud.logging.logback.LoggingAppender">
+            <log>Ticket-Service</log>
+            <flushLevel>WARN</flushLevel>
+        </appender>
 
-        <property name="LOG_PATH" value="./store-service/logs/dev"/>
+        <property name="LOG_PATH" value="./payment-service/logs/dev"/>
 
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
@@ -74,6 +80,7 @@
         </appender>
 
         <root level="INFO">
+            <appender-ref ref="GCP_LOGGING"/>
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="INFO_FILE"/>
             <appender-ref ref="WARN_FILE"/>
@@ -83,13 +90,13 @@
 
     <!-- springProfile: prod -->
     <springProfile name="prod">
-
+        <!-- Google Cloud Logging Appender -->
         <appender name="GCP_LOGGING" class="com.google.cloud.logging.logback.LoggingAppender">
-            <log>Store-Service</log>
-            <flushLevel>INFO</flushLevel>
+            <log>Ticket-Service</log>
+            <flushLevel>WARN</flushLevel>
         </appender>
 
-        <property name="LOG_PATH" value="./store-service/logs/prod"/>
+        <property name="LOG_PATH" value="./payment-service/logs/prod"/>
 
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>

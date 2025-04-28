@@ -37,7 +37,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
 
     // Spring Cloud 의존성
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
@@ -84,6 +84,9 @@ dependencies {
     // GCP Logging
     implementation 'com.google.cloud:spring-cloud-gcp-logging:6.1.0'
     implementation 'com.google.cloud:spring-cloud-gcp-starter:6.1.0'
+
+    // prometheus
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 }
 
 def querydslSrcDir = 'src/main/generated'
