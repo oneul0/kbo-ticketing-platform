@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
+    <include resource="com/google/cloud/spring/logging/logback-appender.xml"/>
+
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
 
     <property name="LOG_PATH_NAME" value="logs/application.log"/>
     <property name="PATTERN"
-              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] %clr([%-5level]){colorByLevel} [%thread] %clr(%logger){magenta}  :  %msg%n"/>
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [seat-service] %clr([%-5level]){colorByLevel} [%thread] %clr(%logger){magenta}  :  %msg%n"/>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH_NAME}</file>
@@ -25,8 +27,14 @@
         </encoder>
     </appender>
 
+    <appender name="GCP_LOGGING" class="com.google.cloud.logging.logback.LoggingAppender">
+        <log>Seat-Service</log>
+        <flushLevel>WARN</flushLevel>
+    </appender>
+
 
     <root level="INFO">
+        <appender-ref ref="GCP_LOGGING"/>
         <appender-ref ref="FILE"/>
         <appender-ref ref="CONSOLE"/>
     </root>
