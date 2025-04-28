@@ -58,6 +58,8 @@ public class QueueAdminController {
 		@PathVariable(name = "id") Long storeId,
 		@RequestParam Long userId
 	) {
+		log.info("[Delete From Queue] deleteUserFromQueue called by userId={}, storeId={}", userId, storeId);
+
 		QueueAdminDeleteUserServiceDto serviceDto = queuePresentationMapper.toQueueAdminDeleteUserServiceDto(storeId,
 			userId);
 		QueueAdminDeleteUserResponseDto sequence = queueAdminService.deleteUserFromQueue(serviceDto);
@@ -67,7 +69,10 @@ public class QueueAdminController {
 	@Description("대기열의 다음 사용자 호출 api. manager 사용 가능")
 	@RequiredRoles({UserRoleType.ADMIN, UserRoleType.MANAGER})
 	@PostMapping("/call")
-	public ResponseEntity<?> callNextUserFromQueue(@RequestBody QueueAdminCallUserRequestDto requestDto) {
+	public ResponseEntity<?> callNextUserFromQueue(
+		@RequestBody QueueAdminCallUserRequestDto requestDto) {
+		log.info("[Call Next User] callNextUserFromQueue called by storeId={}", requestDto.storeId());
+
 		QueueAdminCallUserServiceDto serviceDto = queuePresentationMapper.toQueueAdminCallUserServiceDto(requestDto);
 		QueueAdminCallUserResponseDto sequence = queueAdminService.callNextUserFromQueue(serviceDto);
 		return SuccessResponse.of(QueueSuccessCode.QUEUE_CALL_SUCCESS, sequence);
@@ -80,6 +85,7 @@ public class QueueAdminController {
 		@PathVariable(name = "id") Long storeId,
 		@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
 		@RequestParam(value = "size", required = false) Integer size) {
+		log.info("[Get Queue List] getQueueList called by storeId={}", storeId);
 		Pageable customPageable = pageableConfig.customPageable(page, size, null, null);
 		QueueAdminQueueListRequestDto requestDto = queuePresentationMapper.toQueueAdminQueueListRequestDto(storeId,
 			customPageable);
@@ -97,6 +103,10 @@ public class QueueAdminController {
 		@RequestParam(value = "sortDirection", required = false) String sortDirection,
 		@RequestParam(value = "by", required = false) String by,
 		@ModelAttribute QueueAdminSearchHistoryRequestDto requestDto) {
+		log.info(
+			"[Get Queue List] getQueueHistory called by userId={}, page={}, size={}, sortDirection={}, by={}, requestDto={}",
+			page, size, sortDirection, by, requestDto);
+
 		Pageable customPageable = pageableConfig.customPageable(page, size, sortDirection, by);
 
 		QueueAdminSearchHistoryServiceDto serviceDto = queuePresentationMapper.toQueueAdminSearchHistoryServiceDto(
@@ -112,6 +122,7 @@ public class QueueAdminController {
 		@PathVariable(name = "id") Long id,
 		@RequestAttribute Long userId
 	) {
+		log.info("[Delete Queue History] deleteQueueHistory called by userId={}, historyId={}", userId, id);
 
 		QueueAdminDeleteHistoryServiceDto serviceDto = queuePresentationMapper.toQueueAdminDeleteHistoryServiceDto(id,
 			userId);
@@ -126,6 +137,8 @@ public class QueueAdminController {
 		@PathVariable(name = "id") Long id,
 		@RequestAttribute Long userId,
 		@RequestBody QueueAdminUpdateHistoryRequestDto requestDto) {
+		log.info("[Update Queue History] updateQueueHistory called by userId={}, historyId={}, requestDto={}", userId,
+			id, requestDto);
 
 		QueueAdminUpdateHistoryServiceDto serviceDto = queuePresentationMapper.toQueueAdminUpdateHistoryServiceDto(
 			requestDto, id, userId);
