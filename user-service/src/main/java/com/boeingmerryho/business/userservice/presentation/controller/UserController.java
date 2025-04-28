@@ -1,7 +1,5 @@
 package com.boeingmerryho.business.userservice.presentation.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,9 +49,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1/users")
 public class UserController {
 
-	private static final Logger requestLogger = LoggerFactory.getLogger("requestLogger");
-	private static final Logger suspiciousLogger = LoggerFactory.getLogger("suspiciousLogger");
-
 	private final UserService userService;
 	private final UserPresentationMapper userPresentationMapper;
 
@@ -62,11 +57,11 @@ public class UserController {
 	)
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@RequestBody UserRegisterRequestDto requestDto) {
-		requestLogger.debug("[RegisterUser] Request received: {}", requestDto);
+		log.debug("[RegisterUser] Request received: {}", requestDto);
 		UserRegisterRequestServiceDto requestServiceDto = userPresentationMapper.toUserRegisterRequestServiceDto(
 			requestDto);
 		Long registeredUserId = userService.registerUser(requestServiceDto);
-		log.debug("[RegisterUser] User registered: userId={}", registeredUserId);
+		log.info("[RegisterUser] User registered: userId={}", registeredUserId);
 		return SuccessResponse.of(UserSuccessCode.USER_REGISTER_SUCCESS, registeredUserId);
 	}
 
@@ -77,10 +72,10 @@ public class UserController {
 	public ResponseEntity<SuccessResponse<UserFindResponseDto>> findUser(
 		@RequestAttribute("userId") Long userId
 	) {
-		requestLogger.debug("[FindUser] Request received: userId={}", userId);
+		log.debug("[FindUser] Request received: userId={}", userId);
 		UserFindRequestServiceDto requestServiceDto = userPresentationMapper.toUserSearchRequestServiceDto(userId);
 		UserFindResponseDto responseDto = userService.findUser(requestServiceDto);
-		log.debug("[FindUser] User found: {}", responseDto);
+		log.info("[FindUser] User found: {}", responseDto);
 		return SuccessResponse.of(UserSuccessCode.USER_FIND_SUCCESS, responseDto);
 	}
 
@@ -90,11 +85,11 @@ public class UserController {
 	@PutMapping("/me")
 	public ResponseEntity<?> updateUser(@RequestAttribute("userId") Long id,
 		@RequestBody UserUpdateRequestDto requestDto) {
-		requestLogger.debug("[UpdateUser] Request received: userId={}, updateData={}", id, requestDto);
+		log.debug("[UpdateUser] Request received: userId={}, updateData={}", id, requestDto);
 		UserUpdateRequestServiceDto requestServiceDto = userPresentationMapper.toUserUpdateRequestServiceDto(
 			requestDto, id);
 		UserAdminUpdateResponseDto responseDto = userService.updateMe(requestServiceDto);
-		log.debug("[UpdateUser] User updated: {}", responseDto);
+		log.info("[UpdateUser] User updated: {}", responseDto);
 		return SuccessResponse.of(UserSuccessCode.USER_UPDATE_SUCCESS, responseDto);
 	}
 
@@ -103,11 +98,11 @@ public class UserController {
 	)
 	@DeleteMapping("/me")
 	public ResponseEntity<?> withdrawUser(@RequestAttribute("userId") Long id) {
-		requestLogger.debug("[WithdrawUser] Request received: userId={}", id);
+		log.debug("[WithdrawUser] Request received: userId={}", id);
 		UserWithdrawRequestServiceDto requestServiceDto = userPresentationMapper.toUserWithdrawRequestServiceDto(
 			id);
 		Long withdrawUserId = userService.withdrawUser(requestServiceDto);
-		log.debug("[WithdrawUser] User withdrawn: userId={}", withdrawUserId);
+		log.info("[WithdrawUser] User withdrawn: userId={}", withdrawUserId);
 		return SuccessResponse.of(UserSuccessCode.USER_WITHDRAW_SUCCESS, withdrawUserId);
 	}
 
@@ -117,11 +112,11 @@ public class UserController {
 	@PostMapping("/login")
 	public ResponseEntity<SuccessResponse<UserLoginResponseDto>> loginUser(
 		@RequestBody UserLoginRequestDto requestDto) {
-		requestLogger.debug("[LoginUser] Login attempt: email={}", requestDto.email());
+		log.info("[LoginUser] Login attempt: email={}", requestDto.email());
 		UserLoginRequestServiceDto requestServiceDto = userPresentationMapper.toUserLoginRequestServiceDto(
 			requestDto);
 		UserLoginResponseDto responseDto = userService.loginUser(requestServiceDto);
-		log.debug("[LoginUser] Login successful: accessToken issued");
+		log.info("[LoginUser] Login successful: accessToken issued");
 		return SuccessResponse.of(UserSuccessCode.USER_LOGIN_SUCCESS, responseDto);
 	}
 
@@ -132,11 +127,11 @@ public class UserController {
 	public ResponseEntity<?> logoutUser(
 		@RequestAttribute("userId") Long userId
 	) {
-		requestLogger.debug("[LogoutUser] Logout request received: userId={}", userId);
+		log.info("[LogoutUser] Logout request received: userId={}", userId);
 		UserLogoutRequestServiceDto requestServiceDto = userPresentationMapper.toUserLogoutRequestServiceDto(
 			userId);
 		userService.logoutUser(requestServiceDto);
-		log.debug("[LogoutUser] Logout successful: userId={}", userId);
+		log.info("[LogoutUser] Logout successful: userId={}", userId);
 		return SuccessResponse.of(UserSuccessCode.USER_LOGOUT_SUCCESS);
 	}
 
@@ -146,12 +141,12 @@ public class UserController {
 	@GetMapping("/check")
 	public ResponseEntity<SuccessResponse<UserCheckEmailResponseDto>> checkEmail(
 		@RequestParam(value = "email") String email) {
-		requestLogger.debug("[CheckEmail] Email check request: email={}", email);
+		log.info("[CheckEmail] Email check request: email={}", email);
 		UserCheckEmailRequestServiceDto requestServiceDto = userPresentationMapper.toUserCheckEmailRequestServiceDto(
 			email);
 		UserCheckEmailResponseDto responseDto = userService.checkEmail(
 			requestServiceDto);
-		log.debug("[CheckEmail] Email check result: {}", responseDto);
+		log.info("[CheckEmail] Email check result: {}", responseDto);
 		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_CHECK_SUCCESS, responseDto);
 	}
 
@@ -159,11 +154,11 @@ public class UserController {
 	@PostMapping("/verify/send")
 	public ResponseEntity<SuccessResponse<UserVerificationResponseDto>> sendVerificationCode(
 		@RequestBody @Valid UserEmailVerificationRequestDto dto) {
-		requestLogger.debug("[SendVerificationCode] Sending verification code: email={}", dto.email());
+		log.info("[SendVerificationCode] Sending verification code: email={}", dto.email());
 		UserEmailVerificationRequestServiceDto requestServiceDto = userPresentationMapper.toUserEmailVerificationRequestServiceDto(
 			dto);
 		UserVerificationResponseDto responseDto = userService.sendVerificationCode(requestServiceDto);
-		log.debug("[SendVerificationCode] Verification code sent");
+		log.info("[SendVerificationCode] Verification code sent");
 		return SuccessResponse.of(UserSuccessCode.VERIFICATION_EMAIL_SEND_SUCCESS, responseDto);
 	}
 
@@ -171,11 +166,11 @@ public class UserController {
 	@PostMapping("/verify/check")
 	public ResponseEntity<SuccessResponse<UserVerificationResponseDto>> checkVerificationCode(
 		@RequestBody @Valid UserEmailVerificationCheckRequestDto dto) {
-		suspiciousLogger.warn("[CheckVerificationCode] Checking code for email={}", dto.email());
+		log.info("[CheckVerificationCode] Checking code for email={}", dto.email());
 		UserEmailVerificationCheckRequestServiceDto requestServiceDto = userPresentationMapper.toUserEmailVerificationCheckRequestServiceDto(
 			dto);
 		UserVerificationResponseDto responseDto = userService.verifyCode(requestServiceDto);
-		log.debug("[CheckVerificationCode] Verification code checked successfully");
+		log.info("[CheckVerificationCode] Verification code checked successfully");
 		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_VERIFICATION_SUCCESS, responseDto);
 	}
 
@@ -185,11 +180,11 @@ public class UserController {
 	@PostMapping("/refresh")
 	public ResponseEntity<SuccessResponse<UserRefreshTokenResponseDto>> refreshToken(
 		@RequestBody UserTokenRefreshRequestDto requestDto) {
-		suspiciousLogger.warn("[RefreshToken] Refresh token requested");
+		log.info("[RefreshToken] Refresh token requested");
 		UserRefreshTokenRequestServiceDto requestServiceDto = userPresentationMapper.toUserRefreshTokenRequestServiceDto(
 			requestDto);
 		UserRefreshTokenResponseDto responseDto = userService.refreshToken(requestServiceDto);
-		log.debug("[RefreshToken] Token refreshed successfully");
+		log.info("[RefreshToken] Token refreshed successfully");
 		return SuccessResponse.of(UserSuccessCode.USER_TOKEN_ISSUE_SUCCESS, responseDto);
 	}
 }

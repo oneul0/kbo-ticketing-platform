@@ -1,7 +1,5 @@
 package com.boeingmerryho.business.userservice.presentation.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Description;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -64,9 +62,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/admin/v1/users")
 public class UserAdminController {
 
-	private static final Logger requestLogger = LoggerFactory.getLogger("requestLogger");
-	private static final Logger suspiciousLogger = LoggerFactory.getLogger("suspiciousLogger");
-
 	private final UserAdminService userAdminService;
 	private final UserPresentationMapper userPresentationMapper;
 	private final PageableConfig pageableConfig;
@@ -75,20 +70,20 @@ public class UserAdminController {
 	@PostMapping("/register")
 	public ResponseEntity<SuccessResponse<Long>> registerAdminUser(
 		@RequestBody UserAdminRegisterRequestDto requestDto) {
-		requestLogger.debug("[RegisterUser] Request received: {}", requestDto);
+		log.debug("[RegisterUser] Request received: {}", requestDto);
 		UserAdminRegisterRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminSignUpServiceDto(
 			requestDto);
 		Long registeredUserId = userAdminService.registerUserAdmin(requestServiceDto);
-		log.debug("[RegisterUser] User registered: userId={}", registeredUserId);
+		log.info("[RegisterUser] User registered: userId={}", registeredUserId);
 		return SuccessResponse.of(UserSuccessCode.USER_REGISTER_SUCCESS, registeredUserId);
 	}
 
 	@Description("모든 사용자 리스트 중 id가 일치하는 사용자 조회")
 	@GetMapping("/{id}")
 	public ResponseEntity<SuccessResponse<UserAdminFindResponseDto>> findUser(@PathVariable Long id) {
-		requestLogger.debug("[FindUser] Request received for userId: {}", id);
+		log.debug("[FindUser] Request received for userId: {}", id);
 		UserAdminFindRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminFindRequestServiceDto(id);
-		requestLogger.debug("[FindUser] User found: {}", requestServiceDto.id());
+		log.info("[FindUser] User found: {}", requestServiceDto.id());
 		return SuccessResponse.of(UserSuccessCode.USER_FIND_SUCCESS, userAdminService.findUserAdmin(requestServiceDto));
 	}
 
@@ -96,11 +91,11 @@ public class UserAdminController {
 	@PutMapping("/{id}")
 	public ResponseEntity<SuccessResponse<UserAdminUpdateResponseDto>> updateUser(@PathVariable Long id,
 		@RequestBody UserAdminUpdateRequestDto requestDto) {
-		requestLogger.debug("[UpdateUser] Request received for userId: {}, data: {}", id, requestDto);
+		log.debug("[UpdateUser] Request received for userId: {}, data: {}", id, requestDto);
 		UserAdminUpdateRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminUpdateRequestServiceDto(
 			requestDto, id);
 		UserAdminUpdateResponseDto responseDto = userAdminService.updateUser(requestServiceDto);
-		requestLogger.debug("[UpdateUser] User updated: {}", responseDto);
+		log.info("[UpdateUser] User updated: {}", responseDto);
 		return SuccessResponse.of(UserSuccessCode.USER_UPDATE_SUCCESS, responseDto);
 	}
 
@@ -108,11 +103,11 @@ public class UserAdminController {
 	@PutMapping("/me")
 	public ResponseEntity<?> updateUserMaster(@RequestAttribute("userId") Long id,
 		@RequestBody UserAdminUpdateRequestDto requestDto) {
-		requestLogger.debug("[UpdateUserMaster] Request received for userId: {}, data: {}", id, requestDto);
+		log.debug("[UpdateUserMaster] Request received for userId: {}, data: {}", id, requestDto);
 		UserAdminUpdateRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminUpdateRequestServiceDto(
 			requestDto, id);
 		UserAdminUpdateResponseDto responseDto = userAdminService.updateMe(requestServiceDto);
-		requestLogger.debug("[UpdateUserMaster] User updated: {}", responseDto);
+		log.info("[UpdateUserMaster] User updated: {}", responseDto);
 		return SuccessResponse.of(UserSuccessCode.USER_UPDATE_SUCCESS, responseDto);
 	}
 
@@ -120,44 +115,44 @@ public class UserAdminController {
 	@PutMapping("/roles/{id}")
 	public ResponseEntity<SuccessResponse<UserAdminUpdateRoleResponseDto>> updateRoleUserMaster(@PathVariable Long id,
 		@RequestBody UserAdminUpdateRoleRequestDto requestDto) {
-		requestLogger.debug("[UpdateRoleUserMaster] Request received for userId: {}, data: {}", id, requestDto);
+		log.debug("[UpdateRoleUserMaster] Request received for userId: {}, data: {}", id, requestDto);
 		UserAdminUpdateRoleRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminUpdateRoleRequestServiceDto(
 			requestDto, id);
 		UserAdminUpdateRoleResponseDto responseDto = userAdminService.updateUserRole(requestServiceDto);
-		requestLogger.debug("[UpdateRoleUserMaster] User role updated: {}", responseDto);
+		log.info("[UpdateRoleUserMaster] User role updated: {}", responseDto);
 		return SuccessResponse.of(UserSuccessCode.USER_UPDATE_SUCCESS, responseDto);
 	}
 
 	@Description("회원 탈퇴(본인)")
 	@DeleteMapping("/me")
 	public ResponseEntity<?> withdrawUserMaster(@PathVariable Long id) {
-		requestLogger.debug("[WithdrawUserMaster] Request received for userId: {}", id);
+		log.info("[WithdrawUserMaster] Request received for userId: {}", id);
 		UserAdminWithdrawRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminWithdrawRequestServiceDto(
 			id);
 		Long withdrawId = userAdminService.withdrawUser(requestServiceDto);
-		requestLogger.debug("[WithdrawUserMaster] User withdrawn: {}", withdrawId);
+		log.info("[WithdrawUserMaster] User withdrawn: {}", withdrawId);
 		return SuccessResponse.of(UserSuccessCode.USER_WITHDRAW_SUCCESS, withdrawId);
 	}
 
 	@Description("사용자 삭제")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteUserMaster(@RequestAttribute("userId") Long id) {
-		requestLogger.debug("[DeleteUserMaster] Request received for userId: {}", id);
+		log.info("[DeleteUserMaster] Request received for userId: {}", id);
 		UserAdminDeleteRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminDeleteRequestServiceDto(
 			id);
 		Long deletedId = userAdminService.deleteUser(requestServiceDto);
-		requestLogger.debug("[DeleteUserMaster] User deleted: {}", deletedId);
+		log.info("[DeleteUserMaster] User deleted: {}", deletedId);
 		return SuccessResponse.of(UserSuccessCode.USER_DELETE_SUCCESS, deletedId);
 	}
 
 	@Description("사용자 권한 회수(삭제)")
 	@DeleteMapping("/roles/{id}")
 	public ResponseEntity<?> deleteRoleUserMaster(@PathVariable Long id) {
-		requestLogger.debug("[DeleteRoleUserMaster] Request received for userId: {}", id);
+		log.info("[DeleteRoleUserMaster] Request received for userId: {}", id);
 		UserAdminDeleteRoleRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminDeleteRoleRequestServiceDto(
 			id);
 		Long deletedId = userAdminService.deleteUserRole(requestServiceDto);
-		requestLogger.debug("[DeleteRoleUserMaster] User role deleted: {}", deletedId);
+		log.info("[DeleteRoleUserMaster] User role deleted: {}", deletedId);
 		return SuccessResponse.of(UserSuccessCode.USER_ROLE_DELETED_SUCCESS, deletedId);
 	}
 
@@ -168,14 +163,14 @@ public class UserAdminController {
 		@RequestParam(value = "size", required = false) Integer size,
 		@RequestParam(value = "sortDirection", required = false) String sortDirection,
 		@RequestParam(value = "by", required = false) String by, @ModelAttribute UserAdminSearchRequestDto requestDto) {
-		requestLogger.debug("[SearchUsers] Request received with params: page={}, size={}, sortDirection={}, by={}",
+		log.debug("[SearchUsers] Request received with params: page={}, size={}, sortDirection={}, by={}",
 			page, size, sortDirection, by);
 		Pageable customPageable = pageableConfig.customPageable(page, size, sortDirection, by);
 
 		UserAdminSearchRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminSearchRequestServiceDto(
 			requestDto, customPageable);
 		Page<UserAdminSearchResponseDto> responseDtos = userAdminService.searchUsers(requestServiceDto, customPageable);
-		requestLogger.debug("[SearchUsers] Users found: {}", responseDtos.getContent());
+		log.info("[SearchUsers] Users found: {}", responseDtos.getContent());
 		return SuccessResponse.of(UserSuccessCode.USER_SEARCH_SUCCESS, responseDtos);
 	}
 
@@ -183,11 +178,11 @@ public class UserAdminController {
 	@GetMapping("/check")
 	public ResponseEntity<SuccessResponse<UserAdminCheckEmailResponseDto>> checkEmail(
 		@RequestParam(value = "email") String email) {
-		requestLogger.debug("[CheckEmail] Request received for email: {}", email);
+		log.info("[CheckEmail] Request received for email: {}", email);
 		UserAdminCheckEmailRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminCheckEmailRequestServiceDto(
 			email);
 		UserAdminCheckEmailResponseDto responseDto = userAdminService.checkEmail(requestServiceDto);
-		requestLogger.debug("[CheckEmail] Email check response: {}", responseDto);
+		log.info("[CheckEmail] Email check response: {}", responseDto);
 		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_CHECK_SUCCESS, responseDto);
 	}
 
@@ -195,11 +190,11 @@ public class UserAdminController {
 	@PostMapping("/verify/send")
 	public ResponseEntity<SuccessResponse<UserAdminVerificationResponseDto>> sendVerificationCode(
 		@RequestBody @Valid UserAdminEmailVerificationRequestDto dto) {
-		requestLogger.debug("[SendVerificationCode] Request received: {}", dto);
+		log.info("[SendVerificationCode] Request received: {}", dto);
 		UserAdminEmailVerificationRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminEmailVerificationRequestServiceDto(
 			dto);
 		UserAdminVerificationResponseDto responseDto = userAdminService.sendVerificationCode(requestServiceDto);
-		requestLogger.debug("[SendVerificationCode] Verification code sent: {}", responseDto);
+		log.info("[SendVerificationCode] Verification code sent: {}", responseDto);
 		return SuccessResponse.of(UserSuccessCode.VERIFICATION_EMAIL_SEND_SUCCESS, responseDto);
 	}
 
@@ -207,11 +202,11 @@ public class UserAdminController {
 	@PostMapping("/verify/check")
 	public ResponseEntity<SuccessResponse<UserAdminVerificationResponseDto>> checkVerificationCode(
 		@RequestBody @Valid UserAdminEmailVerificationCheckRequestDto dto) {
-		requestLogger.debug("[CheckVerificationCode] Request received: {}", dto);
+		log.info("[CheckVerificationCode] Request received: {}", dto);
 		UserAdminEmailVerificationCheckRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminEmailVerificationCheckRequestServiceDto(
 			dto);
 		UserAdminVerificationResponseDto responseDto = userAdminService.verifyCode(requestServiceDto);
-		requestLogger.debug("[CheckVerificationCode] Verification code checked: {}", responseDto);
+		log.info("[CheckVerificationCode] Verification code checked: {}", responseDto);
 		return SuccessResponse.of(UserSuccessCode.USER_EMAIL_VERIFICATION_SUCCESS, responseDto);
 	}
 
@@ -219,11 +214,11 @@ public class UserAdminController {
 	@PostMapping("/refresh")
 	public ResponseEntity<SuccessResponse<UserAdminRefreshTokenResponseDto>> refreshToken(
 		@RequestBody UserAdminTokenRefreshRequestDto requestDto) {
-		requestLogger.debug("[RefreshToken] Request received: {}", requestDto);
+		log.info("[RefreshToken] Request received: {}", requestDto);
 		UserAdminRefreshTokenRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminRefreshTokenRequestServiceDto(
 			requestDto);
 		UserAdminRefreshTokenResponseDto responseDto = userAdminService.refreshToken(requestServiceDto);
-		requestLogger.debug("[RefreshToken] Token refreshed: {}", responseDto);
+		log.info("[RefreshToken] Token refreshed: {}", responseDto);
 		return SuccessResponse.of(UserSuccessCode.USER_TOKEN_ISSUE_SUCCESS, responseDto);
 	}
 
@@ -231,11 +226,11 @@ public class UserAdminController {
 	@PostMapping("/login")
 	public ResponseEntity<SuccessResponse<UserLoginResponseDto>> loginUser(
 		@RequestBody UserAdminLoginRequestDto requestDto) {
-		requestLogger.debug("[LoginUser] Request received: {}", requestDto);
+		log.info("[LoginUser] Request received: {}", requestDto);
 		UserAdminLoginRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminLoginRequestServiceDto(
 			requestDto);
 		UserLoginResponseDto responseDto = userAdminService.loginUserAdmin(requestServiceDto);
-		requestLogger.debug("[LoginUser] User logged in: {}", responseDto);
+		log.info("[LoginUser] User logged in: {}", responseDto);
 		return SuccessResponse.of(UserSuccessCode.USER_LOGIN_SUCCESS, responseDto);
 	}
 
@@ -244,11 +239,11 @@ public class UserAdminController {
 	public ResponseEntity<?> logoutUser(
 		@RequestAttribute("userId") Long userId
 	) {
-		requestLogger.debug("[LogoutUser] Request received for userId: {}", userId);
+		log.info("[LogoutUser] Request received for userId: {}", userId);
 		UserLogoutRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminLogoutRequestServiceDto(
 			userId);
 		userAdminService.logoutUser(requestServiceDto);
-		requestLogger.debug("[LogoutUser] User logged out: {}", userId);
+		log.info("[LogoutUser] User logged out: {}", userId);
 		return SuccessResponse.of(UserSuccessCode.USER_LOGOUT_SUCCESS);
 	}
 
