@@ -43,5 +43,9 @@ public interface UserHelper {
 	void removeUserMembershipInfoFromRedis(Long id);
 
 	void validatePassword(String requestPassword, String storedPassword);
+
+	void countLoginFailure(Long userId);
+
+	void countLoginAttempt(Long userId);
 }
 
