@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.boeingmerryho.business.userservice.infrastructure.interceptor.RequestHeaderMdcInterceptor;
+
 import io.github.boeingmerryho.commonlibrary.interceptor.AdminCheckInterceptor;
 import io.github.boeingmerryho.commonlibrary.interceptor.UserCheckInterceptor;
 
@@ -11,9 +13,13 @@ import io.github.boeingmerryho.commonlibrary.interceptor.UserCheckInterceptor;
 public class WebMvcConfig implements WebMvcConfigurer {
 
 	private final RedisUserInfoProvider userInfoProvider;
+	private final RequestHeaderMdcInterceptor requestHeaderMdcInterceptor;
 
-	public WebMvcConfig(RedisUserInfoProvider userInfoProvider) {
+	public WebMvcConfig(RedisUserInfoProvider userInfoProvider,
+		RequestHeaderMdcInterceptor requestHeaderMdcInterceptor) {
 		this.userInfoProvider = userInfoProvider;
+		this.requestHeaderMdcInterceptor = requestHeaderMdcInterceptor;
+
 	}
 
 	@Override
@@ -37,6 +43,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				"/api/v1/users/check",
 				"/api/v1/users/login"
 			);
+
+		registry.addInterceptor(requestHeaderMdcInterceptor)
+			.addPathPatterns("/**");
 	}
 
 }

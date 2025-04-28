@@ -12,7 +12,7 @@
 
     <!-- springProfile: dev -->
     <springProfile name="dev">
-        <property name="LOG_PATH" value="logs/dev"/>
+        <property name="LOG_PATH" value="./payment-service/logs/dev"/>
 
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
@@ -40,12 +40,15 @@
 
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="INFO_FILE"/>
+            <appender-ref ref="WARN_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
         </root>
     </springProfile>
 
     <!-- springProfile: prod -->
     <springProfile name="prod">
-        <property name="LOG_PATH" value="logs/prod"/>
+        <property name="LOG_PATH" value="./payment-service/logs/prod"/>
 
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
