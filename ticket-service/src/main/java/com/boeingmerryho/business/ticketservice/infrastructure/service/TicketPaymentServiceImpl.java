@@ -22,6 +22,7 @@ import com.boeingmerryho.business.ticketservice.exception.TicketException;
 import com.boeingmerryho.business.ticketservice.infrastructure.adapter.kafka.dto.response.SeatInfo;
 
 import io.github.resilience4j.retry.annotation.Retry;
+import io.micrometer.core.annotation.Counted;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -98,6 +99,7 @@ public class TicketPaymentServiceImpl implements TicketPaymentService {
 		return paymentInfoMap;
 	}
 
+	@Counted(value = "ticket.payment.failure", description = "Number of payment failures")
 	public void fallbackCreatePayment(List<Ticket> tickets, List<SeatInfo> seats, Throwable t) {
 		log.error("결제 서비스 호출 실패 - fallback 수행");
 		ticketPaymentRepository.saveFailedPayment(tickets);

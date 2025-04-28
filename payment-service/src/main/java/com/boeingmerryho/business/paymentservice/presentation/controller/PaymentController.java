@@ -33,6 +33,7 @@ import com.boeingmerryho.business.paymentservice.utils.PageableUtils;
 import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
 import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -45,6 +46,7 @@ public class PaymentController {
 
 	@PostMapping("/pay")
 	@RequiredRoles({UserRoleType.NORMAL, UserRoleType.SENIOR})
+	@Timed(value = "payment_ready_time", description = "결제 요청 처리 시간")
 	public ResponseEntity<SuccessResponse<PaymentReadyResponseDto>> pay(
 		@RequestAttribute Long userId,
 		@RequestBody @Valid PaymentReadyRequestDto requestDto
@@ -58,6 +60,7 @@ public class PaymentController {
 
 	@PostMapping("/approve")
 	@RequiredRoles({UserRoleType.NORMAL, UserRoleType.SENIOR})
+	@Timed(value = "payment_approve_time_kakaopay", description = "결제 승인 처리 시간 (카카오페이)")
 	public ResponseEntity<SuccessResponse<PaymentApproveResponseDto>> approvePayment(
 		@RequestAttribute Long userId,
 		@RequestParam("pg_token") String pgToken,

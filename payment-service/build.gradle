@@ -42,6 +42,7 @@ dependencies {
 
     // spring starter
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
@@ -73,6 +74,13 @@ dependencies {
     // test
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // GCP Logging
+    implementation 'com.google.cloud:spring-cloud-gcp-logging:6.1.0'
+    implementation 'com.google.cloud:spring-cloud-gcp-starter:6.1.0'
+
+    // metric
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 dependencyManagement {
