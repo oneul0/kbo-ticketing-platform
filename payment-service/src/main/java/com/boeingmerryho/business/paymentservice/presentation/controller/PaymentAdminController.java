@@ -32,6 +32,7 @@ import com.boeingmerryho.business.paymentservice.utils.PageableUtils;
 import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
 import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -43,6 +44,7 @@ public class PaymentAdminController {
 
 	@PostMapping("/approve")
 	@RequiredRoles({UserRoleType.MANAGER, UserRoleType.ADMIN})
+	@Timed(value = "payment_approve_time_bank_transfer", description = "결제 승인 처리 시간 (무통장 입금)")
 	public ResponseEntity<SuccessResponse<PaymentApproveResponseDto>> approvePayment(
 		@RequestAttribute Long userId,
 		@RequestBody PaymentApproveRequestDto requestDto
@@ -56,6 +58,7 @@ public class PaymentAdminController {
 
 	@PostMapping("/{id}/refund")
 	@RequiredRoles({UserRoleType.MANAGER, UserRoleType.ADMIN})
+	@Timed(value = "payment_refund_time", description = "환불 처리 시간")
 	public ResponseEntity<SuccessResponse<PaymentRefundResponseDto>> refundPayment(
 		@RequestAttribute Long userId,
 		@PathVariable Long id

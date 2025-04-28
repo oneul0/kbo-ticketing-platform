@@ -19,9 +19,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(new UserCheckInterceptor(userInfoProvider))
-			.excludePathPatterns("/error/**");
+			.excludePathPatterns("/error/**", "/actuator/**");
 
 		registry.addInterceptor(new AdminCheckInterceptor(userInfoProvider))
-			.excludePathPatterns("/api/**", "/error/**");
+			.excludePathPatterns("/api/**", "/error/**", "/actuator/**");
 	}
 }
