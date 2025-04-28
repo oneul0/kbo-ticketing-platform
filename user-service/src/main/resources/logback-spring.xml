@@ -8,7 +8,6 @@
     <property name="PATTERN"
               value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] %clr([%-5level]){colorByLevel} [%thread] %clr(%logger){magenta} : %msg | uri=%X{uri} method=%X{method} ip=%X{ip} userAgent=%X{userAgent} requestId=%X{requestId}%n"/>
 
-    <!-- 콘솔 출력용 JSON 포맷 -->
     <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <jsonGeneratorDecorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
@@ -25,11 +24,11 @@
                 <thread>thread</thread>
             </fieldNames>
             <includeMdc>true</includeMdc>
+            <mdcKeys>uri,method,ip,userAgent,requestId</mdcKeys>
             <customFields>{"service":"user-service","env":"${SPRING_PROFILES_ACTIVE}"}</customFields>
         </encoder>
     </appender>
 
-    <!-- 일반 파일 로깅 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_FILE}</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -42,7 +41,6 @@
         </encoder>
     </appender>
 
-    <!-- 요청(request) 전용 파일 로깅 -->
     <appender name="REQUEST_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/user-service-request.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -56,7 +54,6 @@
         </encoder>
     </appender>
 
-    <!-- 의심스러운 행동(suspicious) 전용 파일 로깅 -->
     <appender name="SUSPICIOUS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/user-service-suspicious.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -70,7 +67,6 @@
         </encoder>
     </appender>
 
-    <!-- 비동기 설정 -->
     <appender name="ASYNC_JSON" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="JSON"/>
         <queueSize>500</queueSize>
@@ -95,24 +91,20 @@
         <discardingThreshold>0</discardingThreshold>
     </appender>
 
-    <!-- 기본 root 로그 설정 -->
     <root level="INFO">
         <appender-ref ref="ASYNC_JSON"/>
         <appender-ref ref="ASYNC_FILE"/>
     </root>
 
-    <!-- 사용자 서비스 전체 패키지 디버깅 로거 -->
-    <logger name="com.boeingmerryho.business.userservice" level="DEBUG" additivity="false">
+    <logger name="com.boeingmerryho.business.userservice" level="INFO" additivity="false">
         <appender-ref ref="ASYNC_JSON"/>
         <appender-ref ref="ASYNC_FILE"/>
     </logger>
 
-    <!-- 요청(request)용 로거 -->
-    <logger name="requestLogger" level="INFO" additivity="false">
+    <logger name="requestLogger" level="DEBUG" additivity="false">
         <appender-ref ref="ASYNC_REQUEST_FILE"/>
     </logger>
 
-    <!-- 의심(suspicious) 행동용 로거 -->
     <logger name="suspiciousLogger" level="WARN" additivity="false">
         <appender-ref ref="ASYNC_SUSPICIOUS_FILE"/>
     </logger>
