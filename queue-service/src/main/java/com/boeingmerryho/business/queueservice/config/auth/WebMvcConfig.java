@@ -21,14 +21,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addInterceptor(new UserCheckInterceptor(userInfoProvider))
 			.excludePathPatterns(
 				"/queue-service/**",
-				"/error/**"
+				"/error/**",
+				"/actuator/**"
 			);
 
 		registry.addInterceptor(new AdminCheckInterceptor(userInfoProvider))
 			.excludePathPatterns(
 				"/api/**",
 				"/queue-service/**",
-				"/error/**"
+				"/error/**",
+				"/actuator/**"
 			);
 	}
 }
