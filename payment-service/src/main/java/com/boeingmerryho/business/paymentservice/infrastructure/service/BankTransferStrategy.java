@@ -30,7 +30,9 @@ import com.boeingmerryho.business.paymentservice.presentation.code.PaymentErrorC
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.Ticket;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BankTransferStrategy implements PaymentStrategy {
@@ -53,6 +55,13 @@ public class BankTransferStrategy implements PaymentStrategy {
 			null,
 			getSupportedMethod()
 		));
+
+		log.info("[Payment Ready Success] paymentId: {}, userId: {}, createdAt: {}",
+			payment.getId(),
+			payment.getUserId(),
+			payment.getCreatedAt()
+		);
+
 		return paymentApplicationMapper.toPaymentReadyResponseServiceDto(
 			payment.getId(),
 			payment.getDiscountPrice(),
@@ -91,6 +100,12 @@ public class BankTransferStrategy implements PaymentStrategy {
 				);
 			}
 			payment.confirmPayment();
+
+			log.info("[Payment Approve Success] paymentId: {}, userId: {}, approvedAt: {}",
+				payment.getId(),
+				payment.getUserId(),
+				payment.getUpdatedAt()
+			);
 
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 				@Override
@@ -137,6 +152,12 @@ public class BankTransferStrategy implements PaymentStrategy {
 		PaymentDetail paymentDetail
 	) {
 		paymentDetail.getPayment().refundPayment();
+
+		log.info("[Payment Cancel Success] paymentId: {}, paymentDetailId: {}, canceledAt: {}",
+			paymentDetail.getPayment().getId(),
+			paymentDetail.getId(),
+			paymentDetail.getPayment().getUpdatedAt()
+		);
 
 		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 			@Override
