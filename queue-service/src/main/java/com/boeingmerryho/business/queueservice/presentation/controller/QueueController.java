@@ -45,6 +45,9 @@ public class QueueController {
 	public ResponseEntity<?> joinQueue(
 		@RequestAttribute Long userId,
 		@RequestBody QueueJoinRequestDto requestDto) {
+
+		log.info("[Join Queue] request userId: {}, storeId: {}", userId, requestDto.storeId());
+
 		QueueJoinServiceDto serviceDto = queuePresentationMapper.toQueueJoinServiceDto(requestDto, userId);
 		QueueJoinResponseDto rank = null;
 		try {
@@ -52,6 +55,8 @@ public class QueueController {
 		} catch (InterruptedException e) {
 			throw new GlobalException(ErrorCode.LOCK_ACQUISITION_FAIL);
 		}
+		log.info("[Join Queue] complete userId: {}, storeId: {}, rank: {}", userId, requestDto.storeId(), rank);
+
 		return SuccessResponse.of(QueueSuccessCode.QUEUE_JOIN_SUCCESS, rank);
 	}
 
@@ -62,8 +67,12 @@ public class QueueController {
 	public ResponseEntity<?> getMySequence(
 		@RequestAttribute Long userId,
 		@RequestParam Long storeId) {
+		log.info("[Get My Sequence] request userId: {}, storeId: {}", userId, storeId);
+
 		QueueUserSequenceServiceDto serviceDto = queuePresentationMapper.toQueueUserSequenceServiceDto(storeId, userId);
 		QueueUserRankResponseDto rank = queueService.getRank(serviceDto);
+
+		log.info("[Get My Sequence] complete userId: {}, storeId: {}, rank: {}", userId, storeId, rank);
 		return SuccessResponse.of(QueueSuccessCode.QUEUE_GET_SEQUENCE_SUCCESS, rank);
 	}
 
@@ -75,8 +84,12 @@ public class QueueController {
 		@RequestAttribute Long userId,
 		@PathVariable(name = "id") Long storeId
 	) {
+		log.info("[Cancel Queue] request userId: {}, storeId: {}", userId, storeId);
+
 		QueueCancelServiceDto serviceDto = queuePresentationMapper.toQueueCancelServiceDto(storeId, userId);
 		QueueCancelResponseDto sequence = queueService.cancelQueue(serviceDto);
+
+		log.info("[Cancel Queue] complete userId: {}, storeId: {}", userId, storeId);
 		return SuccessResponse.of(QueueSuccessCode.QUEUE_CANCEL_SUCCESS, sequence);
 	}
 
