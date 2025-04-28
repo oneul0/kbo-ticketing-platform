@@ -23,6 +23,8 @@ public class RedissonConfig {
 	public RedissonClient redissonClient() {
 		Config config = new Config();
 
+		config.setThreads(16).setNettyThreads(32);
+
 		config.setCodec(new JsonJacksonCodec());
 		config.useSingleServer()
 			.setAddress(address)
