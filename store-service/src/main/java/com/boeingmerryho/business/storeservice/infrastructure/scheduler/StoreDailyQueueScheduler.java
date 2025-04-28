@@ -11,6 +11,7 @@ import com.boeingmerryho.business.storeservice.domain.entity.Store;
 import com.boeingmerryho.business.storeservice.domain.repository.StoreRepository;
 import com.boeingmerryho.business.storeservice.infrastructure.kafka.scheduler.StoreQueueSchedulerProducer;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -21,6 +22,7 @@ public class StoreDailyQueueScheduler {
 	private final StoreQueueSchedulerProducer storeQueueSchedulerProducer;
 
 	@Scheduled(cron = "0 0 0 * * *")
+	@Timed(value = "store_daily_scheduler_execution_time", description = "Store Daily Scheduler 실행 시간")
 	public void scheduleDailyQueue() {
 		List<Store> stores = storeRepository.findAllByIsDeletedFalse();
 		// TODO 배치로 id만 가져온다든지, 특정 가게만 가져온다든지 이벤트 payload에 넣고 뿌리기
