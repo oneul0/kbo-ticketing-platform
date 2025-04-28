@@ -41,8 +41,7 @@
         <appender-ref ref="ASYNC_JSON"/>
     </logger>
 
-    <!-- springProfile: dev and prod shared settings -->
-    <springProfile name="dev,prod">
+    <springProfile name="dev">
         <property name="LOG_PATH" value="./user-service/logs/${SPRING_PROFILES_ACTIVE}"/>
 
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -52,62 +51,16 @@
             </encoder>
         </appender>
 
-        <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${LOG_PATH}/application_info.log</file>
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_PATH}/application_info.%d{yyyyMMdd}.gz</fileNamePattern>
-                <maxHistory>7</maxHistory>
-            </rollingPolicy>
-            <filter class="ch.qos.logback.classic.filter.LevelFilter">
-                <level>INFO</level>
-                <onMatch>ACCEPT</onMatch>
-                <onMismatch>DENY</onMismatch>
-            </filter>
-            <encoder>
-                <pattern>${PATTERN}</pattern>
-                <charset>utf8</charset>
-            </encoder>
-        </appender>
-
-        <appender name="WARN_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${LOG_PATH}/application_warn.log</file>
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_PATH}/application_warn.%d{yyyyMMdd}.gz</fileNamePattern>
-                <maxHistory>7</maxHistory>
-            </rollingPolicy>
-            <filter class="ch.qos.logback.classic.filter.LevelFilter">
-                <level>WARN</level>
-                <onMatch>ACCEPT</onMatch>
-                <onMismatch>DENY</onMismatch>
-            </filter>
-            <encoder>
-                <pattern>${PATTERN}</pattern>
-                <charset>utf8</charset>
-            </encoder>
-        </appender>
-
-        <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${LOG_PATH}/application_error.log</file>
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_PATH}/application_error.%d{yyyyMMdd}.gz</fileNamePattern>
-                <maxHistory>7</maxHistory>
-            </rollingPolicy>
-            <filter class="ch.qos.logback.classic.filter.LevelFilter">
-                <level>ERROR</level>
-                <onMatch>ACCEPT</onMatch>
-                <onMismatch>DENY</onMismatch>
-            </filter>
-            <encoder>
-                <pattern>${PATTERN}</pattern>
-                <charset>utf8</charset>
-            </encoder>
-        </appender>
-
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="INFO_FILE"/>
-            <appender-ref ref="WARN_FILE"/>
-            <appender-ref ref="ERROR_FILE"/>
+            <appender-ref ref="GCP_LOGGING"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+        <property name="LOG_PATH" value="./user-service/logs/${SPRING_PROFILES_ACTIVE}"/>
+
+        <root level="INFO">
             <appender-ref ref="GCP_LOGGING"/>
         </root>
     </springProfile>
