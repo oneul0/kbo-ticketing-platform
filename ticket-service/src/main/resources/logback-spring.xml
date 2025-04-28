@@ -4,7 +4,7 @@
 
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
     <property name="PATTERN"
-              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [payment-service] %clr([%-5level]){colorByLevel} [%thread] %clr(%logger){magenta} : %msg%n"/>
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [ticket-service] %clr([%-5level]){colorByLevel} [%thread] %clr(%logger){magenta} : %msg%n"/>
 
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
         <pattern>${PATTERN}</pattern>
