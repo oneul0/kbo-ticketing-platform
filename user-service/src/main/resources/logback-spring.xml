@@ -96,12 +96,12 @@
         <appender-ref ref="ASYNC_FILE"/>
     </root>
 
-    <logger name="com.boeingmerryho.business.userservice" level="DEBUG" additivity="false">
+    <logger name="com.boeingmerryho.business.userservice" level="INFO" additivity="false">
         <appender-ref ref="ASYNC_JSON"/>
         <appender-ref ref="ASYNC_FILE"/>
     </logger>
 
-    <logger name="requestLogger" level="INFO" additivity="false">
+    <logger name="requestLogger" level="DEBUG" additivity="false">
         <appender-ref ref="ASYNC_REQUEST_FILE"/>
     </logger>
 
