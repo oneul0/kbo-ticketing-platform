@@ -18,6 +18,8 @@ import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,6 +39,8 @@ public class UserHelperImpl implements UserHelper {
 	private final UserRepository userRepository;
 
 	private final PasswordEncoder passwordEncoder;
+
+	private final MeterRegistry meterRegistry;
 
 	@Override
 	public User findUserById(Long id) {
@@ -156,4 +160,25 @@ public class UserHelperImpl implements UserHelper {
 		}
 	}
 
+	@Override
+	public void countLoginFailure(Long userId) {
+		Counter counter = Counter.builder("user.login.failures")
+			.tag("userId", String.valueOf(userId))
+			.description("사용자별 로그인 실패 횟수")
+			.register(meterRegistry);
+
+		counter.increment();
+		log.warn("login failed for user {}", userId);
+	}
+
+	@Override
+	public void countLoginAttempt(Long userId) {
+		Counter counter = Counter.builder("user.login.attempts")
+			.tag("userId", String.valueOf(userId))
+			.description("사용자별 로그인 시도 횟수")
+			.register(meterRegistry);
+
+		counter.increment();
+		log.warn("login attempted user {}", userId);
+	}
 }
