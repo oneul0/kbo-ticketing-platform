@@ -18,16 +18,25 @@ public class RequestHeaderMdcInterceptor implements HandlerInterceptor {
 		String method = request.getHeader("X-Method");
 		String uri = request.getHeader("X-Uri");
 
-		if (requestId != null)
+		if (requestId != null) {
 			MDC.put("requestId", requestId);
-		if (clientIp != null)
+		}
+
+		if (clientIp != null) {
 			MDC.put("ip", clientIp);
-		if (userAgent != null)
+		}
+
+		if (userAgent != null) {
 			MDC.put("userAgent", userAgent);
-		if (method != null)
+		}
+
+		if (method != null) {
 			MDC.put("method", method);
-		if (uri != null)
+		}
+
+		if (uri != null) {
 			MDC.put("uri", uri);
+		}
 
 		return true;
 	}
