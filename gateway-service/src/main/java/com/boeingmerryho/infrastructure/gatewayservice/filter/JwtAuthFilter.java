@@ -65,7 +65,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 		String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 		log.info("authHeader : {}", authHeader);
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			log.warn("JWT 토큰 없음, path: {}", path);
+			log.warn("JWT Token not found, path: {}", path);
 			throw new GlobalException(JwtErrorCode.JWT_NOT_FOUND);
 		}
 
@@ -73,12 +73,12 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 			String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
 
 			if (isTokenBlacklisted(token)) {
-				log.error("JWT 블랙리스트, path: {}, token: {}", path, maskToken(token));
+				log.error("JWT blacklisted, path: {}, token: {}", path, maskToken(token));
 				throw new GlobalException(JwtErrorCode.JWT_BLACKLISTED);
 			}
 
 			Claims claims = validateToken(token);
-			log.info("JWT 검증 성공, userId: {}, path: {}", claims.getSubject(), path);
+			log.info("JWT validation success, userId: {}, path: {}", claims.getSubject(), path);
 
 			ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
 				.header("X-User-Id", claims.getSubject())
@@ -87,16 +87,16 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 			return chain.filter(exchange.mutate().request(modifiedRequest).build());
 
 		} catch (ExpiredJwtException e) {
-			log.error("JWT 만료, path: {}, error: {}", path, e.getMessage());
+			log.error("JWT expired, path: {}, error: {}", path, e.getMessage());
 			throw new GlobalException(JwtErrorCode.JWT_EXPIRED);
 		} catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
-			log.error("잘못된 JWT, path: {}, error: {}", path, e.getMessage());
+			log.error("Wrong JWT, path: {}, error: {}", path, e.getMessage());
 			throw new GlobalException(JwtErrorCode.WRONG_JWT);
 		} catch (GlobalException e) {
-			log.error("JWT 예외, path: {}, errorCode: {}", path, e.getErrorCode());
+			log.error("JWT Exception, path: {}, errorCode: {}", path, e.getErrorCode());
 			throw e;
 		} catch (Exception e) {
-			log.error("JWT 검증 실패, path: {}, error: {}", path, e.getMessage());
+			log.error("JWT validation failed, path: {}, error: {}", path, e.getMessage());
 			throw new GlobalException(JwtErrorCode.JWT_VERIFIED_FAIL);
 		}
 	}

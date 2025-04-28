@@ -3,8 +3,6 @@ package com.boeingmerryho.infrastructure.gatewayservice.filter;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -13,17 +11,15 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 /**
  * 로깅, 요청 횟수 제한 적용 필터
  */
+@Slf4j
 @Component
 public class GlobalGatewayFilter implements GlobalFilter, Ordered {
-
-	private static final Logger logger = LoggerFactory.getLogger(GlobalGatewayFilter.class);
-	private static final Logger requestLogger = LoggerFactory.getLogger("requestLogger");
-	private static final Logger suspiciousLogger = LoggerFactory.getLogger("suspiciousLogger");
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -54,7 +50,7 @@ public class GlobalGatewayFilter implements GlobalFilter, Ordered {
 			.request(mutatedRequest)
 			.build();
 
-		requestLogger.info("Incoming request");
+		log.info("Incoming request");
 
 		long startTime = System.currentTimeMillis();
 
@@ -62,10 +58,10 @@ public class GlobalGatewayFilter implements GlobalFilter, Ordered {
 			.doOnError(throwable -> {
 				if (throwable.getMessage() != null && throwable.getMessage().contains("Rate limit exceeded")) {
 					MDC.put("status", "429");
-					suspiciousLogger.error("Rate limit exceeded", throwable);
+					log.error("Rate limit exceeded", throwable);
 				} else {
 					MDC.put("status", "500");
-					logger.error("Request failed", throwable);
+					log.error("Request failed", throwable);
 				}
 			})
 			.then(Mono.fromRunnable(() -> {
@@ -77,7 +73,7 @@ public class GlobalGatewayFilter implements GlobalFilter, Ordered {
 					: "unknown";
 				MDC.put("status", status);
 
-				requestLogger.info("Request completed");
+				log.info("Request completed");
 				MDC.clear();
 			}));
 	}
