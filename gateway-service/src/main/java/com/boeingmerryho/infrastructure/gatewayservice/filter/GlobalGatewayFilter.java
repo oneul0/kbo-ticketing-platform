@@ -1,17 +1,19 @@
 package com.boeingmerryho.infrastructure.gatewayservice.filter;
 
+import java.util.Objects;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-import java.util.UUID;
+import reactor.core.publisher.Mono;
 
 /**
  * 로깅, 요청 횟수 제한 적용 필터
@@ -40,7 +42,7 @@ public class GlobalGatewayFilter implements GlobalFilter, Ordered {
 		MDC.put("method", method);
 		MDC.put("uri", uri);
 
-		exchange.getRequest().mutate()
+		ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
 			.header("X-Request-Id", requestId)
 			.header("X-Client-Ip", clientIp)
 			.header("X-User-Agent", userAgent != null ? userAgent : "unknown")
@@ -48,11 +50,15 @@ public class GlobalGatewayFilter implements GlobalFilter, Ordered {
 			.header("X-Uri", uri)
 			.build();
 
+		ServerWebExchange mutatedExchange = exchange.mutate()
+			.request(mutatedRequest)
+			.build();
+
 		requestLogger.info("Incoming request");
 
 		long startTime = System.currentTimeMillis();
 
-		return chain.filter(exchange)
+		return chain.filter(mutatedExchange)
 			.doOnError(throwable -> {
 				if (throwable.getMessage() != null && throwable.getMessage().contains("Rate limit exceeded")) {
 					MDC.put("status", "429");
