@@ -11,13 +11,7 @@
         <charset>utf8</charset>
     </encoder>
 
-    <!-- springProfile: dev -->
     <springProfile name="dev">
-        <!-- Google Cloud Logging Appender -->
-        <appender name="GCP_LOGGING" class="com.google.cloud.logging.logback.LoggingAppender">
-            <log>Membership-Service</log>
-            <flushLevel>INFO</flushLevel>
-        </appender>
 
         <property name="LOG_PATH" value="./membership-service/logs/dev"/>
 
@@ -80,7 +74,6 @@
         </appender>
 
         <root level="INFO">
-            <appender-ref ref="GCP_LOGGING"/>
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="INFO_FILE"/>
             <appender-ref ref="WARN_FILE"/>
@@ -90,6 +83,11 @@
 
     <!-- springProfile: prod -->
     <springProfile name="prod">
+        <!-- Google Cloud Logging Appender -->
+        <appender name="GCP_LOGGING" class="com.google.cloud.logging.logback.LoggingAppender">
+            <log>Membership-Service</log>
+            <flushLevel>INFO</flushLevel>
+        </appender>
         <property name="LOG_PATH" value="./membership-service/logs/prod"/>
 
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -151,6 +149,7 @@
         </appender>
 
         <root level="INFO">
+            <appender-ref ref="GCP_LOGGING"/>
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="INFO_FILE"/>
             <appender-ref ref="WARN_FILE"/>
