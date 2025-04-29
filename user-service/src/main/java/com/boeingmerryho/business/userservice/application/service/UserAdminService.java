@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,6 +37,7 @@ import com.boeingmerryho.business.userservice.application.utils.mail.EmailServic
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.domain.UserSearchCriteria;
+import com.boeingmerryho.business.userservice.domain.event.UserWithdrawEvent;
 import com.boeingmerryho.business.userservice.domain.repository.CustomUserRepository;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
@@ -61,6 +63,7 @@ public class UserAdminService {
 	private final CustomUserRepository customUserRepository;
 	private final UserApplicationMapper userApplicationMapper;
 	private final PasswordEncoder passwordEncoder;
+	private final ApplicationEventPublisher applicationEventPublisher;
 
 	private final UserHelper userHelper;
 	private final RedisUtil redisUtil;
@@ -192,7 +195,7 @@ public class UserAdminService {
 		User user = userHelper.findUserById(dto.id());
 		user.softDelete(user.getId());
 
-		redisUtil.clearRedisUserData(user.getId());
+		applicationEventPublisher.publishEvent(new UserWithdrawEvent(user.getId()));
 		return user.getId();
 	}
 

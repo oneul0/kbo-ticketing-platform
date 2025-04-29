@@ -3,6 +3,7 @@ package com.boeingmerryho.business.userservice.application.service;
 import java.util.Map;
 
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ import com.boeingmerryho.business.userservice.application.dto.response.other.Use
 import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
 import com.boeingmerryho.business.userservice.application.utils.mail.EmailService;
 import com.boeingmerryho.business.userservice.domain.User;
+import com.boeingmerryho.business.userservice.domain.event.UserWithdrawEvent;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
@@ -51,6 +53,8 @@ public class UserService {
 	private final UserVerificationHelper userVerificationHelper;
 	private final RedisUtil redisUtil;
 	private final EmailService emailService;
+
+	private final ApplicationEventPublisher applicationEventPublisher;
 
 	@Transactional
 	@Counted(value = "user.register", description = "회원가입 요청 횟수")
@@ -145,7 +149,7 @@ public class UserService {
 		User user = userHelper.findUserById(dto.id());
 		user.softDelete(user.getId());
 
-		redisUtil.clearRedisUserData(user.getId());
+		applicationEventPublisher.publishEvent(new UserWithdrawEvent(user.getId()));
 
 		return user.getId();
 	}
