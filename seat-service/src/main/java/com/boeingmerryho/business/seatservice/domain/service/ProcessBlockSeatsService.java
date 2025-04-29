@@ -112,7 +112,6 @@ public class ProcessBlockSeatsService {
 		String membershipKey = createMembershipKey(userId);
 		log.info("membershipKey: {}", membershipKey);
 		String membership = getMembership(membershipKey);
-		log.info("{}", membership);
 
 		if (request.date().isEqual(today.plusDays(7))) {
 			checkReservationTime(membership);
@@ -156,7 +155,7 @@ public class ProcessBlockSeatsService {
 				if (
 					seatBucketValue == null || !seatBucketValue.get("status").equals(ReservationStatus.AVAILABLE.name())
 				) {
-					throw new GlobalException(SeatErrorCode.NOT_FOUND_SEAT);
+					throw new GlobalException(SeatErrorCode.ALREADY_PROCESS_SEAT);
 				}
 
 				updateSeatStatus(userId, seatBucketValue, seatBucketKey);
@@ -216,11 +215,15 @@ public class ProcessBlockSeatsService {
 	}
 
 	private String getMembership(String membershipKey) {
+		Object name;
+
 		Map<Object, Object> membershipInfo = redisTemplate.opsForHash().entries(membershipKey);
-		Object name = membershipInfo.get("name");
+
+		name = membershipInfo.get("name");
 
 		if (name == null) {
-			throw new GlobalException(MembershipErrorCode.NOT_FOUND_MEMBERSHIP);
+			name = Membership.NORMAL.name();
+			// throw new GlobalException(MembershipErrorCode.NOT_FOUND_MEMBERSHIP);
 		}
 
 		return name.toString();

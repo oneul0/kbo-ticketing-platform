@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AutoCreateCacheSeatsScheduler {
 	private final AutoCreateCacheSeatsService autoCreateCacheSeatsService;
 
-	@Scheduled(cron = "0 30 00 * * MON-SUN")
+	@Scheduled(cron = "0 00 17 * * MON-SUN")
 	public void createCacheSeatsOnEveryDay() {
 		autoCreateCacheSeatsService.preloadCacheSeats();
 	}
