@@ -26,6 +26,8 @@ import com.boeingmerryho.business.userservice.application.dto.response.other.Use
 import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
 import com.boeingmerryho.business.userservice.application.utils.mail.EmailService;
 import com.boeingmerryho.business.userservice.domain.User;
+import com.boeingmerryho.business.userservice.domain.event.UserLoginFailureEvent;
+import com.boeingmerryho.business.userservice.domain.event.UserLoginSuccessEvent;
 import com.boeingmerryho.business.userservice.domain.event.UserWithdrawEvent;
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
@@ -72,6 +74,7 @@ public class UserService {
 		return userRepository.save(user).getId();
 	}
 
+	@Transactional
 	public UserLoginResponseDto loginUser(UserLoginRequestServiceDto dto) {
 		User user = userHelper.findUserByEmail(dto.email());
 
@@ -80,7 +83,7 @@ public class UserService {
 		userHelper.validatePassword(dto.password(), user.getPassword());
 
 		try {
-			redisUtil.updateUserInfo(user);
+			applicationEventPublisher.publishEvent(new UserLoginSuccessEvent(user.getId(), user));
 
 			Map<String, String> tokenMap = redisUtil.updateUserJwtToken(user.getId());
 			UserLoginResponseServiceDto serviceDto = UserLoginResponseServiceDto.fromTokens(
@@ -88,13 +91,9 @@ public class UserService {
 				tokenMap.get("refreshToken")
 			);
 
-			userVerificationHelper.getNotifyLoginResponse(user.getId());
-
 			return userApplicationMapper.toUserLoginResponseDto(serviceDto);
 		} catch (Exception e) {
-			userHelper.countLoginFailure(user.getId());
-			redisUtil.rollbackUserInfo(user.getId());
-			redisUtil.rollbackUserJwtToken(user.getId());
+			applicationEventPublisher.publishEvent(new UserLoginFailureEvent(user.getId()));
 
 			throw new GlobalException(ErrorCode.LOGIN_FAILED);
 		}

@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class UserEventListener {
+public class UserWithdrawEventListener {
 	private final RedisUtil redisUtil;
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
