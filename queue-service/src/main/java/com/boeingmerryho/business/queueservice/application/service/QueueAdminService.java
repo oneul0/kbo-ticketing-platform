@@ -26,6 +26,7 @@ import com.boeingmerryho.business.queueservice.domain.entity.QueueSearchCriteria
 import com.boeingmerryho.business.queueservice.domain.model.CancelReason;
 import com.boeingmerryho.business.queueservice.domain.model.QueueUserInfo;
 import com.boeingmerryho.business.queueservice.exception.ErrorCode;
+import com.boeingmerryho.business.queueservice.infrastructure.QueueMetricsHelperImpl;
 import com.boeingmerryho.business.queueservice.presentation.dto.request.admin.QueueAdminQueueListRequestDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminCallUserResponseDto;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.admin.QueueAdminDeleteUserResponseDto;
@@ -44,6 +45,7 @@ public class QueueAdminService {
 	private final QueueApplicationMapper queueApplicationMapper;
 	private final QueueRedisHelper redisHelper;
 	private final QueuePersistenceHelper persistenceHelper;
+	private final QueueMetricsHelperImpl queueMetricsHelper;
 
 	@Description("대기열에서 사용자 강제 삭제 메서드")
 	@DistributedLock(key = "#dto.storeId")
@@ -59,10 +61,10 @@ public class QueueAdminService {
 			throw new GlobalException(ErrorCode.CAN_NOT_REMOVE_QUEUE);
 		}
 
-		Queue canceledQueue = Queue.cancelQueue(storeId, userId, sequence, CancelReason.ILLEGAL_USED); //todo: 삭제 이유 세분화
+		Queue canceledQueue = Queue.cancelQueue(storeId, userId, sequence, CancelReason.ILLEGAL_USED);
 
 		Queue cancelledUser = persistenceHelper.saveQueueInfo(canceledQueue);
-
+		queueMetricsHelper.decrementWaitingUsers();
 		return queueApplicationMapper.toQueueAdminDeleteUserResponseDto(cancelledUser.getStoreId(),
 			cancelledUser.getUserId());
 	}
@@ -84,7 +86,7 @@ public class QueueAdminService {
 		Queue canceledQueue = Queue.confirmQueue(storeId, userInfo.userId(), sequence);
 
 		Queue cancelledUser = persistenceHelper.saveQueueInfo(canceledQueue);
-
+		queueMetricsHelper.decrementWaitingUsers();
 		return queueApplicationMapper.toQueueAdminCallUserResponseDto(
 			storeId,
 			cancelledUser.getUserId(),
