@@ -9,6 +9,8 @@ import com.boeingmerryho.business.paymentservice.presentation.dto.PaymentPresent
 import com.boeingmerryho.business.paymentservice.presentation.dto.request.PaymentCreationRequestDto;
 import com.boeingmerryho.business.paymentservice.presentation.dto.response.PaymentCreationResponseDto;
 
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -19,6 +21,8 @@ public class PaymentFeignController {
 	private final PaymentPresentationMapper paymentPresentationMapper;
 
 	@PostMapping("/payment-service/payments/create")
+	@Timed(value = "payment_create_time", description = "결제 정보 생성 시간")
+	@Counted(value = "payment_create_count", description = "결제 생성 요청 횟수")
 	public PaymentCreationResponseDto createPayment(
 		@RequestBody PaymentCreationRequestDto requestDto
 	) {

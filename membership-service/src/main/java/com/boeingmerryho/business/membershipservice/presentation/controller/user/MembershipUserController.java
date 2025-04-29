@@ -20,6 +20,7 @@ import com.boeingmerryho.business.membershipservice.presentation.dto.response.Me
 import io.github.boeingmerryho.commonlibrary.entity.UserRoleType;
 import io.github.boeingmerryho.commonlibrary.interceptor.RequiredRoles;
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -46,6 +47,7 @@ public class MembershipUserController {
 
 	@PostMapping("/{membershipId}/reserve")
 	@RequiredRoles({UserRoleType.NORMAL, UserRoleType.SENIOR})
+	@Timed(value = "membership_reserve_request", description = "멤버십 요청 처리 시간")
 	public ResponseEntity<SuccessResponse<MembershipUserCreateResponseDto>> reserveMembership(
 		@PathVariable Long membershipId,
 		@RequestAttribute Long userId
