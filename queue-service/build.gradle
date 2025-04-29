@@ -90,6 +90,9 @@ dependencies {
     // prometheus
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
+    // Protobuf
+    implementation 'com.google.protobuf:protobuf-java:4.28.2'
+
 }
 
 def querydslSrcDir = 'src/main/generated'
