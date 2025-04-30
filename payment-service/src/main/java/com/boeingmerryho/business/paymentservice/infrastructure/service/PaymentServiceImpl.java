@@ -53,7 +53,7 @@ public class PaymentServiceImpl implements PaymentService {
 	public PaymentReadyResponseServiceDto pay(
 		PaymentReadyRequestServiceDto requestServiceDto
 	) {
-		// assertInExpiredTimePayment(requestServiceDto.paymentId());
+		assertInExpiredTimePayment(requestServiceDto.paymentId());
 		Payment payment = paymentReader.getPayment(requestServiceDto.paymentId());
 		assertAvailablePayment(
 			payment,
