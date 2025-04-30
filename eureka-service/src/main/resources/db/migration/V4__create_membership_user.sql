@@ -3,6 +3,7 @@ CREATE TABLE baseball.p_membership_user
     id            bigint auto_increment,
     user_id       bigint               not null,
     membership_id bigint               not null,
+    season        year                 not null,
     is_active     boolean default true not null,
     is_deleted    boolean default false not null,
     deleted_by    bigint               null,
@@ -11,10 +12,9 @@ CREATE TABLE baseball.p_membership_user
     created_at    datetime             null,
     updated_by    bigint               null,
     updated_at    datetime             null,
-    season        year                 not null,
     PRIMARY KEY (id, season),
     CONSTRAINT uk_user_season UNIQUE (user_id, season)
-) default character set utf8mb4
+)
     PARTITION BY LIST (season) (
     PARTITION p1995 VALUES IN (1995),
     PARTITION p1996 VALUES IN (1996),

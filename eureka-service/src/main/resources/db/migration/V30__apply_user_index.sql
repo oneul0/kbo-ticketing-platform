@@ -1,0 +1,1 @@
+CREATE INDEX idx_user_email ON p_user (email);
