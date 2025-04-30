@@ -5,6 +5,6 @@ create table p_ticket_history
     match_id   bigint       not null,
     seat_id    bigint       not null,
     user_id    bigint       not null,
-    status     nvarchar(20) not null,
+    status     varchar(20) not null,
     created_at datetime     not null
-);
+) default character set utf8mb4;

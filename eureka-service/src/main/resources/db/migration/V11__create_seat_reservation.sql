@@ -12,4 +12,4 @@ create table p_seat_reservation
     created_at       datetime              null,
     updated_by       bigint                null,
     updated_at       datetime              null
-);
+) default character set utf8mb4;

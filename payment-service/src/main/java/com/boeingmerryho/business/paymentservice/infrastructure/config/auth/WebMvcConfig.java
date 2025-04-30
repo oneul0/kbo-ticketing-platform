@@ -21,6 +21,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addInterceptor(new UserCheckInterceptor(userInfoProvider))
 			.excludePathPatterns(
 				"/error/**",
+				"/payment-service/**",
 				"/actuator/**"
 			);
 
@@ -28,6 +29,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 			.excludePathPatterns(
 				"/api/**",
 				"/error/**",
+				"/payment-service/**",
 				"/actuator/**"
 			);
 	}
