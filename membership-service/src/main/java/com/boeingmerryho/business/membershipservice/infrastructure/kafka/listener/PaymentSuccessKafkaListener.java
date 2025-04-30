@@ -17,7 +17,11 @@ public class PaymentSuccessKafkaListener {
 
 	private final ListenerService listenerService;
 
-	@KafkaListener(topics = "payment-membership-process", groupId = "membership-service")
+	@KafkaListener(
+		topics = "payment-membership-process",
+		groupId = "membership-service",
+		containerFactory = "paymentKafkaListenerContainerFactory"
+	)
 	public void membershipSucceed(MembershipPaymentEvent response) {
 		try {
 			switch (response.event()) {
