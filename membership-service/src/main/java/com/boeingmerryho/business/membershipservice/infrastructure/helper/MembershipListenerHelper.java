@@ -21,18 +21,16 @@ public class MembershipListenerHelper {
 	private final MembershipRepository membershipJpaRepository;
 	private final MembershipUserRepository membershipUserRepository;
 
-	private static final String MEMBERSHIP_USER_PREFIX = "membership:user:";
+	private static final String MEMBERSHIP_USER_PREFIX = "membership:users:";
 
 	@Transactional
-	public void handleMembershipSuccess(Long userId) {
-		String userKey = MEMBERSHIP_USER_PREFIX + userId;
+	public void handleMembershipSuccess(Long userId, Long membershipId) {
+		String userKey = MEMBERSHIP_USER_PREFIX + membershipId;
 
-		String membershipIdValue = redisTemplate.opsForValue().get(userKey);
-		if (membershipIdValue == null) {
+		Boolean isMember = redisTemplate.opsForSet().isMember(userKey, userId.toString());
+		if (Boolean.FALSE.equals(isMember)) {
 			throw new GlobalException(MembershipErrorCode.NOT_FOUND_USER);
 		}
-
-		Long membershipId = Long.valueOf(membershipIdValue);
 
 		Membership membership = membershipJpaRepository.findByIdAndIsDeletedFalse(membershipId)
 			.orElseThrow(() -> new GlobalException(MembershipErrorCode.NOT_FOUND));
@@ -46,6 +44,6 @@ public class MembershipListenerHelper {
 
 		membershipUserRepository.save(newUser);
 
-		redisTemplate.delete(userKey);
+		redisTemplate.opsForSet().remove(userKey, userId.toString());
 	}
 }
