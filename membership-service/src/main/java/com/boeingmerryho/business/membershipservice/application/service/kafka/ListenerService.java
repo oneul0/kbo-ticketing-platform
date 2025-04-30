@@ -18,7 +18,7 @@ public class ListenerService {
 
 	@Transactional
 	public void paymentSucceed(MembershipPaymentEvent response) {
-		membershipListenerHelper.handleMembershipSuccess(response.userId());
+		membershipListenerHelper.handleMembershipSuccess(response.userId(), response.membershipId());
 	}
 
 	public void paymentFailure(MembershipPaymentEvent response) {
