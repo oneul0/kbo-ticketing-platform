@@ -1,9 +1,0 @@
-INSERT INTO `baseball`.p_match (id, home_team_id, away_team_id, match_day, stadium_id, status) VALUES (1, 1, 6, '2025-04-08', 1, 'PROGRESS');
-INSERT INTO `baseball`.p_match (id, home_team_id, away_team_id, match_day, stadium_id, status) VALUES (2, 1, 6, '2025-04-09', 1, 'PROGRESS');
-INSERT INTO `baseball`.p_match (id, home_team_id, away_team_id, match_day, stadium_id, status) VALUES (3, 1, 6, '2025-04-10', 1, 'PROGRESS');
-INSERT INTO `baseball`.p_match (id, home_team_id, away_team_id, match_day, stadium_id, status) VALUES (4, 1, 7, '2025-04-11', 1, 'PROGRESS');
-INSERT INTO `baseball`.p_match (id, home_team_id, away_team_id, match_day, stadium_id, status) VALUES (5, 1, 7, '2025-04-12', 1, 'PROGRESS');
-INSERT INTO `baseball`.p_match (id, home_team_id, away_team_id, match_day, stadium_id, status) VALUES (6, 1, 7, '2025-04-13', 1, 'PROGRESS');
-INSERT INTO `baseball`.p_match (id, home_team_id, away_team_id, match_day, stadium_id, status) VALUES (7, 1, 9, '2025-04-15', 1, 'PROGRESS');
-INSERT INTO `baseball`.p_match (id, home_team_id, away_team_id, match_day, stadium_id, status) VALUES (8, 1, 9, '2025-04-16', 1, 'PROGRESS');
-INSERT INTO `baseball`.p_match (id, home_team_id, away_team_id, match_day, stadium_id, status) VALUES (9, 1, 9, '2025-04-17', 1, 'PROGRESS');

@@ -4,8 +4,8 @@ create table p_ticket
     match_id   bigint                         not null,
     seat_id    bigint                         not null,
     user_id    bigint                         not null,
-    ticket_no  nvarchar(50)                   not null,
-    status     nvarchar(20) default 'PENDING' not null,
+    ticket_no  varchar(50)                   not null,
+    status     varchar(20) default 'PENDING' not null,
     price      int                            not null,
     is_deleted boolean      default false     not null,
     deleted_by bigint                         null,
@@ -14,4 +14,4 @@ create table p_ticket
     created_at datetime                       null,
     updated_by bigint                         null,
     updated_at datetime                       null
-);
+) default character set utf8mb4;
