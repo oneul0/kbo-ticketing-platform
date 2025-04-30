@@ -1,0 +1,1 @@
+CREATE INDEX idx_match_day ON p_match (match_day);

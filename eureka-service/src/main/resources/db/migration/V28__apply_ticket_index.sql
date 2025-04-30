@@ -1,0 +1,1 @@
+CREATE INDEX idx_ticket_ticket_no ON p_ticket (ticket_no);
