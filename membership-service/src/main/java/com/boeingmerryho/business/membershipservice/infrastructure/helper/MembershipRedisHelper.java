@@ -24,54 +24,59 @@ public class MembershipRedisHelper {
 	private final RedisTemplate<String, String> redisTemplate;
 	private final Map<String, Counter> reserveFailCounters = new ConcurrentHashMap<>();
 
+	private static final String MEMBERSHIP_TTL_PREFIX = "membership:ttl:";
+	private static final String MEMBERSHIP_USER_PREFIX = "membership:users:";
 	private static final String MEMBERSHIP_STOCK_PREFIX = "membership:stock:";
-	private static final String MEMBERSHIP_USER_PREFIX = "membership:user:";
+	private static final String MEMBERSHIP_ROLLBACK_ID_PREFIX = "membership:user:map:";
 	private static final String LUA_SCRIPT = """
-			local remain = tonumber(redis.call("DECR", KEYS[1]))
-			if remain < 0 then
-				redis.call("INCR", KEYS[1]);
-				return -1
-			end
-			if redis.call("EXISTS", KEYS[2]) == 1 then
+			if redis.call("SISMEMBER", KEYS[2], ARGV[1]) == 1 then
 				return -2
 			end
-			redis.call("SET", KEYS[2], ARGV[2], "EX", tonumber(ARGV[3]))
+		
+			local remain = tonumber(redis.call("DECR", KEYS[1]))
+			if remain < 0 then
+				redis.call("INCR", KEYS[1])
+				return -1
+			end
+		
+			redis.call("SADD", KEYS[2], ARGV[1])
+			redis.call("SET", ARGV[2], 1, "EX", tonumber(ARGV[3]))
+		 	redis.call("SET", ARGV[4], ARGV[5], "EX", tonumber(ARGV[3]))
 			return 1
 		""";
 	// TODO redis command 각각 쪼개기 방법이랑 비교
-	// TODO SET 자료구조 활용하면 심플하게 변경 가능하니 고려
 
 	public void reserve(Long membershipId, Long userId, Duration ttl) {
+		String ttlKey = MEMBERSHIP_TTL_PREFIX + userId;
+		String mapKey = MEMBERSHIP_ROLLBACK_ID_PREFIX + userId;
+		String userKey = MEMBERSHIP_USER_PREFIX + membershipId;
 		String stockKey = MEMBERSHIP_STOCK_PREFIX + membershipId;
-		String userKey = MEMBERSHIP_USER_PREFIX + userId;
 
 		DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>(LUA_SCRIPT, Long.class);
 
-		try {
-			Long result = redisTemplate.execute(
-				redisScript,
-				List.of(stockKey, userKey),
-				userId.toString(), membershipId.toString(), String.valueOf(ttl.getSeconds())
-			);
-			switch (result.intValue()) {
-				case 1 -> {
-				}
-				case -1 -> {
-					incrementReserveFailCounter("out_of_stock");
-					throw new GlobalException(MembershipErrorCode.OUT_OF_STOCK);
-				}
-				case -2 -> {
-					incrementReserveFailCounter("already_reserved");
-					throw new GlobalException(MembershipErrorCode.ALREADY_RESERVED);
-				}
-				default -> {
-					incrementReserveFailCounter("invalid_request");
-					throw new GlobalException(MembershipErrorCode.UNKNOWN_ERROR);
-				}
+		Long result = redisTemplate.execute(
+			redisScript,
+			List.of(stockKey, userKey),
+			userId.toString(),
+			ttlKey, String.valueOf(ttl.getSeconds()),
+			mapKey, membershipId.toString()
+		);
+
+		switch (result.intValue()) {
+			case 1 -> {
 			}
-		} catch (Exception e) {
-			incrementReserveFailCounter("redis_exception");
-			throw new GlobalException(MembershipErrorCode.REDIS_ERROR);
+			case -1 -> {
+				incrementReserveFailCounter("out_of_stock");
+				throw new GlobalException(MembershipErrorCode.OUT_OF_STOCK);
+			}
+			case -2 -> {
+				incrementReserveFailCounter("already_reserved");
+				throw new GlobalException(MembershipErrorCode.ALREADY_RESERVED);
+			}
+			default -> {
+				incrementReserveFailCounter("invalid_request");
+				throw new GlobalException(MembershipErrorCode.UNKNOWN_ERROR);
+			}
 		}
 	}
 
