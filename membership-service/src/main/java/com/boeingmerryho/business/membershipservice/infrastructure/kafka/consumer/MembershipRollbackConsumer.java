@@ -16,6 +16,7 @@ public class MembershipRollbackConsumer {
 
 	private static final String STOCK_PREFIX = "membership:stock:";
 	private static final String USERS_PREFIX = "membership:users:";
+	private static final String MEMBERSHIP_ROLLBACK_ID_PREFIX = "membership:user:map:";
 
 	@KafkaListener(
 		topics = "membership.reserve.rollback",
@@ -35,9 +36,11 @@ public class MembershipRollbackConsumer {
 
 			String stockKey = STOCK_PREFIX + membershipId;
 			String userSetKey = USERS_PREFIX + membershipId;
+			String mapKey = MEMBERSHIP_ROLLBACK_ID_PREFIX + userId;
 
 			redisTemplate.opsForValue().increment(stockKey);
 			redisTemplate.opsForSet().remove(userSetKey, userId);
+			redisTemplate.delete(mapKey);
 
 			log.info("Rollback success: membershipId={}, userId={}", membershipId, userId);
 		} catch (Exception e) {

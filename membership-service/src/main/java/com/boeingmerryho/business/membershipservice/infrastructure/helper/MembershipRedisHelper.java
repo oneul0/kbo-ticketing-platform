@@ -41,7 +41,7 @@ public class MembershipRedisHelper {
 		
 			redis.call("SADD", KEYS[2], ARGV[1])
 			redis.call("SET", ARGV[2], 1, "EX", tonumber(ARGV[3]))
-		 	redis.call("SET", ARGV[4], ARGV[5], "EX", tonumber(ARGV[3]))
+		 	redis.call("SET", ARGV[4], ARGV[5])
 			return 1
 		""";
 	// TODO redis command 각각 쪼개기 방법이랑 비교
