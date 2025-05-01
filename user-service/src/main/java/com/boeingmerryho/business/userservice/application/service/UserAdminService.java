@@ -30,8 +30,8 @@ import com.boeingmerryho.business.userservice.application.dto.request.admin.User
 import com.boeingmerryho.business.userservice.application.dto.request.admin.UserAdminWithdrawRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.request.other.UserLogoutRequestServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.admin.UserAdminFindResponseDto;
+import com.boeingmerryho.business.userservice.application.dto.response.admin.UserAdminLoginResponseServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.inner.UserTokenResult;
-import com.boeingmerryho.business.userservice.application.dto.response.other.UserLoginResponseServiceDto;
 import com.boeingmerryho.business.userservice.application.utils.RedisUtil;
 import com.boeingmerryho.business.userservice.application.utils.mail.EmailService;
 import com.boeingmerryho.business.userservice.domain.User;
@@ -44,12 +44,12 @@ import com.boeingmerryho.business.userservice.domain.repository.CustomUserReposi
 import com.boeingmerryho.business.userservice.domain.repository.UserRepository;
 import com.boeingmerryho.business.userservice.exception.ErrorCode;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminCheckEmailResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminLoginResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminRefreshTokenResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminSearchResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateRoleResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminVerificationResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
 import io.micrometer.core.annotation.Counted;
@@ -163,7 +163,8 @@ public class UserAdminService {
 		redisUtil.clearRedisUserData(userId);
 	}
 
-	public UserLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto dto) {
+	@Transactional
+	public UserAdminLoginResponseDto loginUserAdmin(UserAdminLoginRequestServiceDto dto) {
 		User user = userHelper.findUserByEmail(dto.email());
 
 		userHelper.countLoginAttempt(user.getId());
@@ -174,12 +175,12 @@ public class UserAdminService {
 			applicationEventPublisher.publishEvent(new UserLoginSuccessEvent(user.getId(), user));
 
 			Map<String, String> tokenMap = redisUtil.updateUserJwtToken(user.getId());
-			UserLoginResponseServiceDto serviceDto = UserLoginResponseServiceDto.fromTokens(
+			UserAdminLoginResponseServiceDto serviceDto = UserAdminLoginResponseServiceDto.fromTokens(
 				tokenMap.get("accessToken"),
 				tokenMap.get("refreshToken")
 			);
 
-			return userApplicationMapper.toUserLoginResponseDto(serviceDto);
+			return userApplicationMapper.toUserAdminLoginResponseDto(serviceDto);
 		} catch (Exception e) {
 			applicationEventPublisher.publishEvent(new UserLoginFailureEvent(user.getId()));
 

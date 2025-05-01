@@ -4,6 +4,7 @@ create table p_match
     home_team_id bigint                          not null,
     away_team_id bigint                          not null,
     match_day    date                            not null,
+    match_time   time                            not null,
     stadium_id   bigint                          not null,
-    status       varchar(20) default 'PROGRESS' not null
-) default character set utf8mb4;
+    status       varchar(20) default 'PROGRESS'  not null
+);
