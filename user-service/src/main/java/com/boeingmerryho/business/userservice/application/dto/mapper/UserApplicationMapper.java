@@ -6,10 +6,12 @@ import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import com.boeingmerryho.business.userservice.application.dto.response.admin.UserAdminFindResponseDto;
+import com.boeingmerryho.business.userservice.application.dto.response.admin.UserAdminLoginResponseServiceDto;
 import com.boeingmerryho.business.userservice.application.dto.response.other.UserLoginResponseServiceDto;
 import com.boeingmerryho.business.userservice.domain.User;
 import com.boeingmerryho.business.userservice.domain.UserRoleType;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminCheckEmailResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminLoginResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminSearchResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateRoleResponseDto;
@@ -47,4 +49,6 @@ public interface UserApplicationMapper {
 	UserAdminVerificationResponseDto toUserAdminVerificationResponseDto(String email);
 
 	UserVerificationResponseDto toUserVerificationResponseDto(String email);
+
+	UserAdminLoginResponseDto toUserAdminLoginResponseDto(UserAdminLoginResponseServiceDto serviceDto);
 }
