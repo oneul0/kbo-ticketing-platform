@@ -44,12 +44,12 @@ import com.boeingmerryho.business.userservice.presentation.dto.request.admin.Use
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminUpdateRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.request.admin.UserAdminUpdateRoleRequestDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminCheckEmailResponseDto;
+import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminLoginResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminRefreshTokenResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminSearchResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminUpdateRoleResponseDto;
 import com.boeingmerryho.business.userservice.presentation.dto.response.admin.UserAdminVerificationResponseDto;
-import com.boeingmerryho.business.userservice.presentation.dto.response.other.UserLoginResponseDto;
 
 import io.github.boeingmerryho.commonlibrary.response.SuccessResponse;
 import jakarta.validation.Valid;
@@ -125,7 +125,7 @@ public class UserAdminController {
 
 	@Description("회원 탈퇴(본인)")
 	@DeleteMapping("/me")
-	public ResponseEntity<?> withdrawUserMaster(@PathVariable Long id) {
+	public ResponseEntity<?> withdrawUserMaster(@RequestAttribute("userId") Long id) {
 		log.info("[WithdrawUserMaster] Request received for userId: {}", id);
 		UserAdminWithdrawRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminWithdrawRequestServiceDto(
 			id);
@@ -224,12 +224,12 @@ public class UserAdminController {
 
 	@Description("email, password를 입력받아 로그인")
 	@PostMapping("/login")
-	public ResponseEntity<SuccessResponse<UserLoginResponseDto>> loginUser(
+	public ResponseEntity<SuccessResponse<UserAdminLoginResponseDto>> loginUser(
 		@RequestBody UserAdminLoginRequestDto requestDto) {
 		log.info("[LoginUser] Request received: {}", requestDto);
 		UserAdminLoginRequestServiceDto requestServiceDto = userPresentationMapper.toUserAdminLoginRequestServiceDto(
 			requestDto);
-		UserLoginResponseDto responseDto = userAdminService.loginUserAdmin(requestServiceDto);
+		UserAdminLoginResponseDto responseDto = userAdminService.loginUserAdmin(requestServiceDto);
 		log.info("[LoginUser] User logged in: {}", responseDto);
 		return SuccessResponse.of(UserSuccessCode.USER_LOGIN_SUCCESS, responseDto);
 	}
