@@ -1,0 +1,35 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build
+
+> Task :compileJava
+Note: /workspace/kbo-ticketing-platform/queue-service/src/main/java/com/boeingmerryho/business/queueservice/infrastructure/QueueRedisHelperImpl.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :processResources
+> Task :classes
+> Task :compileTestJava
+> Task :processTestResources NO-SOURCE
+> Task :testClasses
+
+> Task :test
+
+QueueServiceConcurrencyTest > initializationError FAILED
+    java.lang.IllegalStateException at DockerClientProviderStrategy.java:274
+
+1 test completed, 1 failed
+
+> Task :test FAILED
+
+[Incubating] Problems report is available at: file:///workspace/kbo-ticketing-platform/queue-service/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///workspace/kbo-ticketing-platform/queue-service/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+BUILD FAILED in 48s
+4 actionable tasks: 4 executed

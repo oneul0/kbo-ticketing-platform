@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" tests="63" skipped="0" failures="0" errors="0" timestamp="2026-10-04T05:32:18.233Z" hostname="local-test-host" time="1.435">
+  <properties/>
+  <testcase name="repetition 1 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.165"/>
+  <testcase name="repetition 2 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.056"/>
+  <testcase name="repetition 3 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.045"/>
+  <testcase name="repetition 4 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.038"/>
+  <testcase name="repetition 5 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.034"/>
+  <testcase name="repetition 6 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.029"/>
+  <testcase name="repetition 7 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.031"/>
+  <testcase name="repetition 8 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.041"/>
+  <testcase name="repetition 9 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.035"/>
+  <testcase name="repetition 10 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.031"/>
+  <testcase name="repetition 11 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.031"/>
+  <testcase name="repetition 12 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.032"/>
+  <testcase name="repetition 13 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.028"/>
+  <testcase name="repetition 14 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.029"/>
+  <testcase name="repetition 15 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.028"/>
+  <testcase name="repetition 16 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.027"/>
+  <testcase name="repetition 17 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.026"/>
+  <testcase name="repetition 18 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.031"/>
+  <testcase name="repetition 19 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.037"/>
+  <testcase name="repetition 20 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.025"/>
+  <testcase name="businessValidationErrorSurvivesLockAspect()" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.008"/>
+  <testcase name="removalAllowsNewSequenceWithoutChangingOtherUsers()" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.018"/>
+  <testcase name="repetition 1 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.034"/>
+  <testcase name="repetition 2 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.023"/>
+  <testcase name="repetition 3 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.026"/>
+  <testcase name="repetition 4 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.024"/>
+  <testcase name="repetition 5 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.024"/>
+  <testcase name="repetition 6 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.025"/>
+  <testcase name="repetition 7 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.023"/>
+  <testcase name="repetition 8 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.021"/>
+  <testcase name="repetition 9 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.019"/>
+  <testcase name="repetition 10 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.021"/>
+  <testcase name="repetition 11 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.019"/>
+  <testcase name="repetition 12 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.019"/>
+  <testcase name="repetition 13 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.019"/>
+  <testcase name="repetition 14 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.02"/>
+  <testcase name="repetition 15 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.02"/>
+  <testcase name="repetition 16 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.019"/>
+  <testcase name="repetition 17 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.02"/>
+  <testcase name="repetition 18 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.02"/>
+  <testcase name="repetition 19 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.02"/>
+  <testcase name="repetition 20 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.019"/>
+  <testcase name="duplicatePreservesOriginalScoreRankCounterAndTtl()" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.012"/>
+  <testcase name="repetition 1 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 2 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.005"/>
+  <testcase name="repetition 3 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 4 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 5 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 6 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 7 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 8 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.005"/>
+  <testcase name="repetition 9 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 10 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 11 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.007"/>
+  <testcase name="repetition 12 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.007"/>
+  <testcase name="repetition 13 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.007"/>
+  <testcase name="repetition 14 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 15 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 16 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 17 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 18 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 19 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <testcase name="repetition 20 of 20" classname="com.boeingmerryho.business.queueservice.application.QueueServiceConcurrencyTest" time="0.006"/>
+  <system-out><![CDATA[14:32:15.640 [Test worker] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+14:32:15.643 [Test worker] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+14:32:15.650 [Test worker] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 1.20.6
+14:32:15.751 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+14:32:15.914 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+14:32:15.914 [Test worker] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+14:32:15.926 [Test worker] INFO org.testcontainers.DockerClientFactory -- Connected to docker:
+  Server Version: 29.4.1
+  API Version: 1.54
+  Operating System: Docker Desktop
+  Total Memory: 7936 MB
+  Labels:
+    com.docker.desktop.address=unix:///Users/REDACTED/Library/Containers/com.docker.docker/Data/docker-cli.sock
+14:32:16.112 [Test worker] INFO tc.testcontainers/ryuk:0.11.0 -- Creating container for image: testcontainers/ryuk:0.11.0
+14:32:16.243 [Test worker] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-desktop) does not have credentials for https://index.docker.io/v1/
+14:32:16.317 [Test worker] INFO tc.testcontainers/ryuk:0.11.0 -- Container testcontainers/ryuk:0.11.0 is starting: f114c5dc5a9b81f4c47fa7907bb99e4abf41d1309853d4ce6fd269755b4d4b80
+14:32:16.470 [Test worker] INFO tc.testcontainers/ryuk:0.11.0 -- Container testcontainers/ryuk:0.11.0 started in PT0.357733S
+14:32:16.474 [Test worker] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+14:32:16.474 [Test worker] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+14:32:16.475 [Test worker] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+14:32:16.475 [Test worker] INFO tc.redis:6.2.17-alpine -- Creating container for image: redis:6.2.17-alpine
+14:32:16.510 [Test worker] INFO tc.redis:6.2.17-alpine -- Container redis:6.2.17-alpine is starting: cc56198a21827400c2df2fd030bdc4b9df3f5b1859f9813ce17c6bc90f85f3dc
+14:32:16.655 [Test worker] INFO tc.redis:6.2.17-alpine -- Container redis:6.2.17-alpine started in PT0.180446S
+14:32:17.673 [Test worker] INFO org.redisson.Version -- Redisson 3.45.1
+14:32:17.738 [Test worker] WARN io.netty.resolver.dns.DnsServerAddressStreamProviders -- Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+14:32:17.831 [redisson-netty-1-8] INFO org.redisson.connection.ConnectionsHolder -- 1 connections initialized for localhost/127.0.0.1:57594
+14:32:17.886 [redisson-netty-1-20] INFO org.redisson.connection.ConnectionsHolder -- 24 connections initialized for localhost/127.0.0.1:57594
+14:32:18.106 [Test worker] INFO org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory -- Starting embedded database: url='jdbc:h2:mem:2f4a88eb-e0c3-4220-a316-a15a750100da;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+14:32:18.303 [pool-1-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.336 [pool-1-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.341 [pool-1-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.346 [pool-1-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.350 [pool-1-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.355 [pool-1-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.359 [pool-1-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.364 [pool-1-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.369 [pool-1-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.374 [pool-1-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=2], DefaultTypedTuple [score=2.0, value=3], DefaultTypedTuple [score=3.0, value=4], DefaultTypedTuple [score=4.0, value=5], DefaultTypedTuple [score=5.0, value=8], DefaultTypedTuple [score=6.0, value=1], DefaultTypedTuple [score=7.0, value=9], DefaultTypedTuple [score=8.0, value=10], DefaultTypedTuple [score=9.0, value=6], DefaultTypedTuple [score=10.0, value=7]]
+14:32:18.411 [pool-2-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.415 [pool-2-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.419 [pool-2-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.422 [pool-2-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.426 [pool-2-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.430 [pool-2-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.434 [pool-2-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.437 [pool-2-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.441 [pool-2-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.444 [pool-2-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=3], DefaultTypedTuple [score=2.0, value=6], DefaultTypedTuple [score=3.0, value=5], DefaultTypedTuple [score=4.0, value=4], DefaultTypedTuple [score=5.0, value=2], DefaultTypedTuple [score=6.0, value=8], DefaultTypedTuple [score=7.0, value=7], DefaultTypedTuple [score=8.0, value=10], DefaultTypedTuple [score=9.0, value=1], DefaultTypedTuple [score=10.0, value=9]]
+14:32:18.466 [pool-3-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.469 [pool-3-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.473 [pool-3-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.477 [pool-3-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.480 [pool-3-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.482 [pool-3-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.485 [pool-3-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.487 [pool-3-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.489 [pool-3-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.492 [pool-3-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=1], DefaultTypedTuple [score=2.0, value=4], DefaultTypedTuple [score=3.0, value=3], DefaultTypedTuple [score=4.0, value=10], DefaultTypedTuple [score=5.0, value=8], DefaultTypedTuple [score=6.0, value=6], DefaultTypedTuple [score=7.0, value=9], DefaultTypedTuple [score=8.0, value=5], DefaultTypedTuple [score=9.0, value=2], DefaultTypedTuple [score=10.0, value=7]]
+14:32:18.511 [pool-4-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.514 [pool-4-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.516 [pool-4-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.518 [pool-4-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.521 [pool-4-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.523 [pool-4-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.526 [pool-4-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.528 [pool-4-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.530 [pool-4-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.532 [pool-4-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=1], DefaultTypedTuple [score=2.0, value=10], DefaultTypedTuple [score=3.0, value=3], DefaultTypedTuple [score=4.0, value=6], DefaultTypedTuple [score=5.0, value=2], DefaultTypedTuple [score=6.0, value=9], DefaultTypedTuple [score=7.0, value=4], DefaultTypedTuple [score=8.0, value=7], DefaultTypedTuple [score=9.0, value=5], DefaultTypedTuple [score=10.0, value=8]]
+14:32:18.550 [pool-5-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.552 [pool-5-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.554 [pool-5-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.556 [pool-5-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.558 [pool-5-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.560 [pool-5-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.562 [pool-5-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.564 [pool-5-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.566 [pool-5-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.568 [pool-5-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=3], DefaultTypedTuple [score=2.0, value=7], DefaultTypedTuple [score=3.0, value=1], DefaultTypedTuple [score=4.0, value=6], DefaultTypedTuple [score=5.0, value=9], DefaultTypedTuple [score=6.0, value=2], DefaultTypedTuple [score=7.0, value=8], DefaultTypedTuple [score=8.0, value=5], DefaultTypedTuple [score=9.0, value=4], DefaultTypedTuple [score=10.0, value=10]]
+14:32:18.583 [pool-6-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.585 [pool-6-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.587 [pool-6-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.589 [pool-6-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.590 [pool-6-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.592 [pool-6-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.594 [pool-6-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.596 [pool-6-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.597 [pool-6-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.599 [pool-6-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=1], DefaultTypedTuple [score=2.0, value=6], DefaultTypedTuple [score=3.0, value=4], DefaultTypedTuple [score=4.0, value=2], DefaultTypedTuple [score=5.0, value=7], DefaultTypedTuple [score=6.0, value=5], DefaultTypedTuple [score=7.0, value=10], DefaultTypedTuple [score=8.0, value=9], DefaultTypedTuple [score=9.0, value=8], DefaultTypedTuple [score=10.0, value=3]]
+14:32:18.614 [pool-7-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.616 [pool-7-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.617 [pool-7-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.619 [pool-7-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.621 [pool-7-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.623 [pool-7-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.624 [pool-7-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.626 [pool-7-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.629 [pool-7-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.630 [pool-7-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=6], DefaultTypedTuple [score=2.0, value=3], DefaultTypedTuple [score=3.0, value=10], DefaultTypedTuple [score=4.0, value=7], DefaultTypedTuple [score=5.0, value=8], DefaultTypedTuple [score=6.0, value=1], DefaultTypedTuple [score=7.0, value=2], DefaultTypedTuple [score=8.0, value=4], DefaultTypedTuple [score=9.0, value=5], DefaultTypedTuple [score=10.0, value=9]]
+14:32:18.651 [pool-8-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.654 [pool-8-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.656 [pool-8-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.658 [pool-8-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.660 [pool-8-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.663 [pool-8-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.665 [pool-8-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.666 [pool-8-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.668 [pool-8-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.670 [pool-8-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=5], DefaultTypedTuple [score=2.0, value=7], DefaultTypedTuple [score=3.0, value=4], DefaultTypedTuple [score=4.0, value=1], DefaultTypedTuple [score=5.0, value=6], DefaultTypedTuple [score=6.0, value=3], DefaultTypedTuple [score=7.0, value=8], DefaultTypedTuple [score=8.0, value=2], DefaultTypedTuple [score=9.0, value=10], DefaultTypedTuple [score=10.0, value=9]]
+14:32:18.687 [pool-9-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.690 [pool-9-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.691 [pool-9-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.693 [pool-9-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.696 [pool-9-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.698 [pool-9-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.699 [pool-9-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.701 [pool-9-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.703 [pool-9-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.706 [pool-9-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=7], DefaultTypedTuple [score=2.0, value=3], DefaultTypedTuple [score=3.0, value=8], DefaultTypedTuple [score=4.0, value=9], DefaultTypedTuple [score=5.0, value=10], DefaultTypedTuple [score=6.0, value=5], DefaultTypedTuple [score=7.0, value=4], DefaultTypedTuple [score=8.0, value=1], DefaultTypedTuple [score=9.0, value=6], DefaultTypedTuple [score=10.0, value=2]]
+14:32:18.722 [pool-10-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.724 [pool-10-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.726 [pool-10-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.728 [pool-10-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.730 [pool-10-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.732 [pool-10-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.734 [pool-10-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.736 [pool-10-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.737 [pool-10-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.739 [pool-10-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=1], DefaultTypedTuple [score=2.0, value=4], DefaultTypedTuple [score=3.0, value=8], DefaultTypedTuple [score=4.0, value=9], DefaultTypedTuple [score=5.0, value=6], DefaultTypedTuple [score=6.0, value=3], DefaultTypedTuple [score=7.0, value=2], DefaultTypedTuple [score=8.0, value=5], DefaultTypedTuple [score=9.0, value=10], DefaultTypedTuple [score=10.0, value=7]]
+14:32:18.753 [pool-11-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.755 [pool-11-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.757 [pool-11-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.759 [pool-11-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.761 [pool-11-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.763 [pool-11-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.765 [pool-11-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.767 [pool-11-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.768 [pool-11-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.770 [pool-11-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=6], DefaultTypedTuple [score=2.0, value=2], DefaultTypedTuple [score=3.0, value=7], DefaultTypedTuple [score=4.0, value=10], DefaultTypedTuple [score=5.0, value=8], DefaultTypedTuple [score=6.0, value=1], DefaultTypedTuple [score=7.0, value=9], DefaultTypedTuple [score=8.0, value=3], DefaultTypedTuple [score=9.0, value=4], DefaultTypedTuple [score=10.0, value=5]]
+14:32:18.786 [pool-12-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.788 [pool-12-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.791 [pool-12-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.793 [pool-12-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.796 [pool-12-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.798 [pool-12-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.800 [pool-12-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.802 [pool-12-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.804 [pool-12-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.805 [pool-12-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=3], DefaultTypedTuple [score=2.0, value=10], DefaultTypedTuple [score=3.0, value=9], DefaultTypedTuple [score=4.0, value=5], DefaultTypedTuple [score=5.0, value=8], DefaultTypedTuple [score=6.0, value=2], DefaultTypedTuple [score=7.0, value=6], DefaultTypedTuple [score=8.0, value=4], DefaultTypedTuple [score=9.0, value=7], DefaultTypedTuple [score=10.0, value=1]]
+14:32:18.818 [pool-13-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.820 [pool-13-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.822 [pool-13-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.824 [pool-13-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.826 [pool-13-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.827 [pool-13-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.829 [pool-13-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.831 [pool-13-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.833 [pool-13-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.834 [pool-13-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=1], DefaultTypedTuple [score=2.0, value=4], DefaultTypedTuple [score=3.0, value=9], DefaultTypedTuple [score=4.0, value=6], DefaultTypedTuple [score=5.0, value=3], DefaultTypedTuple [score=6.0, value=5], DefaultTypedTuple [score=7.0, value=10], DefaultTypedTuple [score=8.0, value=2], DefaultTypedTuple [score=9.0, value=7], DefaultTypedTuple [score=10.0, value=8]]
+14:32:18.848 [pool-14-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.850 [pool-14-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.852 [pool-14-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.853 [pool-14-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.855 [pool-14-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.857 [pool-14-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.858 [pool-14-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.860 [pool-14-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.862 [pool-14-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.864 [pool-14-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=3], DefaultTypedTuple [score=2.0, value=7], DefaultTypedTuple [score=3.0, value=4], DefaultTypedTuple [score=4.0, value=8], DefaultTypedTuple [score=5.0, value=2], DefaultTypedTuple [score=6.0, value=9], DefaultTypedTuple [score=7.0, value=5], DefaultTypedTuple [score=8.0, value=1], DefaultTypedTuple [score=9.0, value=6], DefaultTypedTuple [score=10.0, value=10]]
+14:32:18.877 [pool-15-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.879 [pool-15-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.881 [pool-15-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.882 [pool-15-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.884 [pool-15-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.885 [pool-15-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.887 [pool-15-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.889 [pool-15-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.890 [pool-15-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.892 [pool-15-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=1], DefaultTypedTuple [score=2.0, value=8], DefaultTypedTuple [score=3.0, value=2], DefaultTypedTuple [score=4.0, value=6], DefaultTypedTuple [score=5.0, value=9], DefaultTypedTuple [score=6.0, value=7], DefaultTypedTuple [score=7.0, value=5], DefaultTypedTuple [score=8.0, value=10], DefaultTypedTuple [score=9.0, value=3], DefaultTypedTuple [score=10.0, value=4]]
+14:32:18.905 [pool-16-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.907 [pool-16-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.909 [pool-16-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.910 [pool-16-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.912 [pool-16-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.914 [pool-16-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.915 [pool-16-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.917 [pool-16-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.918 [pool-16-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.920 [pool-16-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=3], DefaultTypedTuple [score=2.0, value=1], DefaultTypedTuple [score=3.0, value=7], DefaultTypedTuple [score=4.0, value=6], DefaultTypedTuple [score=5.0, value=10], DefaultTypedTuple [score=6.0, value=8], DefaultTypedTuple [score=7.0, value=4], DefaultTypedTuple [score=8.0, value=2], DefaultTypedTuple [score=9.0, value=9], DefaultTypedTuple [score=10.0, value=5]]
+14:32:18.933 [pool-17-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.935 [pool-17-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.936 [pool-17-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.938 [pool-17-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.939 [pool-17-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.941 [pool-17-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.943 [pool-17-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.944 [pool-17-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:18.945 [pool-17-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.947 [pool-17-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=2], DefaultTypedTuple [score=2.0, value=8], DefaultTypedTuple [score=3.0, value=7], DefaultTypedTuple [score=4.0, value=6], DefaultTypedTuple [score=5.0, value=4], DefaultTypedTuple [score=6.0, value=3], DefaultTypedTuple [score=7.0, value=5], DefaultTypedTuple [score=8.0, value=10], DefaultTypedTuple [score=9.0, value=1], DefaultTypedTuple [score=10.0, value=9]]
+14:32:18.962 [pool-18-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:18.964 [pool-18-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:18.966 [pool-18-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:18.968 [pool-18-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:18.969 [pool-18-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:18.971 [pool-18-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:18.973 [pool-18-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:18.974 [pool-18-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:18.976 [pool-18-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:18.978 [pool-18-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=1], DefaultTypedTuple [score=2.0, value=4], DefaultTypedTuple [score=3.0, value=9], DefaultTypedTuple [score=4.0, value=8], DefaultTypedTuple [score=5.0, value=6], DefaultTypedTuple [score=6.0, value=7], DefaultTypedTuple [score=7.0, value=2], DefaultTypedTuple [score=8.0, value=3], DefaultTypedTuple [score=9.0, value=5], DefaultTypedTuple [score=10.0, value=10]]
+14:32:18.999 [pool-19-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:19.002 [pool-19-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:19.004 [pool-19-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:19.006 [pool-19-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:19.008 [pool-19-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+14:32:19.010 [pool-19-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:19.012 [pool-19-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:19.014 [pool-19-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.017 [pool-19-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:19.019 [pool-19-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=2], DefaultTypedTuple [score=2.0, value=7], DefaultTypedTuple [score=3.0, value=8], DefaultTypedTuple [score=4.0, value=6], DefaultTypedTuple [score=5.0, value=5], DefaultTypedTuple [score=6.0, value=9], DefaultTypedTuple [score=7.0, value=4], DefaultTypedTuple [score=8.0, value=1], DefaultTypedTuple [score=9.0, value=3], DefaultTypedTuple [score=10.0, value=10]]
+14:32:19.031 [pool-20-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.033 [pool-20-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 4
+14:32:19.034 [pool-20-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 3
+14:32:19.036 [pool-20-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 9
+14:32:19.038 [pool-20-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 7
+14:32:19.039 [pool-20-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 6
+14:32:19.041 [pool-20-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:19.042 [pool-20-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 10
+14:32:19.044 [pool-20-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 8
+14:32:19.045 [pool-20-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 5
+QUEUE_RESULT scenario=distinct-service accepted=10 rejected=0 failed=0 size=10 counter=10 members=[DefaultTypedTuple [score=1.0, value=1], DefaultTypedTuple [score=2.0, value=4], DefaultTypedTuple [score=3.0, value=3], DefaultTypedTuple [score=4.0, value=9], DefaultTypedTuple [score=5.0, value=7], DefaultTypedTuple [score=6.0, value=6], DefaultTypedTuple [score=7.0, value=2], DefaultTypedTuple [score=8.0, value=10], DefaultTypedTuple [score=9.0, value=8], DefaultTypedTuple [score=10.0, value=5]]
+14:32:19.067 [Test worker] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.070 [Test worker] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:19.075 [Test worker] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.090 [pool-21-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.093 [pool-21-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.095 [pool-21-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.097 [pool-21-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.099 [pool-21-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.100 [pool-21-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.102 [pool-21-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.105 [pool-21-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.107 [pool-21-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.108 [pool-21-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.122 [pool-22-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.124 [pool-22-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.125 [pool-22-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.126 [pool-22-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.128 [pool-22-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.130 [pool-22-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.131 [pool-22-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.132 [pool-22-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.133 [pool-22-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.134 [pool-22-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.145 [pool-23-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.147 [pool-23-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.148 [pool-23-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.150 [pool-23-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.151 [pool-23-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.153 [pool-23-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.154 [pool-23-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.156 [pool-23-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.157 [pool-23-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.159 [pool-23-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.172 [pool-24-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.174 [pool-24-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.175 [pool-24-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.177 [pool-24-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.178 [pool-24-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.180 [pool-24-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.181 [pool-24-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.182 [pool-24-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.183 [pool-24-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.185 [pool-24-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.196 [pool-25-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.197 [pool-25-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.199 [pool-25-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.200 [pool-25-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.201 [pool-25-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.203 [pool-25-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.204 [pool-25-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.205 [pool-25-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.207 [pool-25-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.208 [pool-25-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.219 [pool-26-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.221 [pool-26-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.223 [pool-26-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.225 [pool-26-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.227 [pool-26-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.229 [pool-26-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.230 [pool-26-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.232 [pool-26-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.234 [pool-26-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.235 [pool-26-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.245 [pool-27-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.247 [pool-27-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.248 [pool-27-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.250 [pool-27-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.251 [pool-27-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.252 [pool-27-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.254 [pool-27-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.255 [pool-27-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.256 [pool-27-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.258 [pool-27-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.267 [pool-28-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.268 [pool-28-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.270 [pool-28-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.271 [pool-28-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.272 [pool-28-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.274 [pool-28-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.275 [pool-28-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.277 [pool-28-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.278 [pool-28-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.279 [pool-28-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.288 [pool-29-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.289 [pool-29-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.290 [pool-29-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.292 [pool-29-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.293 [pool-29-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.294 [pool-29-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.295 [pool-29-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.297 [pool-29-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.298 [pool-29-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.299 [pool-29-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.308 [pool-30-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.310 [pool-30-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.311 [pool-30-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.312 [pool-30-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.314 [pool-30-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.315 [pool-30-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.316 [pool-30-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.318 [pool-30-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.319 [pool-30-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.320 [pool-30-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.329 [pool-31-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.330 [pool-31-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.332 [pool-31-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.333 [pool-31-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.334 [pool-31-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.335 [pool-31-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.336 [pool-31-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.338 [pool-31-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.339 [pool-31-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.340 [pool-31-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.349 [pool-32-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.350 [pool-32-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.351 [pool-32-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.352 [pool-32-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.354 [pool-32-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.355 [pool-32-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.356 [pool-32-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.357 [pool-32-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.358 [pool-32-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.360 [pool-32-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.368 [pool-33-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.370 [pool-33-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.371 [pool-33-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.373 [pool-33-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.374 [pool-33-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.375 [pool-33-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.377 [pool-33-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.378 [pool-33-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.379 [pool-33-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.380 [pool-33-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.388 [pool-34-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.390 [pool-34-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.391 [pool-34-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.392 [pool-34-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.393 [pool-34-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.395 [pool-34-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.397 [pool-34-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.398 [pool-34-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.399 [pool-34-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.401 [pool-34-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.410 [pool-35-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.412 [pool-35-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.413 [pool-35-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.414 [pool-35-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.415 [pool-35-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.417 [pool-35-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.418 [pool-35-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.419 [pool-35-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.420 [pool-35-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.422 [pool-35-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.431 [pool-36-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.432 [pool-36-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.433 [pool-36-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.434 [pool-36-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.435 [pool-36-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.437 [pool-36-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.438 [pool-36-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.439 [pool-36-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.441 [pool-36-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.442 [pool-36-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.451 [pool-37-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.452 [pool-37-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.453 [pool-37-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.455 [pool-37-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.457 [pool-37-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.458 [pool-37-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.459 [pool-37-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.460 [pool-37-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.461 [pool-37-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.463 [pool-37-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.471 [pool-38-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.472 [pool-38-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.473 [pool-38-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.475 [pool-38-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.476 [pool-38-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.477 [pool-38-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.479 [pool-38-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.480 [pool-38-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.481 [pool-38-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.483 [pool-38-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.493 [pool-39-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.494 [pool-39-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.496 [pool-39-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.497 [pool-39-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.498 [pool-39-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.499 [pool-39-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.500 [pool-39-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.501 [pool-39-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.503 [pool-39-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.504 [pool-39-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.513 [pool-40-thread-5] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.514 [pool-40-thread-8] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.515 [pool-40-thread-1] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.517 [pool-40-thread-4] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.518 [pool-40-thread-2] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.519 [pool-40-thread-7] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.520 [pool-40-thread-9] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.521 [pool-40-thread-6] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.522 [pool-40-thread-3] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.523 [pool-40-thread-10] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-service accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+14:32:19.531 [Test worker] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+14:32:19.533 [Test worker] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 2
+14:32:19.536 [Test worker] INFO com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl -- userIdValue : 1
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+QUEUE_RESULT scenario=duplicate-helper accepted=1 rejected=9 failed=0 size=1 counter=1 members=[DefaultTypedTuple [score=1.0, value=1]]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
