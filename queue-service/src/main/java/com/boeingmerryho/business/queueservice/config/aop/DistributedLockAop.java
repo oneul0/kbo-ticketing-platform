@@ -56,6 +56,9 @@ public class DistributedLockAop {
 			}
 			log.debug("[분산락 획득 성공] {} (유효시간: {}초)", lockName, distributedLock.leaseTime());
 			return transactionHandlerForAop.proceed(joinPoint);
+		} catch (GlobalException exception) {
+			// Business rejections (including duplicate joins) must retain their error code.
+			throw exception;
 		} catch (Throwable exception) {
 			log.error("분산락 {} 획득 중 오류 발생", lockName, exception);
 			throw new GlobalException(LockErrorCode.INTERNAL_SERVER_ERROR);

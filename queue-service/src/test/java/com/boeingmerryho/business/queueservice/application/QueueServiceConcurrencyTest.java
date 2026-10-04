@@ -1,27 +1,33 @@
 package com.boeingmerryho.business.queueservice.application;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
+import java.util.concurrent.*;
+import java.util.stream.IntStream;
+import javax.sql.DataSource;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.*;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -29,222 +35,250 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import com.boeingmerryho.business.queueservice.application.dto.mapper.QueueApplicationMapper;
 import com.boeingmerryho.business.queueservice.application.dto.request.other.QueueJoinServiceDto;
 import com.boeingmerryho.business.queueservice.application.service.QueueService;
-import com.boeingmerryho.business.queueservice.domain.repository.CustomQueueRepository;
-import com.boeingmerryho.business.queueservice.domain.repository.QueueRepository;
+import com.boeingmerryho.business.queueservice.config.RedissonConfig;
+import com.boeingmerryho.business.queueservice.config.aop.AopForTransaction;
+import com.boeingmerryho.business.queueservice.config.aop.DistributedLockAop;
 import com.boeingmerryho.business.queueservice.exception.ErrorCode;
+import com.boeingmerryho.business.queueservice.infrastructure.QueueMetricsHelperImpl;
+import com.boeingmerryho.business.queueservice.infrastructure.QueueRedisHelperImpl;
 import com.boeingmerryho.business.queueservice.presentation.dto.response.other.QueueJoinResponseDto;
-
 import io.github.boeingmerryho.commonlibrary.exception.GlobalException;
-import lombok.extern.slf4j.Slf4j;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
-@Slf4j
-@SpringBootTest
-@ActiveProfiles("test")
+/** Real Redis, production serializers, mapper, service and distributed-lock AOP.
+ * Only the persistence collaborator (unused by join) is mocked. No external app config is loaded.
+ */
+@SpringJUnitConfig(QueueServiceConcurrencyTest.TestConfig.class)
 @Testcontainers
-public class QueueServiceConcurrencyTest {
+class QueueServiceConcurrencyTest {
+    private static final long STORE = 1L;
+    private static final int REQUESTS = 10;
 
-	@Container
-	private static final GenericContainer<?> redis = new GenericContainer<>("redis:6.2")
-		.withExposedPorts(6379)
-		.withCommand("redis-server --port 6379 --requirepass testpass")
-		.withStartupTimeout(Duration.ofSeconds(60))
-		.withReuse(false)
-		.withNetworkAliases("redis-test");
+    @Container
+    static final GenericContainer<?> redis = new GenericContainer<>("redis:6.2.17-alpine")
+        .withExposedPorts(6379)
+        .withCommand("redis-server", "--requirepass", "testpass", "--save", "", "--appendonly", "no")
+        .withStartupTimeout(Duration.ofSeconds(60))
+        .withReuse(false);
 
-	@DynamicPropertySource
-	static void redisProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.data.redis.store-queue.host", redis::getHost);
-		registry.add("spring.data.redis.store-queue.port", () -> redis.getMappedPort(6379));
-		registry.add("spring.data.redis.store-queue.username", () -> "default");
-		registry.add("spring.data.redis.store-queue.password", () -> "testpass");
-		registry.add("spring.redisson.address", () -> "redis://" + redis.getHost() + ":" + redis.getMappedPort(6379));
-		registry.add("spring.redisson.password", () -> "testpass");
-	}
+    @DynamicPropertySource
+    static void redisProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.redis.store-queue.host", redis::getHost);
+        registry.add("spring.data.redis.store-queue.port", () -> redis.getMappedPort(6379));
+        registry.add("spring.data.redis.store-queue.username", () -> "default");
+        registry.add("spring.data.redis.store-queue.password", () -> "testpass");
+    }
 
-	@Autowired
-	private QueueService service;
+    @Configuration
+    @EnableAspectJAutoProxy
+    @EnableTransactionManagement
+    @Import({RedissonConfig.class, QueueRedisHelperImpl.class, QueueService.class,
+        QueueMetricsHelperImpl.class, DistributedLockAop.class, AopForTransaction.class})
+    static class TestConfig {
+        @Bean QueueApplicationMapper mapper() { return Mappers.getMapper(QueueApplicationMapper.class); }
+        @Bean MeterRegistry meterRegistry() { return new SimpleMeterRegistry(); }
+        @Bean(destroyMethod = "shutdown") org.springframework.jdbc.datasource.embedded.EmbeddedDatabase dataSource() {
+            return new EmbeddedDatabaseBuilder().generateUniqueName(true).setType(EmbeddedDatabaseType.H2).build();
+        }
+        @Bean PlatformTransactionManager transactionManager(DataSource dataSource) {
+            return new DataSourceTransactionManager(dataSource);
+        }
+    }
 
-	@MockitoBean
-	private QueueRedisHelper redisHelper;
+    @Autowired QueueService service;
+    @Autowired QueueRedisHelper redisHelper;
+    @Autowired RedisTemplate<String, Object> redisTemplateForStoreQueueRedis;
+    @Autowired MeterRegistry meters;
+    @MockitoBean QueuePersistenceHelper persistenceHelper;
+    private String queueKey;
+    private double waitingBefore;
+    private double requestsBefore;
 
-	@Autowired
-	private RedisTemplate<String, Object> redisTemplateForStoreQueueRedis;
+    @BeforeEach
+    void setUp() {
+        // Connection comes exclusively from this class's disposable container, never application.yml.
+        try (var connection = redisTemplateForStoreQueueRedis.getConnectionFactory().getConnection()) {
+            connection.serverCommands().flushDb();
+        }
+        queueKey = redisHelper.getWaitlistInfoPrefix(STORE);
+        redisTemplateForStoreQueueRedis.opsForValue().set("queue:availability:" + STORE, true);
+        for (long user = 1; user <= REQUESTS; user++) {
+            redisTemplateForStoreQueueRedis.opsForSet().add("queue:ticket:" + LocalDate.now(), Long.toString(user));
+            redisTemplateForStoreQueueRedis.opsForValue().set("ticket:user:" + user, Long.toString(user));
+        }
+        waitingBefore = meters.get("queue.waiting.users").gauge().value();
+        requestsBefore = meters.get("queue.request.count").counter().count();
+    }
 
-	@MockitoBean
-	private QueueApplicationMapper queueApplicationMapper;
+    @RepeatedTest(20)
+    void distinctUsersHaveUniqueStoredSequencesAndMatchingResponses() throws Exception {
+        var outcomes = concurrently(IntStream.rangeClosed(1, REQUESTS).mapToObj(i -> (long)i).toList(), false);
+        report("distinct-service", outcomes);
+        assertCounts(outcomes, REQUESTS, 0);
+        assertEquals(REQUESTS, redisHelper.getTotalQueueSize(queueKey));
+        assertEquals(REQUESTS, sequenceCounter());
+        Set<Integer> sequences = new HashSet<>();
+        Set<Object> members = new HashSet<>();
+        for (var outcome : outcomes) {
+            var response = outcome.response();
+            assertEquals(STORE, response.storeId());
+            assertEquals(outcome.user(), response.userId());
+            assertEquals(redisHelper.getUserQueuePosition(STORE, outcome.user()), response.sequence());
+            assertEquals(redisHelper.getUserSequencePosition(STORE, outcome.user()), response.sequence());
+            sequences.add(response.sequence());
+            members.add(Long.toString(outcome.user()));
+        }
+        assertEquals(new HashSet<>(IntStream.rangeClosed(1, REQUESTS).boxed().toList()), sequences);
+        assertEquals(members, redisTemplateForStoreQueueRedis.opsForZSet().range(queueKey, 0, -1));
+        assertMetrics(REQUESTS);
+        assertTtl();
+    }
 
-	@MockitoBean
-	private QueueRepository queueRepository;
+    @RepeatedTest(20)
+    void sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() throws Exception {
+        var outcomes = concurrently(java.util.Collections.nCopies(REQUESTS, 1L), false);
+        report("duplicate-service", outcomes);
+        assertCounts(outcomes, 1, REQUESTS - 1);
+        var response = outcomes.stream().filter(o -> o.response() != null).findFirst().orElseThrow().response();
+        assertEquals(new QueueJoinResponseDto(STORE, 1L, 1), response);
+        assertSingleStoredUser();
+        assertMetrics(1);
+        assertTtl();
+    }
 
-	@MockitoBean
-	private CustomQueueRepository customQueueRepository;
+    @RepeatedTest(20)
+    void helperRejectsDuplicatesAtomicallyWithoutServiceLock() throws Exception {
+        var outcomes = concurrently(java.util.Collections.nCopies(REQUESTS, 1L), true);
+        report("duplicate-helper", outcomes);
+        assertCounts(outcomes, 1, REQUESTS - 1);
+        assertSingleStoredUser();
+        assertTtl();
+    }
 
-	@BeforeEach
-	public void setUp() {
-		// delete
-		redisTemplateForStoreQueueRedis.delete("queue:availability:1");
-		redisTemplateForStoreQueueRedis.delete("ticket:info:2025-04-22");
-		for (int i = 1; i <= 10; i++) {
-			redisTemplateForStoreQueueRedis.delete("ticket:user:" + i);
-		}
-		redisTemplateForStoreQueueRedis.delete("waitlist:1");
-		redisTemplateForStoreQueueRedis.delete("waitlist:1:seq");
+    @Test
+    void duplicatePreservesOriginalScoreRankCounterAndTtl() throws Exception {
+        service.joinQueue(new QueueJoinServiceDto(STORE, 1L, 1L));
+        service.joinQueue(new QueueJoinServiceDto(STORE, 2L, 2L));
+        redisTemplateForStoreQueueRedis.expire(queueKey, Duration.ofMinutes(10));
+        redisTemplateForStoreQueueRedis.expire(queueKey + ":seq", Duration.ofMinutes(10));
+        GlobalException error = assertThrows(GlobalException.class,
+            () -> service.joinQueue(new QueueJoinServiceDto(STORE, 1L, 1L)));
+        assertSame(ErrorCode.USER_ALREADY_IN_QUEUE, error.getErrorCode());
+        assertEquals(1, redisHelper.getUserSequencePosition(STORE, 1L));
+        assertEquals(1, redisHelper.getUserQueuePosition(STORE, 1L));
+        assertEquals(2, redisHelper.getUserQueuePosition(STORE, 2L));
+        assertEquals(2, sequenceCounter());
+        assertEquals(2, redisHelper.getTotalQueueSize(queueKey));
+        assertTrue(redisTemplateForStoreQueueRedis.getExpire(queueKey) <= 600);
+        assertTrue(redisTemplateForStoreQueueRedis.getExpire(queueKey + ":seq") <= 600);
+        assertTtl();
+        assertMetrics(2);
+    }
 
-		//setup
-		for (int i = 1; i <= 10; i++) {
-			redisTemplateForStoreQueueRedis.opsForSet().add("ticket:info:2025-04-22", String.valueOf(i));
-			redisTemplateForStoreQueueRedis.opsForValue().set("ticket:user:" + i, String.valueOf(i));
-		}
-		redisTemplateForStoreQueueRedis.opsForValue().set("queue:availability:1", true);
-		redisTemplateForStoreQueueRedis.opsForValue().set("waitlist:1:seq", 0L);
+    @Test
+    void removalAllowsNewSequenceWithoutChangingOtherUsers() throws Exception {
+        service.joinQueue(new QueueJoinServiceDto(STORE, 1L, 1L));
+        service.joinQueue(new QueueJoinServiceDto(STORE, 2L, 2L));
+        assertTrue(redisHelper.removeUserFromQueue(STORE, 1L));
+        var response = service.joinQueue(new QueueJoinServiceDto(STORE, 1L, 1L));
+        assertEquals(2, response.sequence()); // response is current rank, not immutable sequence
+        assertEquals(3, redisHelper.getUserSequencePosition(STORE, 1L));
+        assertEquals(1, redisHelper.getUserQueuePosition(STORE, 2L));
+        assertEquals(3, sequenceCounter());
+        assertEquals(2, redisHelper.getTotalQueueSize(queueKey));
+    }
 
-		for (int i = 1; i <= 10; i++) {
-			log.info("ticket:info:2025-04-22 contains {}: {}", i,
-				redisTemplateForStoreQueueRedis.opsForSet().isMember("ticket:info:2025-04-22", String.valueOf(i)));
-			log.info("ticket:user:{} value: {}", i,
-				redisTemplateForStoreQueueRedis.opsForValue().get("ticket:user:" + i));
-		}
+    @Test
+    void businessValidationErrorSurvivesLockAspect() {
+        redisTemplateForStoreQueueRedis.opsForValue().set("queue:availability:" + STORE, false);
+        var error = assertThrows(GlobalException.class,
+            () -> service.joinQueue(new QueueJoinServiceDto(STORE, 1L, 1L)));
+        assertSame(ErrorCode.STORE_IS_NOT_ACTIVATED, error.getErrorCode());
+        assertFalse(redisTemplateForStoreQueueRedis.hasKey(queueKey));
+        assertFalse(redisTemplateForStoreQueueRedis.hasKey(queueKey + ":seq"));
+        assertMetrics(0);
+    }
 
-		reset(redisHelper);
-		when(redisHelper.validateStoreIsActive(1L)).thenReturn(true);
-		for (int i = 1; i <= 10; i++) {
-			when(redisHelper.validateTicket(any(), eq((long)i))).thenReturn((long)i);
-		}
-		doNothing().when(redisHelper).joinUserInQueue(eq(1L), anyLong(), anyLong());
-		for (int i = 0; i < 10; i++) {
-			final Long userId = (long)i + 1;
-			when(redisHelper.getUserQueuePosition(1L, userId)).thenReturn(i + 1);
-		}
+    private void assertSingleStoredUser() {
+        assertEquals(Set.of("1"), redisTemplateForStoreQueueRedis.opsForZSet().range(queueKey, 0, -1));
+        assertEquals(1, sequenceCounter());
+        assertEquals(1, redisHelper.getUserSequencePosition(STORE, 1L));
+        assertEquals(1, redisHelper.getUserQueuePosition(STORE, 1L));
+    }
 
-		reset(queueApplicationMapper);
-		for (int i = 0; i < 10; i++) {
-			final Long userId = (long)i + 1;
-			when(queueApplicationMapper.toQueueJoinResponseDto(1L, userId, i + 1))
-				.thenReturn(new QueueJoinResponseDto(1L, userId, i + 1));
-		}
-	}
+    private int sequenceCounter() {
+        return Integer.parseInt(redisTemplateForStoreQueueRedis.opsForValue().get(queueKey + ":seq").toString());
+    }
 
-	@Test
-	@DisplayName("동시에 여러 사용자가 같은 가게 대기열에 등록 요청을 할 경우, 번호를 순차적으로 발급한다.")
-	public void joinQueue_concurrentRequests_assignsSequentialQueueNumbers() throws InterruptedException {
-		// given
-		Long storeId = 1L;
-		int numberOfUsers = 10;
-		ExecutorService executor = Executors.newFixedThreadPool(numberOfUsers);
-		CountDownLatch latch = new CountDownLatch(numberOfUsers);
-		List<QueueJoinResponseDto> results = Collections.synchronizedList(new ArrayList<>());
+    private void assertTtl() {
+        for (String key : List.of(queueKey, queueKey + ":seq")) {
+            long ttl = redisTemplateForStoreQueueRedis.getExpire(key);
+            assertTrue(ttl > 0 && ttl <= 86400, key + " TTL=" + ttl);
+        }
+    }
 
-		// when
-		for (int i = 0; i < numberOfUsers; i++) {
-			final Long userId = (long)i + 1;
-			final Long ticketId = userId;
-			executor.submit(() -> {
-				try {
-					QueueJoinServiceDto dto = new QueueJoinServiceDto(storeId, ticketId, userId);
-					QueueJoinResponseDto response = service.joinQueue(dto);
-					results.add(response);
-					log.info("Added result for userId: {} with ticketId: {} and position: {}",
-						userId, ticketId, response.sequence());
-				} catch (Exception e) {
-					log.error("Error during queue join for userId: {}", userId, e);
-				} finally {
-					latch.countDown();
-				}
-			});
-		}
+    private void assertMetrics(int accepted) {
+        assertEquals(waitingBefore + accepted, meters.get("queue.waiting.users").gauge().value());
+        assertEquals(requestsBefore + accepted, meters.get("queue.request.count").counter().count());
+    }
 
-		boolean completed = latch.await(5, TimeUnit.SECONDS);
-		assertTrue(completed, "모든 task는 시간 내에 완료되어야 합니다.");
+    private record Outcome(long user, QueueJoinResponseDto response, Throwable error) { }
 
-		// then
-		log.info("Results size: {}", results.size());
-		assertEquals(numberOfUsers, results.size(), "결과 목록의 크기가 사용자 수와 일치해야 합니다");
+    private List<Outcome> concurrently(List<Long> users, boolean helperOnly) throws Exception {
+        var executor = Executors.newFixedThreadPool(users.size());
+        var ready = new CountDownLatch(users.size());
+        var start = new CountDownLatch(1);
+        var futures = new ArrayList<Future<Outcome>>();
+        try {
+            for (long user : users) {
+                futures.add(executor.submit(() -> {
+                    ready.countDown();
+                    if (!start.await(10, TimeUnit.SECONDS)) throw new TimeoutException("start barrier");
+                    try {
+                        if (helperOnly) {
+                            redisHelper.joinUserInQueue(STORE, user, user);
+                            return new Outcome(user, new QueueJoinResponseDto(STORE, user,
+                                redisHelper.getUserQueuePosition(STORE, user)), null);
+                        }
+                        return new Outcome(user, service.joinQueue(new QueueJoinServiceDto(STORE, user, user)), null);
+                    } catch (Exception error) {
+                        return new Outcome(user, null, error);
+                    }
+                }));
+            }
+            assertTrue(ready.await(10, TimeUnit.SECONDS), "all workers must reach the start barrier");
+            long started = System.nanoTime();
+            start.countDown();
+            var outcomes = new ArrayList<Outcome>();
+            for (var future : futures) outcomes.add(future.get(15, TimeUnit.SECONDS));
+            System.out.printf("QUEUE_BATCH helperOnly=%s distinctUsers=%d requests=%d elapsedMs=%.3f%n",
+                helperOnly, users.stream().distinct().count(), users.size(), (System.nanoTime() - started) / 1_000_000.0);
+            return outcomes;
+        } finally {
+            start.countDown();
+            executor.shutdownNow();
+            assertTrue(executor.awaitTermination(10, TimeUnit.SECONDS), "workers must terminate");
+        }
+    }
 
-		List<Integer> queueNumbers = results.stream()
-			.map(QueueJoinResponseDto::sequence)
-			.sorted()
-			.toList();
+    private boolean isDuplicate(Outcome outcome) {
+        return outcome.error() instanceof GlobalException error && error.getErrorCode() == ErrorCode.USER_ALREADY_IN_QUEUE;
+    }
 
-		log.info("Queue numbers: {}", queueNumbers);
+    private void assertCounts(List<Outcome> outcomes, int accepted, int rejected) {
+        assertEquals(REQUESTS, outcomes.size());
+        assertEquals(accepted, outcomes.stream().filter(o -> o.response() != null).count(), outcomes.toString());
+        assertEquals(rejected, outcomes.stream().filter(this::isDuplicate).count(), outcomes.toString());
+        assertEquals(0, outcomes.stream().filter(o -> o.error() != null && !isDuplicate(o)).count(), outcomes.toString());
+    }
 
-		for (int i = 0; i < numberOfUsers; i++) {
-			assertEquals(i + 1, queueNumbers.get(i), "큐 번호가 순차적이어야 합니다");
-		}
-
-		executor.shutdown();
-		assertTrue(executor.awaitTermination(1, TimeUnit.SECONDS), "Executor should terminate");
-	}
-
-	@Test
-	@DisplayName("단일 사용자가 여러 번 대기열 등록 요청을 할 경우, 한 번만 처리된다.")
-	public void joinQueue_singleUserMultipleRequests_processesOnlyOnce() throws InterruptedException {
-		// given
-		Long storeId = 1L;
-		Long userId = 1L;
-		Long ticketId = 1L;
-		int numberOfRequests = 10;
-		ExecutorService executor = Executors.newFixedThreadPool(numberOfRequests);
-		CountDownLatch latch = new CountDownLatch(numberOfRequests);
-		List<QueueJoinResponseDto> results = Collections.synchronizedList(new ArrayList<>());
-
-		doAnswer(invocation -> {
-			Long invokedUserId = invocation.getArgument(1);
-			String waitlistKey = "waitlist:1";
-			if (redisTemplateForStoreQueueRedis.opsForSet().isMember(waitlistKey, invokedUserId.toString())) {
-				log.info("User {} already in queue", invokedUserId);
-				throw new GlobalException(ErrorCode.USER_ALREADY_IN_QUEUE);
-			}
-			redisTemplateForStoreQueueRedis.opsForSet().add(waitlistKey, invokedUserId.toString());
-			redisTemplateForStoreQueueRedis.opsForValue().increment("waitlist:1:seq");
-			log.info("Processing joinUserInQueue for userId: {}", invokedUserId);
-			return null;
-		}).when(redisHelper).joinUserInQueue(eq(1L), eq(1L), eq(1L));
-
-		when(redisHelper.getUserQueuePosition(1L, 1L)).thenReturn(1);
-
-		when(queueApplicationMapper.toQueueJoinResponseDto(1L, 1L, 1))
-			.thenReturn(new QueueJoinResponseDto(1L, 1L, 1));
-
-		// when
-		for (int i = 0; i < numberOfRequests; i++) {
-			executor.submit(() -> {
-				try {
-					QueueJoinServiceDto dto = new QueueJoinServiceDto(storeId, ticketId, userId);
-					QueueJoinResponseDto response = service.joinQueue(dto);
-					synchronized (results) {
-						results.add(response);
-					}
-					log.info("Added result for userId: {} with ticketId: {} and position: {}",
-						userId, ticketId, response.sequence());
-				} catch (GlobalException e) {
-					if (e.getErrorCode() == ErrorCode.USER_ALREADY_IN_QUEUE) {
-						log.info("Ignored duplicate request for userId: {} due to USER_ALREADY_IN_QUEUE", userId);
-					} else {
-						log.error("Error during queue join for userId: {}", userId, e);
-					}
-				} catch (Exception e) {
-					log.error("Unexpected error during queue join for userId: {}", userId, e);
-				} finally {
-					latch.countDown();
-				}
-			});
-		}
-
-		boolean completed = latch.await(5, TimeUnit.SECONDS);
-		assertTrue(completed, "All tasks should complete within the timeout period");
-
-		// then
-		log.info("Results size: {}", results.size());
-		assertEquals(1, results.size(), "단일 사용자의 요청은 한 번만 처리되어야 합니다");
-
-		QueueJoinResponseDto result = results.get(0);
-		assertEquals(1L, result.userId(), "userId는 1이어야 합니다");
-		assertEquals(1, result.sequence(), "대기열 위치는 1이어야 합니다");
-
-		Long waitlistSize = redisTemplateForStoreQueueRedis.opsForSet().size("waitlist:1");
-		assertEquals(1L, waitlistSize, "waitlist:1에 단일 사용자만 존재해야 합니다");
-
-		executor.shutdown();
-		assertTrue(executor.awaitTermination(1, TimeUnit.SECONDS), "Executor should terminate");
-	}
+    private void report(String scenario, List<Outcome> outcomes) {
+        long accepted = outcomes.stream().filter(o -> o.response() != null).count();
+        long rejected = outcomes.stream().filter(this::isDuplicate).count();
+        System.out.printf("QUEUE_RESULT scenario=%s accepted=%d rejected=%d failed=%d size=%d counter=%d members=%s%n",
+            scenario, accepted, rejected, outcomes.size() - accepted - rejected,
+            redisHelper.getTotalQueueSize(queueKey), sequenceCounter(),
+            redisTemplateForStoreQueueRedis.opsForZSet().rangeWithScores(queueKey, 0, -1));
+    }
 }

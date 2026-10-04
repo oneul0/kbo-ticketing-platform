@@ -1,0 +1,200 @@
+{
+  "baseline": {
+    "suite": {
+      "tests": "63",
+      "failures": "42",
+      "errors": "0",
+      "skipped": "0",
+      "timestamp": "2026-10-04T05:30:51.202Z",
+      "time": "2.953"
+    },
+    "outcomes": [
+      {
+        "scenario": "distinct-service",
+        "accepted": "10",
+        "rejected": "0",
+        "failed": "0",
+        "size": "10",
+        "counter": "10",
+        "repetitions": 20
+      },
+      {
+        "scenario": "duplicate-helper",
+        "accepted": "10",
+        "rejected": "0",
+        "failed": "0",
+        "size": "1",
+        "counter": "10",
+        "repetitions": 20
+      },
+      {
+        "scenario": "duplicate-service",
+        "accepted": "10",
+        "rejected": "0",
+        "failed": "0",
+        "size": "1",
+        "counter": "10",
+        "repetitions": 20
+      }
+    ],
+    "batch_ms": {}
+  },
+  "fixed-run-1": {
+    "suite": {
+      "tests": "63",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "timestamp": "2026-10-04T05:32:18.233Z",
+      "time": "1.435"
+    },
+    "outcomes": [
+      {
+        "scenario": "distinct-service",
+        "accepted": "10",
+        "rejected": "0",
+        "failed": "0",
+        "size": "10",
+        "counter": "10",
+        "repetitions": 20
+      },
+      {
+        "scenario": "duplicate-helper",
+        "accepted": "1",
+        "rejected": "9",
+        "failed": "0",
+        "size": "1",
+        "counter": "1",
+        "repetitions": 20
+      },
+      {
+        "scenario": "duplicate-service",
+        "accepted": "1",
+        "rejected": "9",
+        "failed": "0",
+        "size": "1",
+        "counter": "1",
+        "repetitions": 20
+      }
+    ],
+    "batch_ms": {}
+  },
+  "fixed-run-2": {
+    "suite": {
+      "tests": "63",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "timestamp": "2026-10-04T05:33:22.010Z",
+      "time": "1.354"
+    },
+    "outcomes": [
+      {
+        "scenario": "distinct-service",
+        "accepted": "10",
+        "rejected": "0",
+        "failed": "0",
+        "size": "10",
+        "counter": "10",
+        "repetitions": 20
+      },
+      {
+        "scenario": "duplicate-helper",
+        "accepted": "1",
+        "rejected": "9",
+        "failed": "0",
+        "size": "1",
+        "counter": "1",
+        "repetitions": 20
+      },
+      {
+        "scenario": "duplicate-service",
+        "accepted": "1",
+        "rejected": "9",
+        "failed": "0",
+        "size": "1",
+        "counter": "1",
+        "repetitions": 20
+      }
+    ],
+    "batch_ms": {
+      "helperOnly=false,distinctUsers=1,requests=10": {
+        "samples": 20,
+        "min": 13.03,
+        "median": 14.233,
+        "max": 15.762
+      },
+      "helperOnly=false,distinctUsers=10,requests=10": {
+        "samples": 20,
+        "min": 16.12,
+        "median": 18.9105,
+        "max": 105.268
+      },
+      "helperOnly=true,distinctUsers=1,requests=10": {
+        "samples": 20,
+        "min": 0.611,
+        "median": 0.725,
+        "max": 1.221
+      }
+    }
+  },
+  "fixed-run-3": {
+    "suite": {
+      "tests": "63",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "timestamp": "2026-10-04T05:34:34.902Z",
+      "time": "1.494"
+    },
+    "outcomes": [
+      {
+        "scenario": "distinct-service",
+        "accepted": "10",
+        "rejected": "0",
+        "failed": "0",
+        "size": "10",
+        "counter": "10",
+        "repetitions": 20
+      },
+      {
+        "scenario": "duplicate-helper",
+        "accepted": "1",
+        "rejected": "9",
+        "failed": "0",
+        "size": "1",
+        "counter": "1",
+        "repetitions": 20
+      },
+      {
+        "scenario": "duplicate-service",
+        "accepted": "1",
+        "rejected": "9",
+        "failed": "0",
+        "size": "1",
+        "counter": "1",
+        "repetitions": 20
+      }
+    ],
+    "batch_ms": {
+      "helperOnly=false,distinctUsers=1,requests=10": {
+        "samples": 20,
+        "min": 12.428,
+        "median": 15.7135,
+        "max": 22.717
+      },
+      "helperOnly=false,distinctUsers=10,requests=10": {
+        "samples": 20,
+        "min": 17.389,
+        "median": 19.896,
+        "max": 114.339
+      },
+      "helperOnly=true,distinctUsers=1,requests=10": {
+        "samples": 20,
+        "min": 0.628,
+        "median": 0.7275,
+        "max": 1.545
+      }
+    }
+  }
+}

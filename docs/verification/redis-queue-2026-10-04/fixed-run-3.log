@@ -1,0 +1,24 @@
+Picked up JAVA_TOOL_OPTIONS: -Dapi.version=1.44
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build
+
+> Task :compileJava
+Note: /workspace/kbo-ticketing-platform/queue-service/src/main/java/com/boeingmerryho/business/queueservice/infrastructure/QueueRedisHelperImpl.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :processResources
+> Task :classes
+> Task :compileTestJava
+> Task :processTestResources NO-SOURCE
+> Task :testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :test
+Picked up JAVA_TOOL_OPTIONS: -Dapi.version=1.44
+
+14:34:36.603 [SpringContextShutdownHook] INFO org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory -- Shutting down embedded database: url='jdbc:h2:mem:2161bd23-9065-4b93-a5d5-47980c11cf00;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false'
+
+[Incubating] Problems report is available at: file:///workspace/kbo-ticketing-platform/queue-service/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 11s
+4 actionable tasks: 4 executed

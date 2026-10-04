@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 
 import com.boeingmerryho.business.queueservice.application.QueueRedisHelper;
@@ -31,6 +32,22 @@ public class QueueRedisHelperImpl implements QueueRedisHelper {
 	private static final String TICKET_USER_INFO_PREFIX = "ticket:user:";
 
 	private static final Long WAITLIST_INFO_EXPIRE_DAY = 1L;
+
+	// Check membership before allocating a sequence. A retry must not move an existing user
+	// or extend the queue lifetime. Redis executes the whole script without interleaving.
+	private static final DefaultRedisScript<Long> JOIN_QUEUE_SCRIPT = new DefaultRedisScript<>("""
+		if redis.call('ZSCORE', KEYS[1], ARGV[1]) then
+		    return 0
+		end
+		local sequence = redis.call('INCR', KEYS[2])
+		redis.call('ZADD', KEYS[1], sequence, ARGV[1])
+		for _, key in ipairs(KEYS) do
+		    if redis.call('TTL', key) == -1 then
+		        redis.call('EXPIRE', key, ARGV[2])
+		    end
+		end
+		return sequence
+		""", Long.class);
 
 	private final RedisTemplate<String, Object> redisTemplateForStoreQueueRedis;
 
@@ -93,16 +110,18 @@ public class QueueRedisHelperImpl implements QueueRedisHelper {
 		String seqKey = redisKey + ":seq";
 
 		try {
-			Long order = redisTemplateForStoreQueueRedis.opsForValue().increment(seqKey);
-
-			redisTemplateForStoreQueueRedis.opsForZSet()
-				.add(redisKey, userId.toString(), Objects.requireNonNull(order).doubleValue());
+			// Use the template's production value serializer for the member, as ZADD did.
+			Long order = redisTemplateForStoreQueueRedis.execute(JOIN_QUEUE_SCRIPT,
+				List.of(redisKey, seqKey), userId.toString(), Duration.ofDays(WAITLIST_INFO_EXPIRE_DAY).toSeconds());
+			if (order == null) {
+				throw new GlobalException(ErrorCode.QUEUE_JOIN_FAIL);
+			}
+			if (order == 0L) {
+				throw new GlobalException(ErrorCode.USER_ALREADY_IN_QUEUE);
+			}
 		} catch (RedisConnectionFailureException e) {
 			throw new GlobalException(ErrorCode.QUEUE_JOIN_FAIL);
 		}
-
-		setExpireIfAbsent(redisKey, Duration.ofDays(WAITLIST_INFO_EXPIRE_DAY));
-		setExpireIfAbsent(seqKey, Duration.ofDays(WAITLIST_INFO_EXPIRE_DAY));
 	}
 
 	@Override
@@ -137,13 +156,6 @@ public class QueueRedisHelperImpl implements QueueRedisHelper {
 		Long removedCount = redisTemplateForStoreQueueRedis.opsForZSet().remove(redisKey, userId.toString());
 
 		return removedCount != null && removedCount > 0;
-	}
-
-	private void setExpireIfAbsent(String key, Duration ttl) {
-		Long expire = redisTemplateForStoreQueueRedis.getExpire(key);
-		if (expire == null || expire == -1) {
-			redisTemplateForStoreQueueRedis.expire(key, ttl);
-		}
 	}
 
 	@Override

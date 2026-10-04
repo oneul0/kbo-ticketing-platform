@@ -1,0 +1,160 @@
+Picked up JAVA_TOOL_OPTIONS: -Dapi.version=1.44
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources NO-SOURCE
+> Task :testClasses UP-TO-DATE
+
+> Task :test
+Picked up JAVA_TOOL_OPTIONS: -Dapi.version=1.44
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :test
+
+QueueServiceConcurrencyTest > businessValidationErrorSurvivesLockAspect() FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:197
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 1 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 2 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 3 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 4 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 5 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 6 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 7 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 8 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 9 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 10 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 11 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 12 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 13 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 14 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 15 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 16 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 17 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 18 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 19 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > sameUserIsAcceptedOnceAndOtherRequestsAreExplicitlyRejected() > repetition 20 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > duplicatePreservesOriginalScoreRankCounterAndTtl() FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:165
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 1 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 2 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 3 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 4 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 5 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 6 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 7 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 8 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 9 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 10 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 11 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 12 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 13 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 14 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 15 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 16 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 17 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 18 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 19 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+QueueServiceConcurrencyTest > helperRejectsDuplicatesAtomicallyWithoutServiceLock() > repetition 20 of 20 FAILED
+    org.opentest4j.AssertionFailedError at QueueServiceConcurrencyTest.java:268
+
+14:30:54.369 [SpringContextShutdownHook] INFO org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory -- Shutting down embedded database: url='jdbc:h2:mem:bfb6e3dd-43be-4df4-953d-9546cbd13599;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false'
+
+> Task :test FAILED
+
+63 tests completed, 42 failed
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///workspace/kbo-ticketing-platform/queue-service/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+BUILD FAILED in 28s
+4 actionable tasks: 1 executed, 3 up-to-date
